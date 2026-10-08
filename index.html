@@ -1561,6 +1561,24 @@ input:checked + .slider:before { transform: translateX(22px); }
   background: #ededed;
 }
 /* 功能结束：全屏覆盖层 */
+
+/* 功能开始：聊天信息页 */
+.chat-info-item {
+  background: #fff;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  font-size: 16px;
+  color: #333;
+}
+.chat-info-item:last-child { border-bottom: none; }
+.chat-info-item:active { background-color: #f5f5f5; }
+.chat-info-arrow { color: #ccc; font-size: 20px; font-weight: 300; line-height: 1; }
+.chat-info-section-gap { height: 10px; background: #ededed; }
+/* 功能结束：聊天信息页 */
 </style>
 </head>
 <body>
@@ -1995,15 +2013,16 @@ input:checked + .slider:before { transform: translateX(22px); }
       </div>
       <span style="color: #ccc; font-size: 20px;">›</span>
     </div>
-    <div style="background: #fff; margin-bottom: 10px;">
-      <div class="me-list-item" data-name="服务" style="padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
-        <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
-          <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #07c160;"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M10,17l-5,-5l1.41,-1.41L10,14.17l7.59,-7.59L19,8L10,17z"/></svg>
-        </div>
-        <span style="font-size: 16px; color: #333; flex-grow: 1;">服务</span>
-        <span style="color: #ccc; font-size: 18px;">›</span>
-      </div>
+    
+<div style="background: #fff; margin-bottom: 10px;">
+  <div class="me-list-item" data-name="服务" style="padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer;">
+    <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+      <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #07c160;"><path d="M12,2A10,10 0 1,0 22,12A10,10 0 0,0 12,2M10,17l-5,-5l1.41,-1.41L10,14.17l7.59,-7.59L19,8L10,17z"/></svg>
     </div>
+    <span style="font-size: 16px; color: #333; flex-grow: 1;">服务</span>
+    <span style="color: #ccc; font-size: 18px;">›</span>
+  </div>
+</div>
     <div style="background: #fff; margin-bottom: 10px;">
       <div class="me-list-item" data-name="收藏" style="padding: 15px 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid #f0f0f0;">
         <div style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
@@ -2052,6 +2071,68 @@ input:checked + .slider:before { transform: translateX(22px); }
   </div>
 </div>
 <!-- 功能结束：我 -->
+
+<!-- 功能开始：个人资料（用户自己的） -->
+<div id="my-profile-info-screen" class="screen" style="background: #f7f7f7;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
+    <button class="back-btn" data-target="me-screen">‹</button>
+    <div class="title-container"><h1 class="title" style="color:#000; font-weight: 600; font-size: 17px;">个人资料</h1></div>
+    <div class="placeholder"></div>
+  </header>
+<main class="content" style="padding: 0; overflow-y: auto;">
+  <div style="background: #fff; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">头像</span>
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <img id="profile-info-avatar" src="" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; cursor: pointer; background:#eee;">
+      <span style="color: #ccc; font-size: 18px;">›</span>
+    </div>
+    <input type="file" id="profile-info-avatar-upload" accept="image/*" style="display: none;">
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">名字</span>
+    <input id="profile-info-name" type="text" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="填写名字">
+  </div>
+  <div id="profile-info-gender-row" style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
+    <span style="font-size: 16px; color: #333;">性别</span>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <span id="profile-info-gender" style="font-size: 16px; color: #888;">未设置</span>
+      <span style="color: #ccc; font-size: 18px;">›</span>
+    </div>
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">地区</span>
+    <input id="profile-info-region" type="text" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="填写地区">
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">手机号</span>
+    <input id="profile-info-phone" type="tel" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="填写手机号">
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">微信号</span>
+    <input id="profile-info-wxid" type="text" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="填写微信号">
+  </div>
+  <div id="profile-info-role-row" style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
+    <span style="font-size: 16px; color: #333;">个人资料</span>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <span id="profile-info-role-name" style="font-size: 14px; color: #888;"></span>
+      <span style="color: #ccc; font-size: 18px;">›</span>
+    </div>
+  </div>
+  <div id="profile-info-qrcode-row" style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
+    <span style="font-size: 16px; color: #333;">我的二维码</span>
+    <svg viewBox="0 0 24 24" style="width: 22px; height: 22px; fill: #888;"><path d="M3,3H11V11H3V3M5,5V9H9V5H5M13,3H21V11H13V3M15,5V9H19V5H15M3,13H11V21H3V13M5,15V19H9V15H5M13,13H15V15H13V13M17,13H19V15H17V13M15,15H17V17H15V15M19,15H21V17H19V15M13,17H15V19H13V17M17,17H19V19H17V17M19,19H21V21H19V19M15,19H17V21H15V19Z"/></svg>
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">拍一拍</span>
+    <input id="profile-info-pat" type="text" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="如：的额头">
+  </div>
+  <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f0f0f0;">
+    <span style="font-size: 16px; color: #333;">签名</span>
+    <input id="profile-info-signature" type="text" style="border: none; outline: none; text-align: right; font-size: 16px; color: #888; background: transparent; max-width: 65%;" placeholder="填写个性签名">
+  </div>
+</main>
+</div>
+<!-- 功能结束：个人资料（用户自己的） -->
 
 <!-- 功能开始：我的朋友圈（列表页，只能看自己的） -->
 <div id="my-moments-screen" class="screen" style="background: #ededed;">
@@ -2977,6 +3058,39 @@ input:checked + .slider:before { transform: translateX(22px); }
   </div>
 </div>
 
+<!-- 新增：我的虚拟形象修改资料弹窗 -->
+<div id="my-profile-edit-modal" class="modal-overlay">
+  <div class="modal-window" style="max-width: 340px; padding: 20px;">
+    <h3 style="margin-bottom: 15px; text-align: center; color: var(--primary-color);">修改资料</h3>
+    <form id="my-profile-edit-form">
+      <div style="display: flex; justify-content: center; margin-bottom: 20px;">
+        <img src="https://i.postimg.cc/GtbTnxhP/o-o-1.jpg" id="my-profile-edit-avatar-preview" style="width: 80px; height: 80px; border-radius: 50%; cursor: pointer; border: 2px solid var(--primary-color); object-fit: cover;">
+        <input type="file" id="my-profile-edit-avatar-upload" accept="image/*" style="display:none;">
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label for="my-profile-edit-name" style="margin-bottom: 5px;">角色姓名</label>
+        <input type="text" id="my-profile-edit-name" placeholder="你的角色真名" required style="padding: 10px;">
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <label for="my-profile-edit-remark" style="margin-bottom: 5px;">角色备注 (昵称)</label>
+        <input type="text" id="my-profile-edit-remark" placeholder="你希望AI怎么称呼你" required style="padding: 10px;">
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+          <label for="my-profile-edit-persona" style="margin-bottom: 0;">角色人设</label>
+          <input type="file" id="my-profile-edit-persona-file" accept=".txt,.docx" style="display:none;">
+          <label for="my-profile-edit-persona-file" class="btn-small-upload">导入文件</label>
+        </div>
+        <textarea id="my-profile-edit-persona" rows="4" placeholder="描述你希望在对话中扮演的形象。" style="padding: 10px;"></textarea>
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
+        <button type="button" class="btn btn-secondary" id="my-profile-edit-link-wb-btn" style="width:100%; padding: 10px; font-size: 14px;">绑定局部世界书 <span id="my-profile-edit-wb-count" style="color:#888; font-size: 12px; margin-left:5px;">(未绑定)</span></button>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top: 10px; padding: 12px;">保存修改</button>
+    </form>
+  </div>
+</div>
+
 <div id="add-sticker-modal" class="modal-overlay">
   <div class="modal-window">
     <h3 id="add-sticker-modal-title">添加新表情</h3>
@@ -3220,22 +3334,166 @@ input:checked + .slider:before { transform: translateX(22px); }
 <!-- 功能结束：心声 -->
 <!-- 功能结束：所有弹窗 -->
 
+<!-- 功能开始：聊天信息页（私聊全屏） -->
+<div id="chat-info-screen" class="screen" style="background: #ededed;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
+    <button class="back-btn" id="chat-info-back-btn" style="color: #000;">‹</button>
+    <div class="title-container"><h1 class="title" style="color:#000; font-weight:600; font-size:17px;">聊天信息</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding: 0; overflow-y: auto;">
+    <div style="background: #fff; padding: 20px; display: flex; gap: 15px; align-items: flex-start;">
+      <div id="chat-info-avatar-wrap" style="display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+        <img id="chat-info-avatar" src="" style="width: 55px; height: 55px; border-radius: 6px; object-fit: cover; background:#eee;">
+        <span id="chat-info-avatar-name" style="font-size: 12px; color: #888; margin-top: 6px; max-width: 70px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="width: 55px; height: 55px; border: 1px dashed #ddd; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #ddd; font-size: 26px; font-weight: 200; user-select: none;">+</div>
+      </div>
+    </div>
+    <div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item" id="chat-info-search-btn">
+      <span>查找聊天记录</span>
+      <span class="chat-info-arrow">›</span>
+    </div>
+    <div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item">
+      <span>消息免打扰</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-mute-toggle"><span class="slider round"></span></label>
+    </div>
+    <div class="chat-info-item">
+      <span>置顶聊天</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-pin-toggle"><span class="slider round"></span></label>
+    </div>
+    
+<div class="chat-info-item" id="chat-info-bubble-btn">
+  <span>气泡</span>
+  <div style="display:flex; align-items:center; gap:5px;">
+    <span id="chat-info-bubble-status" style="font-size:13px; color:#888;"></span>
+    <span class="chat-info-arrow">›</span>
+  </div>
+</div>
+<div class="chat-info-item" id="chat-info-memory-btn">
+  <span>记忆</span>
+  <div style="display:flex; align-items:center; gap:5px;">
+    <span id="chat-info-memory-status" style="font-size:13px; color:#888;"></span>
+    <span class="chat-info-arrow">›</span>
+  </div>
+</div>
+<div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item" id="chat-info-bg-btn">
+      <span>设置当前聊天背景</span>
+      <span class="chat-info-arrow">›</span>
+    </div>
+    <div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item" id="chat-info-clear-btn">
+      <span>清空聊天记录</span>
+      <span class="chat-info-arrow">›</span>
+    </div>
+    <div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item" id="chat-info-pat-btn">
+      <span>拍一拍</span>
+      <div style="display:flex; align-items:center; gap:5px;">
+        <span id="chat-info-pat-preview" style="font-size:13px; color:#888;"></span>
+        <span class="chat-info-arrow">›</span>
+      </div>
+    </div>
+    <div class="chat-info-section-gap"></div>
+
+    <div class="chat-info-item" id="chat-info-report-btn">
+      <span>投诉</span>
+      <span class="chat-info-arrow">›</span>
+    </div>
+    <div class="chat-info-section-gap"></div>
+  </main>
+</div>
+
+<!-- 子页：气泡 -->
+<div id="chat-info-bubble-screen" class="screen" style="background: #ededed;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
+    <button class="back-btn" id="chat-info-bubble-back" style="color: #000;">‹</button>
+    <div class="title-container"><h1 class="title" style="color:#000; font-weight:600; font-size:17px;">气泡</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding: 20px; overflow-y: auto; background: #fff;">
+    <div class="form-group">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <label for="chat-info-custom-css" style="margin-bottom:0;">自定义气泡样式</label>
+        <input type="checkbox" id="chat-info-use-custom-css" style="width: auto;">
+      </div>
+      <div id="chat-info-bubble-preview" class="bubble-css-preview" style="background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;"></div>
+      <textarea id="chat-info-custom-css" rows="8" placeholder="在此输入CSS代码...&#10;例如：&#10;.message-bubble.sent { background-color: #A5D6A7; }&#10;.message-bubble.received { background-color: #E1E1E1; }" disabled></textarea>
+      <button type="button" class="btn btn-neutral" id="chat-info-reset-css" style="margin-top: 10px; width: auto; padding: 5px 15px; font-size: 14px;">恢复默认</button>
+    </div>
+    <button type="button" class="btn btn-primary" id="chat-info-save-css" style="margin-top: 15px;">保存</button>
+  </main>
+</div>
+
+<!-- 子页：记忆轮数 -->
+<div id="chat-info-memory-screen" class="screen" style="background: #ededed;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
+    <button class="back-btn" id="chat-info-memory-back" style="color: #000;">‹</button>
+    <div class="title-container"><h1 class="title" style="color:#000; font-weight:600; font-size:17px;">记忆轮数</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding: 20px; overflow-y: auto;">
+    <div class="form-group">
+      <label for="chat-info-memory-input">最大记忆轮数</label>
+      <input type="number" id="chat-info-memory-input" min="1" value="10">
+      <p style="font-size:12px; color:#888; margin-top: 8px;">AI 会记住最近多少轮对话作为上下文。数值越大，记忆越长。</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="chat-info-memory-save">保存</button>
+  </main>
+</div>
+
+<!-- 子页：拍一拍 -->
+<div id="chat-info-pat-screen" class="screen" style="background: #ededed;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
+    <button class="back-btn" id="chat-info-pat-back" style="color: #000;">‹</button>
+    <div class="title-container"><h1 class="title" style="color:#000; font-weight:600; font-size:17px;">拍一拍</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding: 20px; overflow-y: auto;">
+    <div class="form-group">
+      <label for="chat-info-pat-input">我的拍一拍后缀</label>
+      <input type="text" id="chat-info-pat-input" placeholder="如：的肩膀说小机灵鬼">
+      <p style="font-size:12px; color:#888; margin-top: 8px;">AI 拍你时，会显示“拍了拍 ${后缀}”。同步自个人资料里的“拍一拍”。</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="chat-info-pat-save">保存</button>
+  </main>
+</div>
+
+<!-- 子页：搜索聊天记录 -->
+<div id="chat-info-search-screen" class="screen" style="background: #ededed;">
+  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 10px 15px;">
+    <button class="back-btn" id="chat-info-search-back" style="color: #000; width: auto;">‹</button>
+    <div style="flex-grow:1; background:#fff; border-radius:6px; display:flex; align-items:center; padding:6px 12px; margin: 0 10px;">
+      <input type="text" id="chat-info-search-input" placeholder="搜索聊天记录" style="border: none; outline: none; font-size: 15px; width: 100%;" autocomplete="off">
+    </div>
+    <div style="width: 30px;"></div>
+  </header>
+  <main class="content" style="padding: 0; background: #fff; overflow-y: auto;">
+    <ul id="chat-info-search-list" class="list-container" style="padding: 0;"></ul>
+  </main>
+</div>
+<!-- 功能结束：聊天信息页 -->
+
 <!-- 功能开始：聊天设置侧边栏 -->
 <div id="chat-settings-sidebar" class="settings-sidebar">
   <div class="header">聊天设置</div>
   <div class="content">
     <form id="chat-settings-form">
-      <div class="avatar-setting">
-        <img src="" alt="我的头像" id="setting-my-avatar-preview" class="avatar-preview">
-        <input type="file" id="setting-my-avatar-upload" accept="image/*" style="display:none;">
-        <label for="setting-my-avatar-upload" class="btn btn-secondary" style="flex-grow:1;">更换我的头像</label>
-      </div>
-      <div class="form-group"><label for="setting-my-name">我的姓名</label><input type="text" id="setting-my-name"></div>
-      <div class="form-group"><label for="setting-my-persona">我的人设</label><textarea id="setting-my-persona" placeholder="描述你希望在对话中扮演的形象。"></textarea></div>
-      <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-      <div class="form-group">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-          <label for="setting-use-custom-css" style="margin-bottom:0;">自定义气泡样式</label>
+      
+<div class="form-group"><label for="setting-my-name">我的姓名</label><input type="text" id="setting-my-name"></div>
+<hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+<div class="form-group">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+    <label for="setting-use-custom-css" style="margin-bottom:0;">自定义气泡样式</label>
           <input type="checkbox" id="setting-use-custom-css" style="width: auto;">
         </div>
         <div id="private-bubble-css-preview" class="bubble-css-preview" style="background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;"></div>
@@ -3265,14 +3523,9 @@ input:checked + .slider:before { transform: translateX(22px); }
       </div>
       <div class="form-group"><label for="setting-group-name">群名 (AI也可见)</label><input type="text" id="setting-group-name"></div>
       <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-      <div class="avatar-setting">
-        <img src="" alt="我的头像" id="setting-group-my-avatar-preview" class="avatar-preview">
-        <input type="file" id="setting-group-my-avatar-upload" accept="image/*" style="display:none;">
-        <label for="setting-group-my-avatar-upload" class="btn btn-secondary" style="flex-grow:1;">更换我的头像</label>
-      </div>
-      <div class="form-group"><label for="setting-group-my-nickname">我的群昵称</label><input type="text" id="setting-group-my-nickname"></div>
-      <div class="form-group"><label for="setting-group-my-persona">我的人设</label><textarea id="setting-group-my-persona" placeholder="描述你希望在此群聊中扮演的形象。"></textarea></div>
-      <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
+      
+<div class="form-group"><label for="setting-group-my-nickname">我的群昵称</label><input type="text" id="setting-group-my-nickname"></div>
+<hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
       <div class="form-group"><label>群成员</label><div class="group-members-list" id="group-members-list-container"></div></div>
       
 <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
@@ -3350,13 +3603,13 @@ async function compressImage(file, options = {}) {
 /* ========== 功能开始：动态注入 HTML（API/壁纸/字体/音效/自定义/教程） ========== */
 document.getElementById('api-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">API 设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="api-form"><div class="form-group"><label for="api-provider">API 服务商</label><select id="api-provider" name="provider"><option value="newapi">NewAPI (自定义)</option><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option></select></div><div class="form-group"><label for="api-url">API 地址（后缀不用添加/v1）</label><input type="url" id="api-url" name="url" placeholder="选择服务商可自动填写" required></div><div class="form-group"><label for="api-key">密钥 (Key)</label><input type="password" id="api-key" name="key" placeholder="请输入你的API密钥" required></div><button type="button" class="btn btn-secondary" id="fetch-models-btn"><span class="btn-text">点击拉取模型</span><div class="spinner"></div></button><div class="form-group"><label for="api-model">选择模型</label><select id="api-model" name="model" required><option value="">请先拉取模型列表</option></select></div><button type="submit" class="btn btn-primary" id="save-btn"><span class="btn-text">保 存</span><div class="spinner"></div></button></form></main>`;
 
-document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
+document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
 
-document.getElementById('font-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">字体设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="font-settings-form"><div class="form-group"><label for="font-url">字体链接 (ttf, woff, woff2)</label><input type="url" id="font-url" placeholder="https://.../font.ttf" required></div><p style="font-size:12px; color:#888; text-align:center;">示例: https://lf3-static.bytednsdoc.com/obj/eden-cn/jplptk/ljhwZthlaukjlkulzlp/portal/fonts/HarmonyOS_Sans_SC_Regular.woff2</p><button type="submit" class="btn btn-primary">应用字体</button><button type="button" class="btn btn-neutral" id="restore-default-font-btn" style="margin-top: 15px;">恢复默认字体</button></form></main>`;
+document.getElementById('font-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">字体设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="font-settings-form"><div class="form-group"><label for="font-url">字体链接 (ttf, woff, woff2)</label><input type="url" id="font-url" placeholder="https://.../font.ttf" required></div><p style="font-size:12px; color:#888; text-align:center;">示例: https://lf3-static.bytednsdoc.com/obj/eden-cn/jplptk/ljhwZthlaukjlkulzlp/portal/fonts/HarmonyOS_Sans_SC_Regular.woff2</p><button type="submit" class="btn btn-primary">应用字体</button><button type="button" class="btn btn-neutral" id="restore-default-font-btn" style="margin-top: 15px;">恢复默认字体</button></form></main>`;
 
 document.getElementById('sound-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">音效设置</h1></div><div class="placeholder"></div></header><main class="content" style="background: #f7f7f7; padding-bottom: 80px;"><form id="sound-settings-form"><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">短信铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-sms-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">所有新消息的默认提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-sms-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-sms-btn">试听</button><button type="button" class="btn-small-upload" id="reset-sms-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">特别关心</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-special-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">置顶聊天的AI回复提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-special-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-special-btn">试听</button><button type="button" class="btn-small-upload" id="reset-special-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); opacity: 0.6;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">来电铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" disabled><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">(功能暂未开放)</div><input type="text" placeholder="暂未开放" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" disabled></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); opacity: 0.6;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">视频铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" disabled><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">(功能暂未开放)</div><input type="text" placeholder="暂未开放" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" disabled></div><div style="padding: 20px 0;"><button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">保存设置</button></div></form></main>`;
 
-document.getElementById('customize-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">主屏幕自定义</h1></div><div class="placeholder"></div></header><main class="content"><form id="customize-form"></form></main>`;
+document.getElementById('customize-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">主屏幕自定义</h1></div><div class="placeholder"></div></header><main class="content"><form id="customize-form"></form></main>`;
 
 document.getElementById('tutorial-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">教程</h1></div><div class="placeholder"></div></header><main class="content" id="tutorial-content-area"></main>`;
 /* ========== 功能结束：动态注入 HTML ========== */
@@ -3868,6 +4121,10 @@ if (!db.myProfile) {
   if (!db.myProfile.avatar) db.myProfile.avatar = 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
   if (!db.myProfile.nickname) db.myProfile.nickname = '我';
   if (!db.myProfile.signature) db.myProfile.signature = '这个人很懒，什么都没有留下';
+  if (!db.myProfile.roleName) db.myProfile.roleName = '';
+  if (!db.myProfile.remark) db.myProfile.remark = '';
+  if (!db.myProfile.persona) db.myProfile.persona = '';
+  if (!db.myProfile.worldBookIds) db.myProfile.worldBookIds = [];
 }
   if (db.statusBarEnabled === undefined) db.statusBarEnabled = false;
   if (db.safeAreaEnabled === undefined) db.safeAreaEnabled = true;
@@ -3889,8 +4146,10 @@ if (!db.myProfile) {
     if (c.address === undefined) c.address = '';
     if (c.signature === undefined || c.signature === '') c.signature = '这个人很懒，什么都没有留下';
     if (c.addTime === undefined) c.addTime = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-    if (c.isStarred === undefined) c.isStarred = false;
-    if (c.isBlacklisted === undefined) c.isBlacklisted = false;
+    
+if (c.isStarred === undefined) c.isStarred = false;
+if (c.isBlacklisted === undefined) c.isBlacklisted = false;
+if (c.isMuted === undefined) c.isMuted = false;
   
   if (c.aiBlockedUser === undefined) c.aiBlockedUser = false;
   if (c.aiBlockRounds === undefined) c.aiBlockRounds = 0;
@@ -3911,9 +4170,14 @@ if (!db.myProfile) {
     if (wb.enabled === undefined) wb.enabled = true;
     if (wb.group === undefined) wb.group = '';
   });
+
+  // 统一同步“我的头像”，保证个人资料里改完，所有聊天/群聊都跟着变
+  if (db.myProfile && db.myProfile.avatar) {
+    db.characters.forEach(c => { c.myAvatar = db.myProfile.avatar; });
+    db.groups.forEach(g => { if (g.me) g.me.avatar = db.myProfile.avatar; });
+  }
 };
 /* ========== 功能结束：数据保存与加载 ========== */
-
 /* ========== 功能开始：Toast / 界面切换 ========== */
 window.showToast = (message) => {
   toastElement.textContent = message;
@@ -4111,6 +4375,8 @@ document.body.addEventListener('click', (e) => {
   safely('时钟', () => { updateClock(); setInterval(updateClock, 30000); });
   safely('全局字体', () => applyGlobalFont(db.fontUrl));
   safely('我的页面', setupMeScreen);
+safely('个人资料页', setupMyProfileInfoScreen);
+safely('我的虚拟形象弹窗', setupMyProfileEditModal);
   safely('新的朋友搜索按钮', () => {
     const nfSearchBtn = document.getElementById('new-friends-search-btn');
     if (nfSearchBtn) nfSearchBtn.addEventListener('click', () => openSearchScreen());
@@ -4858,8 +5124,10 @@ function renderChatList() {
     const avatarClass = chat.type === 'group' ? 'group-avatar' : '';
     const itemName = chat.type === 'private' ? chat.remarkName : chat.name;
     const pinBadgeHTML = chat.isPinned ? '<span class="pin-badge">置顶</span>' : '';
-    const unreadCount = chat.unreadCount || (chat.unread ? 1 : 0);
-    const unreadDotHTML = unreadCount > 0 ? `<span class="unread-badge">${unreadCount > 99 ? '99+' : unreadCount}</span>` : '';
+    
+const isMutedPrivate = chat.type === 'private' && chat.isMuted;
+const unreadCount = isMutedPrivate ? 0 : (chat.unreadCount || (chat.unread ? 1 : 0));
+const unreadDotHTML = unreadCount > 0 ? `<span class="unread-badge">${unreadCount > 99 ? '99+' : unreadCount}</span>` : '';
     const pinActionText = chat.isPinned ? '取消<br>置顶' : '置顶';
     li.innerHTML = `
 <div class="chat-item-swipe-actions">
@@ -5272,9 +5540,29 @@ messageArea.addEventListener('click', (e) => {
       handleMessageLongPress(messageWrapper, touch.clientX, touch.clientY);
     }, 400);
   });
-  messageArea.addEventListener('touchend', () => clearTimeout(longPressTimer));
-  messageArea.addEventListener('touchmove', () => clearTimeout(longPressTimer));
-  saveEditBtn.addEventListener('click', saveMessageEdit);
+  
+messageArea.addEventListener('touchend', () => clearTimeout(longPressTimer));
+messageArea.addEventListener('touchmove', () => clearTimeout(longPressTimer));
+
+/* 功能开始：双击头像触发拍一拍 */
+let lastAvatarTapEl = null;
+let lastAvatarTapTime = 0;
+messageArea.addEventListener('click', (e) => {
+  const avatarEl = e.target.closest('.message-avatar');
+  if (!avatarEl) return;
+  const now = Date.now();
+  if (lastAvatarTapEl === avatarEl && now - lastAvatarTapTime < 320) {
+    lastAvatarTapEl = null;
+    lastAvatarTapTime = 0;
+    triggerPatPat(avatarEl);
+  } else {
+    lastAvatarTapEl = avatarEl;
+    lastAvatarTapTime = now;
+  }
+});
+/* 功能结束：双击头像触发拍一拍 */
+
+saveEditBtn.addEventListener('click', saveMessageEdit);
   cancelEditBtn.addEventListener('click', cancelMessageEdit);
   cancelMultiSelectBtn.addEventListener('click', exitMultiSelectMode);
 deleteSelectedBtn.addEventListener('click', deleteSelectedMessages);
@@ -5288,6 +5576,54 @@ deleteSelectedBtn.addEventListener('click', deleteSelectedMessages);
   }
   /* 功能结束：心声 */
 }
+/* 功能开始：拍一拍 */
+async function triggerPatPat(avatarEl) {
+  const chat = (currentChatType === 'private')
+    ? db.characters.find(c => c.id === currentChatId)
+    : db.groups.find(g => g.id === currentChatId);
+  if (!chat) return;
+
+  const wrapper = avatarEl.closest('.message-wrapper');
+  if (!wrapper) return;
+  const isSent = wrapper.classList.contains('sent');
+
+  const myPatSuffix = (db.myProfile && db.myProfile.patSuffix) || '';
+  const myName = (currentChatType === 'private') ? chat.myName : chat.me.nickname;
+
+  let text = '';
+  if (isSent) {
+    // 双击自己的头像 → 拍自己
+    text = `${myName}拍了拍我${myPatSuffix}`;
+  } else {
+    // 双击对方头像 → 拍对方
+    let targetName;
+    let targetSuffix = '';
+    if (currentChatType === 'private') {
+      targetName = chat.remarkName || chat.realName || '对方';
+      targetSuffix = chat.patSuffix || '';
+    } else {
+      const senderId = wrapper.dataset.senderId;
+      const sender = chat.members.find(m => m.id === senderId);
+      targetName = (sender && (sender.groupNickname || sender.realName)) || '成员';
+      targetSuffix = (sender && sender.patSuffix) || '';
+    }
+    text = `${myName}拍了拍${targetName}${targetSuffix}`;
+  }
+
+  const msg = {
+    id: `msg_pat_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    role: 'system',
+    content: `[system-display:${text}]`,
+    parts: [],
+    timestamp: Date.now()
+  };
+  if (currentChatType === 'group') msg.senderId = 'user_me';
+  chat.history.push(msg);
+  await saveData();
+  await addMessageBubble(msg, chat, currentChatType);
+  renderChatList();
+}
+/* 功能结束：拍一拍 */
 
 /* 功能开始：心声 */
 function showHeartCard(heartText, chat) {
@@ -5776,17 +6112,23 @@ async function addMessageBubble(message, chatArg, chatTypeArg) {
       messageArea.appendChild(bubbleElement);
       messageArea.scrollTop = messageArea.scrollHeight;
       if (message.role === 'assistant') {
-        if (chatType === 'private') playSoundWithThrottle((chat.isPinned || chat.isStarred) ? 'special' : 'sms');
-        else playSoundWithThrottle('sms');
+        if (!(chatType === 'private' && chat.isMuted)) {
+          if (chatType === 'private') playSoundWithThrottle((chat.isPinned || chat.isStarred) ? 'special' : 'sms');
+          else playSoundWithThrottle('sms');
+        }
       }
     }
   } else {
     if (message.role === 'assistant') {
-      chat.unread = true;
-      chat.unreadCount = (chat.unreadCount || 0) + 1;
+      if (!(chatType === 'private' && chat.isMuted)) {
+        chat.unread = true;
+        chat.unreadCount = (chat.unreadCount || 0) + 1;
+      }
       renderChatList();
-      if (chatType === 'private') playSoundWithThrottle(chat.isPinned ? 'special' : 'sms');
-      else playSoundWithThrottle('sms');
+      if (!(chatType === 'private' && chat.isMuted)) {
+        if (chatType === 'private') playSoundWithThrottle(chat.isPinned ? 'special' : 'sms');
+        else playSoundWithThrottle('sms');
+      }
     }
   }
 }
@@ -6958,12 +7300,18 @@ function setupWorldBookApp() {
       if (countSpan) countSpan.textContent = selectedIds.length > 0 ? `(已选${selectedIds.length}本)` : '(未绑定)';
       worldBookSelectionModal.classList.remove('visible');
       showToast('局部世界书已选择');
-    } else if (ctx === 'edit-profile') {
-      tempEditProfileWorldBooks = selectedIds;
-      const countSpan = document.getElementById('edit-profile-wb-count');
-      if (countSpan) countSpan.textContent = selectedIds.length > 0 ? `(已选${selectedIds.length}本)` : '(未绑定)';
-      worldBookSelectionModal.classList.remove('visible');
-    } else {
+    
+} else if (ctx === 'edit-profile') {
+  tempEditProfileWorldBooks = selectedIds;
+  const countSpan = document.getElementById('edit-profile-wb-count');
+  if (countSpan) countSpan.textContent = selectedIds.length > 0 ? `(已选${selectedIds.length}本)` : '(未绑定)';
+  worldBookSelectionModal.classList.remove('visible');
+} else if (ctx === 'my-profile') {
+  tempMyProfileWorldBooks = selectedIds;
+  const countSpan = document.getElementById('my-profile-edit-wb-count');
+  if (countSpan) countSpan.textContent = selectedIds.length > 0 ? `(已选${selectedIds.length}本)` : '(未绑定)';
+  worldBookSelectionModal.classList.remove('visible');
+} else {
       if (currentChatType === 'private') {
         const character = db.characters.find(c => c.id === currentChatId);
         if (character) character.worldBookIds = selectedIds;
@@ -7020,8 +7368,13 @@ function renderWorldBookList() {
 /* ========== 功能开始：私聊设置（侧边栏） ========== */
 function setupChatSettings() {
   chatSettingsBtn.addEventListener('click', () => {
-    if (currentChatType === 'private') { loadSettingsToSidebar(); settingsSidebar.classList.add('open'); }
-    else if (currentChatType === 'group') { loadGroupSettingsToSidebar(); groupSettingsSidebar.classList.add('open'); }
+    if (currentChatType === 'private') {
+      renderChatInfoScreen();
+      switchScreen('chat-info-screen');
+    } else if (currentChatType === 'group') {
+      loadGroupSettingsToSidebar();
+      groupSettingsSidebar.classList.add('open');
+    }
   });
   document.querySelector('.phone-screen').addEventListener('click', e => {
     const openSidebar = document.querySelector('.settings-sidebar.open');
@@ -7056,16 +7409,8 @@ function setupChatSettings() {
       showToast('样式已重置为默认');
     }
   });
-  document.getElementById('setting-my-avatar-upload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
-        document.getElementById('setting-my-avatar-preview').src = compressedUrl;
-      } catch (error) { showToast('头像压缩失败，请重试'); }
-    }
-  });
-  document.getElementById('setting-chat-bg-upload').addEventListener('change', async (e) => {
+  
+document.getElementById('setting-chat-bg-upload').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (file) {
       const char = db.characters.find(c => c.id === currentChatId);
@@ -7080,7 +7425,7 @@ function setupChatSettings() {
       }
     }
   });
-  clearChatHistoryBtn.addEventListener('click', async () => {
+clearChatHistoryBtn.addEventListener('click', async () => {
     const character = db.characters.find(c => c.id === currentChatId);
     if (!character) return;
     if (confirm(`你确定要清空与“${character.remarkName}”的所有聊天记录吗？这个操作是不可恢复的！`)) {
@@ -7092,14 +7437,268 @@ function setupChatSettings() {
       showToast('聊天记录已清空');
     }
   });
+
+  /* ========== 功能开始：聊天信息页逻辑 ========== */
+  const ciBack = document.getElementById('chat-info-back-btn');
+  if (ciBack) ciBack.addEventListener('click', () => switchScreen('chat-room-screen'));
+
+  
+const ciAvatarWrap = document.getElementById('chat-info-avatar-wrap');
+if (ciAvatarWrap) ciAvatarWrap.addEventListener('click', () => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (char) {
+    // 从聊天信息进 → 好友资料页返回键指向聊天信息页
+    const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+    if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'chat-info-screen');
+    renderFriendProfile(char);
+    switchScreen('friend-profile-screen');
+  }
+});
+
+  const ciSearchBtn = document.getElementById('chat-info-search-btn');
+  if (ciSearchBtn) ciSearchBtn.addEventListener('click', () => {
+    document.getElementById('chat-info-search-input').value = '';
+    document.getElementById('chat-info-search-list').innerHTML =
+      '<div style="text-align:center;padding:40px;color:#aaa;font-size:14px;">输入关键词搜索与该好友的聊天记录</div>';
+    switchScreen('chat-info-search-screen');
+    setTimeout(() => document.getElementById('chat-info-search-input').focus(), 100);
+  });
+
+  const ciMuteToggle = document.getElementById('chat-info-mute-toggle');
+  if (ciMuteToggle) ciMuteToggle.addEventListener('change', async (e) => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    char.isMuted = e.target.checked;
+    await saveData();
+    renderChatList();
+    showToast(char.isMuted ? '已开启消息免打扰' : '已关闭消息免打扰');
+  });
+
+  const ciPinToggle = document.getElementById('chat-info-pin-toggle');
+  if (ciPinToggle) ciPinToggle.addEventListener('change', async (e) => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    char.isPinned = e.target.checked;
+    await saveData();
+    renderChatList();
+    showToast(char.isPinned ? '已置顶' : '已取消置顶');
+  });
+
+  // 气泡子页
+  const ciBubbleBtn = document.getElementById('chat-info-bubble-btn');
+  if (ciBubbleBtn) ciBubbleBtn.addEventListener('click', () => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    document.getElementById('chat-info-use-custom-css').checked = !!char.useCustomBubbleCss;
+    document.getElementById('chat-info-custom-css').value = char.customBubbleCss || '';
+    document.getElementById('chat-info-custom-css').disabled = !char.useCustomBubbleCss;
+    updateBubbleCssPreview(
+      document.getElementById('chat-info-bubble-preview'),
+      char.customBubbleCss || '',
+      !char.useCustomBubbleCss,
+      colorThemes[char.theme || 'black_white']
+    );
+    switchScreen('chat-info-bubble-screen');
+  });
+
+  const ciUseCustomCss = document.getElementById('chat-info-use-custom-css');
+  const ciCustomCss = document.getElementById('chat-info-custom-css');
+  const ciPreviewBox = document.getElementById('chat-info-bubble-preview');
+  if (ciUseCustomCss && ciCustomCss) {
+    ciUseCustomCss.addEventListener('change', (e) => {
+      ciCustomCss.disabled = !e.target.checked;
+      const char = db.characters.find(c => c.id === currentChatId);
+      const theme = colorThemes[(char && char.theme) || 'black_white'];
+      updateBubbleCssPreview(ciPreviewBox, ciCustomCss.value, !e.target.checked, theme);
+    });
+    ciCustomCss.addEventListener('input', () => {
+      const char = db.characters.find(c => c.id === currentChatId);
+      if (char && ciUseCustomCss.checked) updateBubbleCssPreview(ciPreviewBox, ciCustomCss.value, false, colorThemes[char.theme || 'black_white']);
+    });
+  }
+  const ciResetCss = document.getElementById('chat-info-reset-css');
+  if (ciResetCss) ciResetCss.addEventListener('click', () => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    ciCustomCss.value = '';
+    ciUseCustomCss.checked = false;
+    ciCustomCss.disabled = true;
+    updateBubbleCssPreview(ciPreviewBox, '', true, colorThemes[(char && char.theme) || 'black_white']);
+    showToast('已恢复默认预览');
+  });
+  const ciSaveCss = document.getElementById('chat-info-save-css');
+  if (ciSaveCss) ciSaveCss.addEventListener('click', async () => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    char.useCustomBubbleCss = ciUseCustomCss.checked;
+    char.customBubbleCss = ciCustomCss.value;
+    await saveData();
+    updateCustomBubbleStyle(currentChatId, char.customBubbleCss, char.useCustomBubbleCss);
+    currentPage = 1;
+    renderMessages(false, true);
+    const st = document.getElementById('chat-info-bubble-status');
+    if (st) st.textContent = char.useCustomBubbleCss ? '自定义' : '默认';
+    showToast('气泡样式已保存');
+    switchScreen('chat-info-screen');
+  });
+  const ciBubbleBack = document.getElementById('chat-info-bubble-back');
+  if (ciBubbleBack) ciBubbleBack.addEventListener('click', () => switchScreen('chat-info-screen'));
+
+  // 记忆轮数子页
+  const ciMemoryBtn = document.getElementById('chat-info-memory-btn');
+  if (ciMemoryBtn) ciMemoryBtn.addEventListener('click', () => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    document.getElementById('chat-info-memory-input').value = char.maxMemory || 10;
+    switchScreen('chat-info-memory-screen');
+  });
+  
+const ciMemorySave = document.getElementById('chat-info-memory-save');
+if (ciMemorySave) ciMemorySave.addEventListener('click', async () => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  const v = parseInt(document.getElementById('chat-info-memory-input').value);
+  char.maxMemory = (v && v > 0) ? v : 10;
+  await saveData();
+  const memStatusEl = document.getElementById('chat-info-memory-status');
+  if (memStatusEl) memStatusEl.textContent = `${char.maxMemory} 轮`;
+  showToast('记忆轮数已保存');
+  switchScreen('chat-info-screen');
+});
+  const ciMemoryBack = document.getElementById('chat-info-memory-back');
+  if (ciMemoryBack) ciMemoryBack.addEventListener('click', () => switchScreen('chat-info-screen'));
+
+  // 聊天背景
+  const ciBgBtn = document.getElementById('chat-info-bg-btn');
+  if (ciBgBtn) ciBgBtn.addEventListener('click', () => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const char = db.characters.find(c => c.id === currentChatId);
+      if (!char) return;
+      try {
+        const url = await compressImage(file, { quality: 0.85, maxWidth: 1080, maxHeight: 1920 });
+        char.chatBg = url;
+        chatRoomScreen.style.backgroundImage = `url(${url})`;
+        await saveData();
+        showToast('聊天背景已更换');
+      } catch (err) { showToast('背景压缩失败，请重试'); }
+    };
+    fileInput.click();
+  });
+
+  // 清空聊天记录
+  
+const ciClearBtn = document.getElementById('chat-info-clear-btn');
+if (ciClearBtn) ciClearBtn.addEventListener('click', async () => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  if (confirm(`确定要清空与“${char.remarkName}”的所有聊天记录吗？此操作不可恢复！`)) {
+    char.history = [];
+    await saveData();
+    renderMessages(false, true);
+    renderChatList();
+    showToast('聊天记录已清空');
+    switchScreen('chat-info-screen');
+  }
+});
+
+  // 拍一拍子页
+  const ciPatBtn = document.getElementById('chat-info-pat-btn');
+  if (ciPatBtn) ciPatBtn.addEventListener('click', () => {
+    const patSuffix = (db.myProfile && db.myProfile.patSuffix) || '';
+    document.getElementById('chat-info-pat-input').value = patSuffix;
+    switchScreen('chat-info-pat-screen');
+  });
+  const ciPatSave = document.getElementById('chat-info-pat-save');
+  if (ciPatSave) ciPatSave.addEventListener('click', async () => {
+    if (!db.myProfile) db.myProfile = {};
+    db.myProfile.patSuffix = document.getElementById('chat-info-pat-input').value.trim();
+    await saveData();
+    showToast('拍一拍后缀已保存');
+    switchScreen('chat-info-screen');
+    renderChatInfoScreen();
+  });
+  const ciPatBack = document.getElementById('chat-info-pat-back');
+  if (ciPatBack) ciPatBack.addEventListener('click', () => switchScreen('chat-info-screen'));
+
+  // 投诉
+  const ciReportBtn = document.getElementById('chat-info-report-btn');
+  if (ciReportBtn) ciReportBtn.addEventListener('click', () => showToast('投诉功能开发中，敬请期待'));
+
+  // 搜索记录
+  const ciSearchInput = document.getElementById('chat-info-search-input');
+  if (ciSearchInput) ciSearchInput.addEventListener('input', (e) => executeChatInfoSearch(e.target.value));
+  const ciSearchBack = document.getElementById('chat-info-search-back');
+  if (ciSearchBack) ciSearchBack.addEventListener('click', () => switchScreen('chat-info-screen'));
+
+  /* ========== 功能结束：聊天信息页逻辑 ========== */
 }
 
+/* ========== 功能开始：渲染聊天信息页 ========== */
+function renderChatInfoScreen() {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  document.getElementById('chat-info-avatar').src = char.avatar || '';
+  document.getElementById('chat-info-avatar-name').textContent = char.remarkName || '';
+  document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
+  document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
+document.getElementById('chat-info-bubble-status').textContent = char.useCustomBubbleCss ? '自定义' : '默认';
+  const memStatusEl = document.getElementById('chat-info-memory-status');
+  if (memStatusEl) memStatusEl.textContent = `${char.maxMemory || 10} 轮`;
+  document.getElementById('chat-info-pat-preview').textContent = (db.myProfile && db.myProfile.patSuffix) || '未设置';
+}
+
+function executeChatInfoSearch(keyword) {
+  const list = document.getElementById('chat-info-search-list');
+  if (!list) return;
+  const q = (keyword || '').trim();
+  list.innerHTML = '';
+  if (!q) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;font-size:14px;">输入关键词搜索与该好友的聊天记录</div>';
+    return;
+  }
+  const chat = db.characters.find(c => c.id === currentChatId);
+  if (!chat) return;
+  const matches = (chat.history || []).filter(m => {
+    if (m.isOffline) return false;
+    if (m.role === 'system') return false;
+    let text = m.content || '';
+    const match = text.match(/\[.*?的消息：([\s\S]+?)\]/);
+    if (match) text = match[1];
+    return text.includes(q);
+  });
+  if (matches.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;font-size:14px;">没有找到相关消息</div>';
+    return;
+  }
+  matches.slice().reverse().forEach(msg => {
+    let text = msg.content || '';
+    const match = text.match(/\[.*?的消息：([\s\S]+?)\]/);
+    if (match) text = match[1];
+    const isMe = msg.role === 'user';
+    const t = new Date(msg.timestamp || Date.now());
+    const timeStr = `${t.getMonth() + 1}/${t.getDate()} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+    const li = document.createElement('li');
+    li.style.cssText = 'padding: 12px 15px; border-bottom: 1px solid #f0f0f0; cursor: pointer;';
+    li.innerHTML = `
+      <div style="display:flex; gap:10px; align-items:flex-start;">
+        <img src="${isMe ? (chat.myAvatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg') : chat.avatar}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size: 12px; color: #888; margin-bottom: 4px;">${isMe ? '我' : (chat.remarkName || '对方')} · ${timeStr}</div>
+          <div style="font-size: 14px; color: #333; word-break: break-word;">${escapeHtml(text)}</div>
+        </div>
+      </div>`;
+    list.appendChild(li);
+  });
+}
+/* ========== 功能结束：渲染聊天信息页 ========== */
 function loadSettingsToSidebar() {
   const e = db.characters.find(e => e.id === currentChatId);
   if (e) {
-    document.getElementById('setting-my-avatar-preview').src = e.myAvatar;
     document.getElementById('setting-my-name').value = e.myName;
-    document.getElementById('setting-my-persona').value = e.myPersona;
     document.getElementById('setting-max-memory').value = e.maxMemory;
     const useCustomCssCheckbox = document.getElementById('setting-use-custom-css'),
       customCssTextarea = document.getElementById('setting-custom-bubble-css'),
@@ -7115,13 +7714,7 @@ async function saveSettingsFromSidebar() {
   const e = db.characters.find(e => e.id === currentChatId);
   
 if (e) {
-  e.myAvatar = document.getElementById('setting-my-avatar-preview').src;
-  // 同步给全局“我的头像”
-  db.myProfile.avatar = e.myAvatar;
-  if (db.characters) db.characters.forEach(c => c.myAvatar = e.myAvatar);
-  
   e.myName = document.getElementById('setting-my-name').value;
-    e.myPersona = document.getElementById('setting-my-persona').value;
     e.theme = 'black_white';
     e.maxMemory = parseInt(document.getElementById('setting-max-memory').value) || 10;
     e.useCustomBubbleCss = document.getElementById('setting-use-custom-css').checked;
@@ -7419,16 +8012,8 @@ function setupGroupChatSystem() {
     showToast(`新成员 ${newMember.groupNickname} 已加入`);
     createMemberForGroupModal.classList.remove('visible');
   });
-  document.getElementById('setting-group-my-avatar-upload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
-        document.getElementById('setting-group-my-avatar-preview').src = compressedUrl;
-      } catch (error) { showToast('头像压缩失败'); }
-    }
-  });
-  confirmGroupRecipientBtn.addEventListener('click', () => {
+  
+confirmGroupRecipientBtn.addEventListener('click', () => {
     const selectedRecipientIds = Array.from(groupRecipientSelectionList.querySelectorAll('input:checked')).map(input => input.value);
     if (selectedRecipientIds.length === 0) return showToast('请至少选择一个收件人。');
     currentGroupAction.recipients = selectedRecipientIds;
@@ -7462,9 +8047,7 @@ function loadGroupSettingsToSidebar() {
   if (!group) return;
   document.getElementById('setting-group-avatar-preview').src = group.avatar;
   document.getElementById('setting-group-name').value = group.name;
-  document.getElementById('setting-group-my-avatar-preview').src = group.me.avatar;
   document.getElementById('setting-group-my-nickname').value = group.me.nickname;
-  document.getElementById('setting-group-my-persona').value = group.me.persona;
   document.getElementById('setting-group-max-memory').value = group.maxMemory;
   renderGroupMembersInSettings(group);
   const useGroupCustomCssCheckbox = document.getElementById('setting-group-use-custom-css'),
@@ -7515,11 +8098,10 @@ async function saveGroupSettingsFromSidebar() {
   const oldName = group.name;
   const newName = document.getElementById('setting-group-name').value;
   if (oldName !== newName) { group.name = newName; sendRenameNotification(group, newName); }
-  group.avatar = document.getElementById('setting-group-avatar-preview').src;
-  group.me.avatar = document.getElementById('setting-group-my-avatar-preview').src;
-  group.me.nickname = document.getElementById('setting-group-my-nickname').value;
-  group.me.persona = document.getElementById('setting-group-my-persona').value;
-  group.theme = 'black_white';
+  
+group.avatar = document.getElementById('setting-group-avatar-preview').src;
+group.me.nickname = document.getElementById('setting-group-my-nickname').value;
+group.theme = 'black_white';
   group.maxMemory = parseInt(document.getElementById('setting-group-max-memory').value) || 10;
   group.useCustomBubbleCss = document.getElementById('setting-group-use-custom-css').checked;
   group.customBubbleCss = document.getElementById('setting-group-custom-bubble-css').value;
@@ -8223,11 +8805,17 @@ if (sorted.length === 0) {
                 </div>
             </div>
         `;
-        li.onclick = () => {
-            // 点击互动消息，回到朋友圈页面
-            switchScreen('discover-screen');
-        };
-        list.appendChild(li);
+        
+li.onclick = () => {
+  currentChatId = char.id;
+  currentChatType = 'private';
+  // 从通讯录进 → 好友资料页返回键指向通讯录
+  const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+  if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'contacts-screen');
+  renderFriendProfile(char);
+  switchScreen('friend-profile-screen');
+};
+container.appendChild(li);
     });
 }
 
@@ -9188,43 +9776,219 @@ document.querySelectorAll('#me-screen .me-list-item').forEach(item => {
     item.addEventListener('click', () => {
       const name = item.dataset.name;
       if (name === '朋友圈') {
-        renderMyProfileMomentsScreen(); // 改为直接渲染个人主页
-        switchScreen('my-profile-moments-screen'); // 改为直接跳转个人主页
+        renderMyProfileMomentsScreen();
+        switchScreen('my-profile-moments-screen');
+      } else if (name === '个人资料') {
+        // 划重点：这里打开的是「小u自己的个人资料」
+        // 全部读写都走 db.myProfile，跟 AI 角色（db.characters）完全不互通
+        renderMyProfileInfoScreen();
+        switchScreen('my-profile-info-screen');
       } else {
         showToast('该功能暂未开放，敬请期待！');
       }
     });
 });
-  const card = document.getElementById('me-profile-card');
-  const avatarImg = document.getElementById('me-avatar');
-  
+const card = document.getElementById('me-profile-card');
   if (card) {
     card.addEventListener('click', () => {
-      // 触发头像上传
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          try {
-            const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
-            db.myProfile.avatar = compressedUrl;
-            await saveData();
-            // 更新“我”界面头像
-            if (avatarImg) avatarImg.src = compressedUrl;
-            // 同步更新朋友圈头像
-            renderDiscoverScreen();
-            showToast('头像已更新');
-          } catch (error) { showToast('图片处理失败'); }
-        }
-      };
-      fileInput.click();
+      renderMyProfileInfoScreen();
+      switchScreen('my-profile-info-screen');
     });
   }
 }
-/* ========== 功能结束：我（个人主页） ========== */
 
+/* ========== 功能开始：个人资料（用户） ========== */
+function renderMyProfileInfoScreen() {
+  if (!db.myProfile) db.myProfile = {};
+  const p = db.myProfile;
+  if (!db.myWxid) { db.myWxid = 'wxid_' + Math.random().toString(36).slice(2, 10); }
+  document.getElementById('profile-info-avatar').src = p.avatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+  document.getElementById('profile-info-name').value = p.nickname || '我';
+  document.getElementById('profile-info-gender').textContent = p.gender || '未设置';
+  document.getElementById('profile-info-region').value = p.region || '';
+  document.getElementById('profile-info-phone').value = p.phone || '';
+  document.getElementById('profile-info-wxid').value = p.wxid || db.myWxid || '';
+  document.getElementById('profile-info-pat').value = p.patSuffix || '';
+  document.getElementById('profile-info-signature').value = p.signature || '';
+  const roleNameEl = document.getElementById('profile-info-role-name');
+  if (roleNameEl) roleNameEl.textContent = p.remark || p.roleName || '未设置';
+}
+
+function setupMyProfileInfoScreen() {
+  // 头像
+  const avatarImg = document.getElementById('profile-info-avatar');
+  const avatarInput = document.getElementById('profile-info-avatar-upload');
+  if (avatarImg && avatarInput) {
+    avatarImg.addEventListener('click', () => avatarInput.click());
+    avatarInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const url = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
+        db.myProfile.avatar = url;
+        avatarImg.src = url;
+        db.characters.forEach(c => { c.myAvatar = url; });
+        db.groups.forEach(g => { if (g.me) g.me.avatar = url; });
+        await saveData();
+        renderMeScreen();
+        renderDiscoverScreen();
+        showToast('头像已更新');
+      } catch (err) { showToast('图片处理失败'); }
+      e.target.value = null;
+    });
+  }
+
+  // 普通文本字段
+  const bindInput = (id, key, syncFn) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('change', async () => {
+      const val = el.value.trim();
+      db.myProfile[key] = val;
+      if (syncFn) syncFn(val);
+      await saveData();
+      renderMeScreen();
+      renderDiscoverScreen();
+    });
+  };
+  bindInput('profile-info-name', 'nickname');
+  bindInput('profile-info-region', 'region');
+  bindInput('profile-info-phone', 'phone');
+  bindInput('profile-info-wxid', 'wxid', (v) => { db.myWxid = v; });
+  bindInput('profile-info-pat', 'patSuffix');
+  bindInput('profile-info-signature', 'signature');
+
+  // 性别
+  const genderRow = document.getElementById('profile-info-gender-row');
+  if (genderRow) {
+    genderRow.addEventListener('click', () => {
+      const sheet = document.createElement('div');
+      sheet.className = 'acct-action-sheet-overlay visible';
+      sheet.innerHTML = `<div class="acct-action-sheet">
+        <button data-g="男" style="color:#333;">男</button>
+        <button data-g="女" style="color:#333;">女</button>
+        <button data-g="" style="color:#333;">不显示</button>
+        <button class="cancel-btn" style="color:#333;">取消</button>
+      </div>`;
+      document.body.appendChild(sheet);
+      sheet.querySelectorAll('button[data-g]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          db.myProfile.gender = btn.dataset.g || '';
+          document.getElementById('profile-info-gender').textContent = btn.dataset.g || '未设置';
+          await saveData();
+          sheet.remove();
+        });
+      });
+      sheet.querySelector('.cancel-btn').addEventListener('click', () => sheet.remove());
+      sheet.addEventListener('click', (e) => { if (e.target === sheet) sheet.remove(); });
+    });
+  }
+
+// 二维码占位
+  const qrRow = document.getElementById('profile-info-qrcode-row');
+  if (qrRow) qrRow.addEventListener('click', () => showToast('二维码功能开发中，敬请期待'));
+
+  // 我的虚拟形象 → 打开修改资料弹窗
+  const roleRow = document.getElementById('profile-info-role-row');
+  if (roleRow) roleRow.addEventListener('click', () => openMyProfileEditModal());
+}
+
+/* ========== 我的虚拟形象（弹窗） ========== */
+let tempMyProfileWorldBooks = [];
+
+function openMyProfileEditModal() {
+  if (!db.myProfile) db.myProfile = {};
+  const p = db.myProfile;
+  document.getElementById('my-profile-edit-name').value = p.roleName || '';
+  document.getElementById('my-profile-edit-remark').value = p.remark || '';
+  document.getElementById('my-profile-edit-persona').value = p.persona || '';
+  document.getElementById('my-profile-edit-avatar-preview').src = p.avatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+  tempMyProfileWorldBooks = p.worldBookIds || [];
+  const countSpan = document.getElementById('my-profile-edit-wb-count');
+  if (countSpan) countSpan.textContent = tempMyProfileWorldBooks.length > 0 ? `(已选${tempMyProfileWorldBooks.length}本)` : '(未绑定)';
+  document.getElementById('my-profile-edit-modal').classList.add('visible');
+}
+
+function setupMyProfileEditModal() {
+  const modal = document.getElementById('my-profile-edit-modal');
+  if (!modal) return;
+
+  const avatarUpload = document.getElementById('my-profile-edit-avatar-upload');
+  const avatarPreview = document.getElementById('my-profile-edit-avatar-preview');
+  if (avatarPreview && avatarUpload) {
+    avatarPreview.addEventListener('click', () => avatarUpload.click());
+    avatarUpload.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const url = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
+        avatarPreview.src = url;
+      } catch (err) { showToast('图片处理失败'); }
+      e.target.value = null;
+    });
+  }
+
+  bindTextFileInput(document.getElementById('my-profile-edit-persona-file'), document.getElementById('my-profile-edit-persona'));
+
+  const wbBtn = document.getElementById('my-profile-edit-link-wb-btn');
+  if (wbBtn) wbBtn.addEventListener('click', () => {
+    const localBooks = db.worldBooks.filter(wb => (wb.scope || 'global') === 'local');
+    if (localBooks.length === 0) return showToast('暂无局部世界书');
+    worldBookSelectionList.innerHTML = '';
+    localBooks.forEach(book => {
+      const li = document.createElement('li');
+      li.className = 'world-book-select-item';
+      const isChecked = tempMyProfileWorldBooks.includes(book.id);
+      li.innerHTML = `<input type="checkbox" id="wb-mp-${book.id}" value="${book.id}" ${isChecked ? 'checked' : ''}><label for="wb-mp-${book.id}">${book.name}</label>`;
+      worldBookSelectionList.appendChild(li);
+    });
+    worldBookSelectionModal.classList.add('visible');
+    window.currentWorldBookSelectionContext = 'my-profile';
+  });
+
+  const form = document.getElementById('my-profile-edit-form');
+  if (form) form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!db.myProfile) db.myProfile = {};
+    const newName = document.getElementById('my-profile-edit-name').value.trim();
+    const newRemark = document.getElementById('my-profile-edit-remark').value.trim();
+    const newPersona = document.getElementById('my-profile-edit-persona').value.trim();
+    const newAvatar = avatarPreview.src;
+    if (!newName || !newRemark) return showToast('姓名和备注不能为空');
+
+    db.myProfile.roleName = newName;
+    db.myProfile.remark = newRemark;
+    db.myProfile.persona = newPersona;
+    db.myProfile.avatar = newAvatar;
+    db.myProfile.worldBookIds = tempMyProfileWorldBooks;
+
+    // 同步「我」的形象到所有 AI 角色 / 群聊
+    db.characters.forEach(c => {
+      c.myAvatar = newAvatar;
+      c.myName = newRemark;
+      c.myPersona = newPersona;
+    });
+    db.groups.forEach(g => {
+      if (g.me) {
+        g.me.avatar = newAvatar;
+        g.me.nickname = newRemark;
+        g.me.persona = newPersona;
+      }
+    });
+
+    await saveData();
+    renderMyProfileInfoScreen();
+    renderMeScreen();
+    renderDiscoverScreen();
+    renderChatList();
+    showToast('资料已保存');
+    modal.classList.remove('visible');
+  });
+
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
+}
+/* ========== 功能结束：我的虚拟形象 ========== */
+/* ========== 功能结束：个人资料（用户） ========== */
 /* ========== 功能开始：搜索 & 加好友 ========== */
 function openSearchScreen() {
   document.getElementById('search-input').value = '';
@@ -9265,13 +10029,17 @@ function executeSearch(keyword) {
           <div style="font-size: 13px; color: #888; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">微信号: ${char.wxid || '无'}</div>
         </div>
         <div style="font-size: 14px; color: #07c160; flex-shrink: 0;">已添加</div>`;
-      div.onclick = () => {
-        currentChatId = char.id;
-        currentChatType = 'private';
-        renderFriendProfile(char);
-        switchScreen('friend-profile-screen');
-      };
-      resultArea.appendChild(div);
+      
+div.onclick = () => {
+  currentChatId = char.id;
+  currentChatType = 'private';
+  // 从搜索结果进 → 好友资料页返回键指向通讯录
+  const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+  if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'contacts-screen');
+  renderFriendProfile(char);
+  switchScreen('friend-profile-screen');
+};
+resultArea.appendChild(div);
     });
     return;
   }
