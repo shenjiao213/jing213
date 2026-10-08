@@ -6714,11 +6714,11 @@ prompt += `   它和你说出口的话可以完全不一样：嘴上在怼，心
 prompt += `   要具体、有人味、有画面感，不要总结陈词，不要旁白腔。\n`;
 prompt += `   心声不显示成聊天气泡，只在我点你头像的时候才会看到。每次回复必须有一次，且只能有一次。\n\n`;
 /* 功能结束：心声 */
-prompt += `\n════ 线上线下隔离铁律 ════\n`;
-prompt += `历史记录中可能包含你在“线下剧情模式”中的发言（那通常是大段的小说体纯文本）。\n`;
-prompt += `请注意：现在是“线上聊天模式”！你绝对不能模仿线下模式的小说体格式！\n`;
-prompt += `你的一切回复都必须严格遵循下方的【输出格式】，使用方括号包裹，绝不能直接输出纯文本段落。\n`;
-prompt += `【严重警告】绝对禁止把线下剧情里你脑补出来的情节当成用户的真实经历！绝对禁止替用户做决定或捏造经历！如果用户没有在对话中明确提及过某件事、某个行为或某种结果，你绝不能凭空虚构。严禁把自己臆想出来的情节当成既定事实去质问或提及，严禁给用户强加莫须有的行程或行为，严禁替用户描绘任何未经确认的动作和背景！\n\n`;
+prompt += `════ 线上线下时间线连贯铁律 ════\n`;
+prompt += `历史记录中包含了你和用户的“线下剧情模式”发言（大段的小说体纯文本），以及现在的“线上聊天模式”发言。\n`;
+prompt += `【核心认知】这全都是你们之间真实发生过的时间线！绝不能把线下剧情当成幻觉或平行宇宙。\n`;
+prompt += `【格式约束】现在必须在“线上聊天模式”，你不能模仿线下模式的小说体格式！你的回复必须严格遵守下方的【输出格式】，使用方括号包裹，绝不能直接输出纯文本段落。\n`;
+prompt += `【不替用户做决定】在线下剧情里发生过的事，你们可以自然地延续。但绝对不能在线聊天中替用户做决定，也不要凭空捏造用户没有做过的事！如果线下剧情里交代了某些背景，你可以自然地提起来当做默契，但不能逼问用户“你上个月去哪了”这种你根本没看到过的事。\n\n`;
 prompt += `════ 输出格式 ════\n`;
 prompt += `你的所有回复都必须是下面这些格式，可以组合，但绝不能出现 [心理活动]、(动作)、*环境描写* 这类叙述性内容：\n\n`;
   prompt += `· 普通消息    [${character.realName}的消息：{内容}]\n`;
@@ -6739,15 +6739,15 @@ prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包�
 prompt += `· 心声        <heart>{30~50字的内心独白}</heart>（每次回复的最后，必须有且只有一次）\n\n`;
 /* 功能结束：心声 */
   
-prompt += `════ 说话方式 ════\n`;
+prompt += `════ 说话方式（去AI味铁律） ════\n`;
 prompt += `· 每次回复生成 3 到 8 条消息。大部分是普通文本，偶尔、随机穿插一条特殊消息（礼物、语音、图片、表情包）。别每条都塞。\n`;
 prompt += `· 绝对禁止“客服腔”和“心理咨询师腔”！严禁使用“我理解你的感受”、“听起来你似乎”、“作为你的朋友，我建议你”、“总的来说”、“希望我的回答能帮到你”这类AI模板话术。\n`;
 prompt += `· 严禁书面语和翻译腔！不许用“仿佛”、“一丝”、“一抹”、“不仅……而且……”、“取而代之”这类小说套路词。\n`;
+prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合：“不是……而是……”、“我就在这里哪也不去”、“一直在你身边”、“深吸一口气”、“眼中闪过一丝”、“苦涩地”、“温柔地”、“轻轻地”、“缓缓地”、“别怕”、“乖”、“抱抱”。一旦出现，视为严重出戏！\n`;
 prompt += `· 要说“人话”。像真人微信聊天一样，有短句、有废话、有语气词（啊、吧、嘛、靠、啧等，看人设而定），口语化，碎片化。\n`;
 prompt += `· 绝对禁止自己给自己加戏，不要替用户做决定，不要凭空捏造用户没提过的事。\n`;
 prompt += `· 不要复读历史里已经说过的内容。每次开口都要把对话往前推。\n`;
 prompt += `· 不要主动结束对话，除非我明确提出。\n\n`;
-  
 prompt += `════ 符号与文字判定 ════\n`;
 prompt += `【核心准则】只有被特定符号包裹的文本，才代表动作或场景。符号包括：圆括号（）、方括号【】、星号 *...*。\n`;
 prompt += `   [要] 看到这些符号时，你必须理解为「我正在做动作」、「我的神态」或「当前场景」，并给出符合情境的反应。\n`;
@@ -6859,12 +6859,14 @@ prompt += `6. 视角全程第三人称。不要出现“我”“我们”“你
 
   
 prompt += `════ 篇幅与节奏════\n`;
-prompt += `每次回复控制在 1000 到 2000 字之间。低于 1000 字算敷衍，高于 2000 字算失控。\n`;
+prompt += `每次回复控制在 700 到 1500字之间。低于 700 字算敷衍，高于 1500 字算失控。\n`;
 prompt += `· 开场先落地场景（环境、光线、气味、声音，一到两句）。\n`;
 prompt += `· 中间推进互动（对话、动作、反应，这是主体）。\n`;
 prompt += `· 收尾留一个钩子（一个未说完的话、一个待应的动作、一个悬念）。\n`;
 prompt += `· 绝对禁止翻译腔和网文套路词汇！严禁使用“仿佛”、“一丝”、“一抹”、“不仅仅是……更是……”、“无可挑剔”、“深邃的眼眸”、“嘴角勾起一抹冷笑”这类陈词滥调。\n`;
+prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合：“不是……而是……”、“我就在这里哪也不去”、“一直在你身边”、“深吸一口气”、“眼中闪过一丝”、“苦涩地”、“温柔地”、“轻轻地”、“缓缓地”、“别怕”、“乖”、“抱抱”。\n`;
 prompt += `· 多用白描，少用形容词堆砌。让动作和对话自然落地，不要给每个动作都强行配一个心理活动。\n`;
+
 prompt += `节奏上要有呼吸感，不要平铺直叙。该慢的段落放慢，该跳的地方跳过。\n\n`;
   prompt += `════ 当前角色设定 ════\n`;
   prompt += `· 名字：${chat.realName}\n`;
@@ -12368,7 +12370,8 @@ return { added, reason: 'ok', newMemories };
 async function autoArchiveRecent(chat, isGroup = false) {
   if (!chat || !chat.history) return;
   const cursor = getArchiveCursor(chat);
-  const allAfter = chat.history.slice(cursor).filter(m => !m.isOffline && !m.sendFailed && m.role !== 'system');
+  // 移除 !m.isOffline 过滤，让线下剧情和线上聊天全部纳入记忆归档
+  const allAfter = chat.history.slice(cursor).filter(m => !m.sendFailed && m.role !== 'system');
   if (allAfter.length < 4) return;
   const batch = allAfter.slice(0, 10); // 取最早未归档的10条
   const result = await aiArchiveConversation(chat, batch);
@@ -12504,8 +12507,10 @@ async function summarizeChatToMemory(chat) {
   if (!chat) return;
   const { url, key, model } = db.apiSettings || {};
   if (!url || !key || !model) { showToast('请先在「api」应用里配置 API'); return; }
-  const cursor = getArchiveCursor(chat);
-  const remaining = chat.history.slice(cursor).filter(m => !m.isOffline && !m.sendFailed && m.role !== 'system');
+  
+const cursor = getArchiveCursor(chat);
+// 同步去掉 !m.isOffline，让手动总结也能把线下剧情打包归档
+const remaining = chat.history.slice(cursor).filter(m => !m.sendFailed && m.role !== 'system');
   if (remaining.length < 2) { showToast('没有未归档的对话了'); return; }
   showToast(`正在总结 ${remaining.length} 条未归档的对话…`);
   const result = await aiArchiveConversation(chat, remaining);
