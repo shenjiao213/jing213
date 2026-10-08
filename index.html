@@ -381,15 +381,14 @@ body {
   width: 0; height: 0;
   border-style: solid;
   border-width: 5px 0 5px 6px;
-  border-color: transparent transparent transparent #95ec69;
+  border-color: transparent transparent transparent var(--bubble-sent-bg, #95ec69);
 }
-.message-bubble.received { border-bottom-left-radius: 2px; }
 .message-bubble.received::after {
   content: ''; position: absolute; left: -6px; top: 12px;
   width: 0; height: 0;
   border-style: solid;
   border-width: 5px 6px 5px 0;
-  border-color: transparent #ffffff transparent transparent;
+  border-color: transparent var(--bubble-received-bg, #ffffff) transparent transparent;
 }
 .system-notification-bubble {
   background-color: rgba(200, 200, 200, 0.5);
@@ -1467,6 +1466,162 @@ input:checked + .slider:before { transform: translateX(22px); }
 .offline-icon-btn.send-btn svg { fill: #fff; }
 .offline-icon-btn.send-btn:active { background: #555; }
 /* 功能结束：线下模式样式 */
+
+/* 功能开始：记忆样式（韩系灰白） */
+#memory-screen { background: #f7f7f7; }
+#memory-screen .app-header {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #eaeaea !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 10px 15px;
+}
+#memory-screen .app-header .title { color: #1a1a1a; font-weight: 600; font-size: 17px; }
+#memory-screen .app-header .back-btn { color: #1a1a1a; }
+#memory-screen .app-header .action-btn { color: #1a1a1a; }
+
+.memory-stats {
+  padding: 18px 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #eaeaea;
+  display: flex; gap: 8px;
+}
+.memory-stat { flex: 1; text-align: center; }
+.memory-stat .num { font-size: 22px; font-weight: 600; color: #333; }
+.memory-stat .lbl { font-size: 11px; color: #999; margin-top: 4px; letter-spacing: .5px; }
+
+.memory-tabs {
+  display: flex; gap: 8px; padding: 12px 16px;
+  background: #ffffff; border-bottom: 1px solid #eaeaea;
+  overflow-x: auto; scrollbar-width: none;
+}
+.memory-tabs::-webkit-scrollbar { display: none; }
+.memory-tab {
+  padding: 6px 14px; font-size: 13px; color: #888;
+  background: #f2f2f2; border-radius: 14px;
+  cursor: pointer; white-space: nowrap;
+  transition: all .2s; flex-shrink: 0;
+  user-select: none; -webkit-user-select: none;
+}
+.memory-tab.active { background: #333; color: #fff; }
+
+.memory-search-bar { padding: 12px 16px 0; background: #ffffff; }
+.memory-search-bar input {
+  width: 100%; padding: 10px 14px;
+  border: 1px solid #e8e8e8; border-radius: 8px;
+  background: #fafafa; font-size: 14px;
+  outline: none; box-sizing: border-box;
+  font-family: inherit; color: #333;
+}
+.memory-search-bar input:focus { border-color: #ccc; background: #fff; }
+
+#memory-list { padding: 12px 0 30px 0; }
+.memory-item {
+  background: #ffffff; margin: 10px 15px;
+  padding: 16px 18px; border-radius: 10px;
+  border-left: 3px solid #ddd;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  position: relative;
+}
+.memory-item.anchor    { border-left-color: #333; }
+.memory-item.important { border-left-color: #888; }
+.memory-item.daily     { border-left-color: #bbb; }
+.memory-item.trivial   { border-left-color: #ddd; }
+
+.memory-item .m-badge {
+  position: absolute; top: 12px; right: 14px;
+  font-size: 10px; color: #999; padding: 2px 8px;
+  background: #f2f2f2; border-radius: 8px;
+  letter-spacing: .5px;
+}
+.memory-item.anchor .m-badge { background: #333; color: #fff; }
+.memory-item .m-content {
+  font-size: 14px; color: #333; line-height: 1.65;
+  padding-right: 60px; word-break: break-word;
+}
+.memory-item .m-meta {
+  font-size: 11px; color: #aaa; margin-top: 10px;
+  display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+}
+.memory-item .m-meta .perm { color: #333; font-weight: 500; }
+.memory-item .m-actions {
+  display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+}
+.memory-item .m-actions button {
+  padding: 5px 12px; font-size: 12px;
+  border: 1px solid #e8e8e8; background: #fafafa;
+  border-radius: 6px; color: #666; cursor: pointer;
+  font-family: inherit; transition: all .15s;
+}
+.memory-item .m-actions button:active { background: #f0f0f0; }
+.memory-item .m-actions button.danger { color: #e57373; border-color: #f5d5d5; }
+
+.memory-empty {
+  text-align: center; padding: 60px 20px;
+  color: #bbb; font-size: 14px; line-height: 1.8;
+}
+/* 功能结束：记忆样式 */
+
+/* 功能开始：韩系弹窗 */
+.hg-modal-overlay {
+  position: fixed; inset: 0; z-index: 7000;
+  background: rgba(30, 30, 36, 0.34);
+  -webkit-backdrop-filter: blur(8px) saturate(.9);
+  backdrop-filter: blur(8px) saturate(.9);
+  display: none; align-items: center; justify-content: center;
+  padding: 26px;
+}
+.hg-modal-overlay.visible { display: flex; }
+.hg-modal {
+  width: 100%; max-width: 320px;
+  background: #fbfbfd;
+  border-radius: 16px;
+  padding: 22px 22px 16px;
+  box-shadow:
+    0 20px 40px -18px rgba(42, 42, 54, .28),
+    inset 0 1px 0 #ffffff,
+    inset 0 0 0 1px rgba(186, 186, 198, .28);
+  font-family: var(--font-family);
+  animation: heartCardIn .34s cubic-bezier(.2, .9, .28, 1.12) both;
+}
+.hg-modal-title {
+  font-size: 15px; font-weight: 600; color: #2b2b33;
+  text-align: center; letter-spacing: .3px;
+}
+.hg-modal-sub {
+  font-size: 12px; color: #9a9aa6;
+  text-align: center; margin-top: 6px; line-height: 1.55;
+}
+.hg-modal-textarea {
+  width: 100%; min-height: 84px; margin-top: 14px;
+  padding: 12px 14px;
+  border: 1px solid #e8e8ee;
+  border-radius: 10px;
+  background: #ffffff;
+  font-size: 14px; color: #333;
+  outline: none; resize: none;
+  font-family: inherit;
+  box-sizing: border-box;
+  line-height: 1.6;
+  transition: border-color .15s;
+}
+.hg-modal-textarea:focus { border-color: #c9c9d4; }
+.hg-modal-actions {
+  display: flex; gap: 10px; margin-top: 16px;
+}
+.hg-modal-btn {
+  flex: 1; padding: 11px 0;
+  border-radius: 10px; border: none;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: inherit;
+  transition: background .15s;
+}
+.hg-modal-cancel { background: #f0f0f3; color: #6e6e7a; }
+.hg-modal-cancel:active { background: #e4e4ea; }
+.hg-modal-confirm { background: #333; color: #fff; }
+.hg-modal-confirm:active { background: #1a1a1a; }
+/* 功能结束：韩系弹窗 */
+
 /* 功能开始：心声 */
 .message-info.info-has-heart { cursor: pointer; }
 .message-avatar.has-heart {
@@ -1508,6 +1663,20 @@ input:checked + .slider:before { transform: translateX(22px); }
   justify-content: center; /* 垂直居中，视觉更舒服 */
 }
 
+.heart-card-head {
+  position: relative; z-index: 1;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px;
+}
+.heart-card-tag {
+  font-size: 11px; color: #b9b9c6;
+  letter-spacing: .2em; font-weight: 500;
+}
+.heart-card-dots { display: flex; gap: 4px; }
+.heart-card-dots i {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #d0d0d8; display: inline-block;
+}
 .heart-card-body {
   position: relative; z-index: 1;
   font-family: 'Zhi Mang Xing', 'Kaiti SC', 'STKaiti', 'KaiTi', cursive; /* 恢复图2的手写体 */
@@ -1749,6 +1918,10 @@ input:checked + .slider:before { transform: translateX(22px); }
 <div class="panel-item" id="offline-mode-btn">
   <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
   <span>线下</span>
+</div>
+<div class="panel-item" id="memory-btn">
+  <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M12,2A4,4 0 0,0 8,6C6.34,6 5,7.34 5,9C5,10.07 5.57,11 6.42,11.55C6.16,12 6,12.48 6,13A3,3 0 0,0 9,16H11V22H13V16H15A3,3 0 0,0 18,13C18,12.48 17.84,12 17.58,11.55C18.43,11 19,10.07 19,9C19,7.34 17.66,6 16,6A4,4 0 0,0 12,2Z"/></svg></div>
+  <span>记忆</span>
 </div>
         <div class="panel-item" id="gift-btn">
           <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M20,8L12,13L4,8V6H20M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M12.5,18C12.5,17.29 12.17,16.65 11.64,16.27C12.17,15.89 12.5,15.26 12.5,14.55C12.5,13.6 11.83,12.79 11,12.58V12H13V10H11V8H13V6H11V5C11,4.45 10.55,4 10,4H8C7.45,4 7,4.45 7,5V6H9V8H7V10H9V12H7V12.58C6.17,12.79 5.5,13.6 5.5,14.55C5.5,15.26 5.83,15.89 6.36,16.27C5.83,16.65 5.5,17.29 5.5,18H12.5Z"/></svg></div>
@@ -2738,6 +2911,33 @@ input:checked + .slider:before { transform: translateX(22px); }
 </div>
 <!-- 功能结束：线下模式界面 -->
 
+<!-- 功能开始：记忆界面 -->
+<div id="memory-screen" class="screen">
+<header class="app-header">
+  <button class="back-btn" id="memory-back-btn">‹</button>
+  <div class="title-container"><h1 class="title" id="memory-title">记忆</h1></div>
+  <div style="display:flex; align-items:center; gap:6px;">
+    <button class="action-btn" id="memory-summarize-btn" style="width:auto; padding:6px 12px; font-size:13px; font-weight:500; background:#f0f0f3; color:#333; border-radius:10px;">总结</button>
+    <button class="action-btn" id="memory-add-btn" style="width:auto; padding:6px 12px; font-size:13px; font-weight:500; background:#333; color:#fff; border-radius:10px;">添加</button>
+  </div>
+</header>
+  <main class="content" style="padding:0; overflow-y:auto; display:flex; flex-direction:column;">
+    <div class="memory-stats" id="memory-stats"></div>
+    <div class="memory-tabs" id="memory-tabs">
+      <div class="memory-tab active" data-level="all">全部</div>
+      <div class="memory-tab" data-level="anchor">锚点</div>
+      <div class="memory-tab" data-level="important">重要</div>
+      <div class="memory-tab" data-level="daily">日常</div>
+      <div class="memory-tab" data-level="trivial">碎片</div>
+    </div>
+    <div class="memory-search-bar">
+      <input type="text" id="memory-search-input" placeholder="搜索一件事、一个人、一句话…" autocomplete="off">
+    </div>
+    <div id="memory-list"></div>
+  </main>
+</div>
+<!-- 功能结束：记忆界面 -->
+
 <!-- 功能开始：转账全屏 -->
 <div id="transfer-screen" class="screen" style="background: #f7f7f7; z-index: 2000;">
   <header class="app-header" style="background: #ededed; border-bottom: none;">
@@ -3332,6 +3532,20 @@ input:checked + .slider:before { transform: translateX(22px); }
   </div>
 </div>
 <!-- 功能结束：心声 -->
+
+<!-- 功能开始：韩系输入弹窗 -->
+<div id="hg-input-modal" class="hg-modal-overlay">
+  <div class="hg-modal">
+    <div class="hg-modal-title" id="hg-modal-title">输入</div>
+    <div class="hg-modal-sub" id="hg-modal-sub" style="display:none;"></div>
+    <textarea id="hg-modal-input" class="hg-modal-textarea" placeholder=""></textarea>
+    <div class="hg-modal-actions">
+      <button type="button" class="hg-modal-btn hg-modal-cancel">取消</button>
+      <button type="button" class="hg-modal-btn hg-modal-confirm">确定</button>
+    </div>
+  </div>
+</div>
+<!-- 功能结束：韩系输入弹窗 -->
 <!-- 功能结束：所有弹窗 -->
 
 <!-- 功能开始：聊天信息页（私聊全屏） -->
@@ -3372,13 +3586,6 @@ input:checked + .slider:before { transform: translateX(22px); }
   <span>气泡</span>
   <div style="display:flex; align-items:center; gap:5px;">
     <span id="chat-info-bubble-status" style="font-size:13px; color:#888;"></span>
-    <span class="chat-info-arrow">›</span>
-  </div>
-</div>
-<div class="chat-info-item" id="chat-info-memory-btn">
-  <span>记忆</span>
-  <div style="display:flex; align-items:center; gap:5px;">
-    <span id="chat-info-memory-status" style="font-size:13px; color:#888;"></span>
     <span class="chat-info-arrow">›</span>
   </div>
 </div>
@@ -3434,23 +3641,6 @@ input:checked + .slider:before { transform: translateX(22px); }
   </main>
 </div>
 
-<!-- 子页：记忆轮数 -->
-<div id="chat-info-memory-screen" class="screen" style="background: #ededed;">
-  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
-    <button class="back-btn" id="chat-info-memory-back" style="color: #000;">‹</button>
-    <div class="title-container"><h1 class="title" style="color:#000; font-weight:600; font-size:17px;">记忆轮数</h1></div>
-    <div class="placeholder"></div>
-  </header>
-  <main class="content" style="padding: 20px; overflow-y: auto;">
-    <div class="form-group">
-      <label for="chat-info-memory-input">最大记忆轮数</label>
-      <input type="number" id="chat-info-memory-input" min="1" value="10">
-      <p style="font-size:12px; color:#888; margin-top: 8px;">AI 会记住最近多少轮对话作为上下文。数值越大，记忆越长。</p>
-    </div>
-    <button type="button" class="btn btn-primary" id="chat-info-memory-save">保存</button>
-  </main>
-</div>
-
 <!-- 子页：拍一拍 -->
 <div id="chat-info-pat-screen" class="screen" style="background: #ededed;">
   <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
@@ -3501,7 +3691,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         <button type="button" class="btn btn-neutral" id="reset-custom-bubble-css-btn" style="margin-top: 10px; width: auto; padding: 5px 15px; font-size: 14px;">恢复默认</button>
       </div>
       
-<div class="form-group"><label for="setting-max-memory">最大记忆轮数</label><input type="number" id="setting-max-memory" value="10" min="1"></div>
+<div class="form-group"><label for="setting-max-memory">最大记忆轮数</label><input type="number" id="setting-max-memory" value="300" min="1"></div>
 <div class="form-group"><label for="setting-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input type="file" id="setting-chat-bg-upload" accept="image/*" style="display:none;"></div>
 <button type="submit" class="btn btn-primary">保存设置</button>
     </form>
@@ -3538,7 +3728,7 @@ input:checked + .slider:before { transform: translateX(22px); }
         <textarea id="setting-group-custom-bubble-css" rows="6" placeholder="在此输入CSS代码..." disabled></textarea>
         <button type="button" class="btn btn-neutral" id="reset-group-custom-bubble-css-btn" style="margin-top: 10px; width: auto; padding: 5px 15px; font-size: 14px;">恢复默认</button>
       </div>
-      <div class="form-group"><label for="setting-group-max-memory">最大记忆轮数</label><input type="number" id="setting-group-max-memory" value="10" min="1"></div>
+      <div class="form-group"><label for="setting-group-max-memory">最大记忆轮数</label><input type="number" id="setting-group-max-memory" value="300" min="1"></div>
       <div class="form-group"><label for="setting-group-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input type="file" id="setting-group-chat-bg-upload" accept="image/*" style="display:none;"></div>
       <button type="submit" class="btn btn-primary">保存设置</button>
     </form>
@@ -3741,14 +3931,14 @@ const editWorldBookForm = document.getElementById('edit-world-book-form');
 const worldBookIdInput = document.getElementById('world-book-id');
 const worldBookNameInput = document.getElementById('world-book-name');
 const worldBookContentInput = document.getElementById('world-book-content');
-const linkWorldBookBtn = document.getElementById('link-world-book-btn');
+
 const worldBookSelectionModal = document.getElementById('world-book-selection-modal');
 const worldBookSelectionList = document.getElementById('world-book-selection-list');
 const saveWorldBookSelectionBtn = document.getElementById('save-world-book-selection-btn');
 const fontSettingsForm = document.getElementById('font-settings-form');
 const fontUrlInput = document.getElementById('font-url');
 const restoreDefaultFontBtn = document.getElementById('restore-default-font-btn');
-const createGroupBtn = document.getElementById('create-group-btn');
+
 const createGroupModal = document.getElementById('create-group-modal');
 const createGroupForm = document.getElementById('create-group-form');
 const memberSelectionList = document.getElementById('member-selection-list');
@@ -3772,7 +3962,7 @@ const groupRecipientSelectionModal = document.getElementById('group-recipient-se
 const groupRecipientSelectionList = document.getElementById('group-recipient-selection-list');
 const confirmGroupRecipientBtn = document.getElementById('confirm-group-recipient-btn');
 const groupRecipientSelectionTitle = document.getElementById('group-recipient-selection-title');
-const linkGroupWorldBookBtn = document.getElementById('link-group-world-book-btn');
+
 const wechatMoreBtn = document.getElementById('wechat-more-btn');
 const wechatMorePanel = document.getElementById('wechat-more-panel');
 /* ========== 功能结束：DOM 元素缓存 ========== */
@@ -4004,6 +4194,44 @@ const MSG_RE = {
   invite: /\[(.*?)邀请(.*?)加入了群聊\]/,
   rename: /\[(.*?)修改群名为：(.*?)\]/
 };
+/* 清洗记忆文本里的方括号标记，防止污染聊天 prompt */
+function sanitizeMemoryText(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/\[[^\]]{0,60}?的消息：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?的语音：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?送来的礼物：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?发来的照片\/视频：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?的转账：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?的表情包：([\s\S]*?)\]/g, '$1')
+    .replace(/\[[^\]]{0,60}?发送的表情包：([\s\S]*?)\]/g, '$1')
+    .replace(/<heart>[\s\S]*?<\/heart>/gi, '')
+    .replace(/[\[\]{}]/g, '')
+    .trim();
+}
+/* 兜底：把模型误输出的 JSON 抢救成纯文本 */
+function salvageJsonAsText(raw) {
+  const s = String(raw || '').trim();
+  if (!s.startsWith('{') && !s.startsWith('[')) return null;
+  const jsonMatch = s.match(/\{[\s\S]*\}/);
+  const candidate = jsonMatch ? jsonMatch[0] : s;
+  try {
+    const obj = JSON.parse(candidate);
+    if (Array.isArray(obj)) {
+      const texts = obj.map(o => (o && (o.text || o.content)) || '').filter(Boolean);
+      return texts.join('\n') || '';
+    }
+    if (typeof obj.text === 'string') return obj.text;
+    if (typeof obj.content === 'string') return obj.content;
+    if (typeof obj.reply === 'string') return obj.reply;
+    if (Array.isArray(obj.messages)) {
+      return obj.messages.map(m => typeof m === 'string' ? m : (m.text || m.content || '')).filter(Boolean).join('\n');
+    }
+    return ''; // 是归档 JSON（含 memories）→ 返回空串，让调用方跳过
+  } catch (e) {
+    return null;
+  }
+}
 function readTextFile(file, onSuccess) {
   const name = file.name.toLowerCase();
   if (name.endsWith('.txt')) {
@@ -4130,11 +4358,13 @@ if (!db.myProfile) {
   if (db.safeAreaEnabled === undefined) db.safeAreaEnabled = true;
   if (db.timeFormat24h === undefined) db.timeFormat24h = true;
 
-  db.characters.forEach(c => {
-    if (!c.id) c.id = 'char_' + Date.now() + Math.random().toString(36).slice(2, 7);
-    if (!c.history || !Array.isArray(c.history)) c.history = [];
-    if (c.isPinned === undefined) c.isPinned = false;
-    if (c.status === undefined) c.status = '在线';
+  
+db.characters.forEach(c => {
+  if (!c.id) c.id = 'char_' + Date.now() + Math.random().toString(36).slice(2, 7);
+  if (!c.history || !Array.isArray(c.history)) c.history = [];
+  if (c.maxMemory === undefined) c.maxMemory = 300;
+  if (c.isPinned === undefined) c.isPinned = false;
+  if (c.status === undefined) c.status = '在线';
     if (!c.worldBookIds) c.worldBookIds = [];
     if (c.customBubbleCss === undefined) c.customBubbleCss = '';
     if (c.useCustomBubbleCss === undefined) c.useCustomBubbleCss = false;
@@ -4155,9 +4385,11 @@ if (c.isMuted === undefined) c.isMuted = false;
   if (c.aiBlockRounds === undefined) c.aiBlockRounds = 0;
   if (!c.momentsCover) c.momentsCover = 'https://imgbed.heliar.top/i/jZ1OI1whdv32dikS_IMG_20261004_034256.jpg';
 });
-  db.groups.forEach(g => {
-    if (g.isPinned === undefined) g.isPinned = false;
-    if (!g.worldBookIds) g.worldBookIds = [];
+  
+db.groups.forEach(g => {
+  if (g.maxMemory === undefined) g.maxMemory = 300;
+  if (g.isPinned === undefined) g.isPinned = false;
+  if (!g.worldBookIds) g.worldBookIds = [];
     if (g.customBubbleCss === undefined) g.customBubbleCss = '';
     if (g.useCustomBubbleCss === undefined) g.useCustomBubbleCss = false;
     if (g.unread === undefined) g.unread = false;
@@ -4225,6 +4457,12 @@ function removeContextMenu() {
   const menu = document.querySelector('.context-menu');
   if (menu) menu.remove();
 }
+function extractBubbleColor(css, sel) {
+  if (!css) return '';
+  const re = new RegExp(sel + '\\s*\\{[^}]*?(?:background(?:-color)?)\\s*:\\s*([^;\\}]+)', 'i');
+  const m = css.match(re);
+  return m ? m[1].trim() : '';
+}
 function updateCustomBubbleStyle(chatId, css, enabled) {
   const styleId = `custom-bubble-style-for-${chatId}`;
   let styleElement = document.getElementById(styleId);
@@ -4235,7 +4473,10 @@ function updateCustomBubbleStyle(chatId, css, enabled) {
       document.head.appendChild(styleElement);
     }
     const scopedCss = css.replace(/(\.message-bubble(?:\.sent|\.received)?)/g, `#chat-room-screen.chat-active-${chatId} $1`);
-    styleElement.innerHTML = scopedCss;
+    const sentColor = extractBubbleColor(css, '\\.message-bubble\\.sent');
+    const recvColor = extractBubbleColor(css, '\\.message-bubble\\.received');
+    const varCss = `#chat-room-screen.chat-active-${chatId} { --bubble-sent-bg: ${sentColor || '#95ec69'}; --bubble-received-bg: ${recvColor || '#ffffff'}; }`;
+    styleElement.innerHTML = varCss + '\n' + scopedCss;
   } else {
     if (styleElement) styleElement.remove();
   }
@@ -4324,9 +4565,25 @@ async function callAI({ messages, systemPrompt, stream = false }) {
   const headers = isGemini
     ? { 'Content-Type': 'application/json' }
     : { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` };
-  const body = isGemini
-    ? { contents: messages, system_instruction: { parts: [{ text: systemPrompt }] }, generationConfig: {} }
-    : { model, messages: [{ role: 'system', content: systemPrompt }, ...messages], stream };
+  
+let body;
+if (isGemini) {
+  const contents = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: typeof m.content === 'string' ? m.content : JSON.stringify(m.content) }]
+  }));
+  body = {
+    contents,
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    generationConfig: {}
+  };
+} else {
+  body = {
+    model,
+    messages: [{ role: 'system', content: systemPrompt }, ...messages],
+    stream
+  };
+}
   const resp = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(body) });
   if (!resp.ok) throw new Error(`API ${resp.status}: ${await resp.text()}`);
   if (stream) return resp;
@@ -4377,10 +4634,11 @@ document.body.addEventListener('click', (e) => {
   safely('我的页面', setupMeScreen);
 safely('个人资料页', setupMyProfileInfoScreen);
 safely('我的虚拟形象弹窗', setupMyProfileEditModal);
-  safely('新的朋友搜索按钮', () => {
-    const nfSearchBtn = document.getElementById('new-friends-search-btn');
-    if (nfSearchBtn) nfSearchBtn.addEventListener('click', () => openSearchScreen());
-  });
+  
+safely('新的朋友搜索按钮', () => {
+  const nfSearchBtn = document.getElementById('new-friends-search-btn');
+  if (nfSearchBtn) nfSearchBtn.addEventListener('click', () => openSearchScreen('new-friends-screen'));
+});
   safely('主屏幕', setupHomeScreen);
   safely('聊天列表', setupChatListScreen);
   safely('底部Tab', setupBottomTabBar);
@@ -4428,6 +4686,8 @@ safely('发现页', setupDiscoverScreen);
 safely('评论键盘适配', setupCommentInputKeyboardAdaptation); 
 safely('计算器', setupCalculatorApp);
   safely('每日记', setupAccountingApp);
+safely('记忆屏', setupMemoryScreen);
+safely('记忆衰减', runMemoryDecayOnBoot);
 };
 /* ========== 功能结束：初始化 ========== */
 /* ========== 功能开始：好友资料页 ========== */
@@ -4849,15 +5109,18 @@ function renderContactsList() {
             </div>
           </div>
         </div>`;
-      li.onclick = () => {
-        currentChatId = char.id;
-        currentChatType = 'private';
-        renderFriendProfile(char);
-        switchScreen('friend-profile-screen');
-      };
-      container.appendChild(li);
-    });
+      
+    li.onclick = () => {
+      currentChatId = char.id;
+      currentChatType = 'private';
+      const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+      if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'contacts-screen');
+      renderFriendProfile(char);
+      switchScreen('friend-profile-screen');
+    };
+    container.appendChild(li);
   });
+});
   if (db.characters.length > 0) {
     const friendCountDiv = document.createElement('div');
     friendCountDiv.style.cssText = 'text-align: center; color: #888; font-size: 14px; padding: 25px 0 20px 0;';
@@ -4930,8 +5193,9 @@ document.addEventListener('click', (e) => {
 /* ========== 功能开始：聊天列表 ========== */
 function setupChatListScreen() {
   renderChatList();
-  const chatSearchBtn = document.getElementById('chat-search-btn');
-  if (chatSearchBtn) chatSearchBtn.addEventListener('click', () => openSearchScreen());
+  
+const chatSearchBtn = document.getElementById('chat-search-btn');
+if (chatSearchBtn) chatSearchBtn.addEventListener('click', () => openSearchScreen('chat-list-screen'));
   const dropdownMenu = document.getElementById('wechat-dropdown-menu');
   addChatBtn.addEventListener('click', (e) => { e.stopPropagation(); dropdownMenu.classList.toggle('visible'); });
   document.addEventListener('click', (e) => {
@@ -5106,15 +5370,20 @@ function renderChatList() {
           lastMessageText = urlRegex.test(text) ? '[图片]' : text;
         }
       } else {
-        const lastEverMsg = chat.history[chat.history.length - 1];
-        const inviteRegex = /\[(.*?)邀请(.*?)加入了群聊\]/;
-        const renameRegex = /\[.*?修改群名为：.*?\]/;
-        const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
-        const timeSkipMatch = lastEverMsg.content.match(timeSkipRegex);
-        if (timeSkipMatch) lastMessageText = timeSkipMatch[1];
-        else if (inviteRegex.test(lastEverMsg.content)) lastMessageText = '新成员加入了群聊';
-        else if (renameRegex.test(lastEverMsg.content)) lastMessageText = '群聊名称已修改';
-      }
+  const lastEverMsg = chat.history[chat.history.length - 1];
+  if (!lastEverMsg) {
+    lastMessageText = '开始聊天吧...';
+  } else {
+    const inviteRegex = /\[(.*?)邀请(.*?)加入了群聊\]/;
+    const renameRegex = /\[.*?修改群名为：.*?\]/;
+    const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
+    const timeSkipMatch = lastEverMsg.content.match(timeSkipRegex);
+    if (timeSkipMatch) lastMessageText = timeSkipMatch[1];
+    else if (inviteRegex.test(lastEverMsg.content)) lastMessageText = '新成员加入了群聊';
+    else if (renameRegex.test(lastEverMsg.content)) lastMessageText = '群聊名称已修改';
+  }
+}
+
     }
     const li = document.createElement('li');
     li.className = 'list-item chat-item';
@@ -5125,8 +5394,8 @@ function renderChatList() {
     const itemName = chat.type === 'private' ? chat.remarkName : chat.name;
     const pinBadgeHTML = chat.isPinned ? '<span class="pin-badge">置顶</span>' : '';
     
-const isMutedPrivate = chat.type === 'private' && chat.isMuted;
-const unreadCount = isMutedPrivate ? 0 : (chat.unreadCount || (chat.unread ? 1 : 0));
+const isMutedChat = !!chat.isMuted;
+const unreadCount = isMutedChat ? 0 : (chat.unreadCount || (chat.unread ? 1 : 0));
 const unreadDotHTML = unreadCount > 0 ? `<span class="unread-badge">${unreadCount > 99 ? '99+' : unreadCount}</span>` : '';
     const pinActionText = chat.isPinned ? '取消<br>置顶' : '置顶';
     li.innerHTML = `
@@ -5209,7 +5478,7 @@ function setupAddFriendScreen() {
       realName, remarkName, persona, avatar,
       myName: '我', myPersona: '',
       myAvatar: 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg',
-      theme: 'black_white', maxMemory: 10, chatBg: '', history: [],
+      theme: 'black_white', maxMemory: 300, chatBg: '', history: [],
       isPinned: false, status: '在线',
       worldBookIds: tempAddFriendWorldBooks,
       useCustomBubbleCss: false, customBubbleCss: '',
@@ -5233,7 +5502,7 @@ function setupAddFriendScreen() {
 let cropState = {
   isDragging: false, lastX: 0, lastY: 0, startDistance: 0, startScale: 1,
   baseW: 0, baseH: 0, x: 0, y: 0, scale: 1, img: null,
-  cw: 220, ch: 220 // 容器宽高
+  cw: 240, ch: 240 // 容器宽高（与 CSS 中 #crop-area 的 240px 保持一致）
 };
 
 function openCropModal(imageSrc) {
@@ -5656,13 +5925,50 @@ function handleMessageLongPress(messageWrapper, x, y) {
   const isTransferMessage = /\[.*?给你转账：.*?\]|\[.*?的转账：.*?\]|\[.*?向.*?转账：.*?\]/.test(message.content);
   const isGiftMessage = /\[.*?送来的礼物：.*?\]|\[.*?向.*?送来了礼物：.*?\]/.test(message.content);
   const isInvisibleMessage = /\[[\s\S]*?(?:接收|退回)[\s\S]*?的转账\]|\[[\s\S]*?更新状态为：[\s\S]*?\]|\[[\s\S]*?已接收礼物\]|\[system:[\s\S]*?\]|\[[\s\S]*?邀请[\s\S]*?加入了群聊\]|\[[\s\S]*?修改群名为：[\s\S]*?\]|\[system-display:[\s\S]*?\]/i.test(message.content);
-  let menuItems = [];
-  if (!isImageRecognitionMsg && !isVoiceMessage && !isStickerMessage && !isPhotoVideoMessage && !isTransferMessage && !isGiftMessage && !isInvisibleMessage) {
-    menuItems.push({ label: '编辑', action: () => startMessageEdit(messageId) });
-  }
-  menuItems.push({ label: '删除', action: () => enterMultiSelectMode(messageId) });
+  
+let menuItems = [];
+if (!isImageRecognitionMsg && !isVoiceMessage && !isStickerMessage && !isPhotoVideoMessage && !isTransferMessage && !isGiftMessage && !isInvisibleMessage) {
+  menuItems.push({ label: '编辑', action: () => startMessageEdit(messageId) });
+}
+/* ★ 收到 AI 发来的表情包 → 可以保存到我的表情 */
+const isStickerFromOther = isStickerMessage
+  && message.role !== 'user'
+  && /\[.*?发送的表情包：.*?\]/.test(message.content);
+if (isStickerFromOther) {
+  menuItems.push({ label: '保存到我的表情', action: () => saveReceivedSticker(message) });
+}
+menuItems.push({ label: '删除', action: () => enterMultiSelectMode(messageId) });
   if (menuItems.length > 0) createContextMenu(menuItems, x, y);
 }
+/* ========== 功能开始：把收到的表情包保存到自己收藏 ========== */
+async function saveReceivedSticker(message) {
+  const receivedRegex = /\[(?:.+?)发送的表情包：([\s\S]+?)\]/;
+  const m = message.content.match(receivedRegex);
+  if (!m) { showToast('无法识别这个表情包'); return; }
+  const rawPath = m[1].trim();
+  let data = message.stickerData;
+  if (!data) data = resolveStickerUrl(rawPath);
+  const defaultName = (rawPath.split('/').pop() || '表情').replace(/\.[^.]+$/, '').slice(0, 8) || '表情包';
+
+  const name = await showHgInput({
+    title: '保存表情包',
+    sub: '给这个表情包取个名字，以后你也能用',
+    placeholder: '如：偷笑',
+    value: defaultName
+  });
+  if (!name) return;
+  const cleanName = String(name).trim();
+  if (!cleanName) return;
+  if (!db.myStickers) db.myStickers = [];
+  if (db.myStickers.some(s => s.name === cleanName)) {
+    showToast('已有同名表情包了');
+    return;
+  }
+  db.myStickers.push({ id: `sticker_${Date.now()}`, name: cleanName, data });
+  await saveData();
+  showToast(`已保存到我的表情「${cleanName}」`);
+}
+/* ========== 功能结束 ========== */
 
 function startMessageEdit(messageId) {
   exitMultiSelectMode();
@@ -5790,7 +6096,22 @@ function openChatRoom(chatId, type) {
     switchScreen('chat-room-screen');
 }
 /* ========== 功能结束：聊天室交互 ========== */
-
+/* ========== 功能开始：表情包 URL 解析 & 破损兜底 ========== */
+function resolveStickerUrl(rawPath) {
+  if (!rawPath) return buildStickerFallback('');
+  const p = String(rawPath).trim();
+  if (/^(https?:)?\/\//i.test(p) || p.startsWith('data:')) return p;
+  const pathExtractionRegex = /[a-zA-Z0-9]+\/.*$/;
+  const m = p.match(pathExtractionRegex);
+  const finalPath = m ? m[0] : p;
+  return `https://i.postimg.cc/${finalPath}`;
+}
+function buildStickerFallback(name) {
+  const safe = String(name || '表情包').slice(0, 12).replace(/[<>&"]/g, '');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"><rect width="120" height="120" rx="12" fill="#f2f2f2"/><text x="60" y="58" text-anchor="middle" font-size="11" fill="#b0b0b0" font-family="-apple-system,sans-serif">表情包</text><text x="60" y="76" text-anchor="middle" font-size="9" fill="#c8c8c8" font-family="-apple-system,sans-serif">${safe}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+/* ========== 功能结束：表情包 URL 解析 & 破损兜底 ========== */
 /* ========== 功能开始：消息渲染 ========== */
 function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
   const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
@@ -5901,19 +6222,32 @@ function createMessageBubbleElement(message) {
   const imageRecogMatch = content.match(imageRecogRegex);
   const textMatch = content.match(textRegex);
 
-  if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
+  
+if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
     bubbleElement = document.createElement('div');
     bubbleElement.className = 'image-bubble';
     let stickerSrc = '';
-    if (isSent) stickerSrc = stickerData;
-    else {
+    let stickerNameForFallback = '';
+    if (isSent) {
+      stickerSrc = stickerData;
+      const nm = content.match(/\[(?:.+?)的表情包：(.+?)\]/);
+      stickerNameForFallback = nm ? nm[1].trim() : '';
+    } else {
       const rawPath = receivedStickerMatch[1].trim();
-      const pathExtractionRegex = /[a-zA-Z0-9]+\/.*$/;
-      const extractedPathMatch = rawPath.match(pathExtractionRegex);
-      const finalPath = extractedPathMatch ? extractedPathMatch[0] : rawPath;
-      stickerSrc = `https://i.postimg.cc/${finalPath}`;
+      stickerNameForFallback = rawPath;
+      // 优先用绑定的 stickerData（AI 从自己收藏里挑的、或补录的图）
+      if (message.stickerData) stickerSrc = message.stickerData;
+      else stickerSrc = resolveStickerUrl(rawPath);
     }
-    bubbleElement.innerHTML = `<img src="${stickerSrc}" alt="表情包">`;
+    const stickerImg = document.createElement('img');
+    stickerImg.alt = '表情包';
+    // ★ 破损兜底：加载失败就换成灰底提示图，绝不再出现裂图
+    stickerImg.onerror = () => {
+      stickerImg.onerror = null;
+      stickerImg.src = buildStickerFallback(stickerNameForFallback);
+    };
+    stickerImg.src = stickerSrc;
+    bubbleElement.appendChild(stickerImg);
   } else if (privateGiftMatch || groupGiftMatch) {
     const match = privateGiftMatch || groupGiftMatch;
     bubbleElement = document.createElement('div');
@@ -6118,19 +6452,20 @@ async function addMessageBubble(message, chatArg, chatTypeArg) {
         }
       }
     }
-  } else {
-    if (message.role === 'assistant') {
-      if (!(chatType === 'private' && chat.isMuted)) {
-        chat.unread = true;
-        chat.unreadCount = (chat.unreadCount || 0) + 1;
-      }
-      renderChatList();
-      if (!(chatType === 'private' && chat.isMuted)) {
-        if (chatType === 'private') playSoundWithThrottle(chat.isPinned ? 'special' : 'sms');
-        else playSoundWithThrottle('sms');
-      }
+  
+} else {
+  if (message.role === 'assistant') {
+    if (!chat.isMuted) {
+      chat.unread = true;
+      chat.unreadCount = (chat.unreadCount || 0) + 1;
+    }
+    renderChatList();
+    if (!chat.isMuted) {
+      if (chatType === 'private') playSoundWithThrottle(chat.isPinned ? 'special' : 'sms');
+      else playSoundWithThrottle('sms');
     }
   }
+}
 }
 /* ========== 功能结束：消息渲染 ========== */
 
@@ -6263,8 +6598,11 @@ function generatePrivateSystemPrompt(character) {
   const now = new Date();
   const currentTime = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-  let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
-  prompt += `════ 环境 ════\n`;
+  
+let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
+prompt += focusPrompt('线上私聊', '只进行微信式聊天，不要输出小说体，不要处理其他功能。');
+prompt += buildMemoryBlock(character, '');
+prompt += `════ 环境 ════\n`;
   prompt += `【时间】现在是 ${currentTime}。你知道是几点，但别没事就提时间，除非话题真的跟时间有关。\n`;
   prompt += `【场景】这是纯线上空间。你我之间不存在线下关系，不要提议见面、不要留其他平台联系方式、不要扯现实里的事。你始终是「在线的角色」。\n\n`;
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
@@ -6277,7 +6615,67 @@ prompt += `· 人设：\n${character.persona || "一个友好、乐于助人的�
 if (worldBooksDuring) prompt += `\n════ 世界书 · 中置设定 ════\n${worldBooksDuring}\n`;
 if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
 if (character.myPersona) prompt += `\n════ 我的人设 ════\n${character.myPersona}\n（你心里有数就行，不用刻意演给我看）\n`;
-  prompt += `\n════ 特殊格式识别 ════\n`;
+
+/* 功能开始：记忆召回注入 */
+const lastUserMsg = [...(character.history || [])].reverse().find(m => m.role === 'user' && !m.sendFailed);
+const lastUserText = lastUserMsg ? lastUserMsg.content.replace(/\[.*?\]/g, '') : '';
+const recalled = recallMemories(character, lastUserText, 8);
+if (recalled.length > 0) {
+  const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
+  recalled.forEach(m => {
+    const cleanContent = sanitizeMemoryText(m.content);
+    if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
+  });
+  prompt += `\n════ 你记得的事 ════\n`;
+  prompt += `（这些是你和用户之间真实发生过的事，是你自己记在心里的。下面不会每条都提，但你心里有底。）\n`;
+  if (byLevel.anchor.length) {
+    prompt += `\n【永远忘不掉的】\n`;
+    byLevel.anchor.forEach(m => { prompt += `· ${m.content}\n`; });
+  }
+  if (byLevel.important.length) {
+    prompt += `\n【重要的】\n`;
+    byLevel.important.forEach(m => { prompt += `· ${m.content}\n`; });
+  }
+  if (byLevel.daily.length) {
+    prompt += `\n【日常的】\n`;
+    byLevel.daily.forEach(m => { prompt += `· ${m.content}\n`; });
+  }
+  if (byLevel.trivial.length) {
+    prompt += `\n【隐约有点印象的】\n`;
+    byLevel.trivial.forEach(m => { prompt += `· ${m.content}\n`; });
+  }
+  prompt += `\n【回忆原则 · 比什么都重要】\n`;
+  prompt += `· 不要机械复述这些条目。不要在回复里逐条列举。\n`;
+  prompt += `· 只有话题真的相关时，才像真人一样"突然想起来"，自然带一句。\n`;
+  prompt += `· 提的时候要说具体画面、感觉、当时的一句话——不要只说"我记得那件事"。\n`;
+  prompt += `· 比如用户说"上次看电影"，你要想起的是"那天你穿了一件奶白色大衣，冻得一直往我这边靠"，而不是"我们2024年10月5日看了电影"。\n`;
+  prompt += `· 如果用户提的事你记忆里没有，就自然地说"有点记不清了""你再说说？"——绝不假装记得。\n`;
+  prompt += `· 说出的话要贴合你的人设、当下情绪、和用户的亲疏。\n`;
+  prompt += `· 锚点记忆（生日、重要事件）绝不能忘、不能模糊。\n\n`;
+recalled.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
+}
+/* 功能结束：记忆召回注入 */
+
+/* 功能开始：跨聊天记忆（群聊话题延伸到私聊） */
+const crossMemories = recallGroupMemoriesForPrivate(character, lastUserText, 4);
+if (crossMemories.length > 0) {
+  prompt += `\n════ 群聊里记下的事（可以自然延伸到私聊） ════\n`;
+  prompt += `（这些是你在群里和用户相处时、心里记下的事。私聊里不用专门提，但如果话题对上了，可以自然地接一句——就像人会把群里没说完的话私底下继续。）\n`;
+  crossMemories.forEach(m => {
+    const fromTag = m._fromGroupName ? `（来自群「${m._fromGroupName}」）` : '';
+    prompt += `· ${m.content}${fromTag}\n`;
+  });
+  prompt += `\n【延伸原则 · 重要】\n`;
+  prompt += `· 用户在群里提过、但私聊里没落实的事，可以在这里自然地问一句。\n`;
+  prompt += `· 例如：群里用户说想吃火锅，你在私聊里可以问"那家店要不要我订？"\n`;
+  prompt += `· 不要直接说"你在群里说……"，太刻意。就当自己一直记着。\n`;
+  prompt += `· 如果话题对不上，就别提。硬提会显得假。\n`;
+  prompt += `· 同一条记忆不要反复提，提过一次就等下次再说。\n\n`;
+  crossMemories.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
+}
+/* 功能结束：跨聊天记忆 */
+
+prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `我发来的消息里有些会包在方括号里，你要能读懂：\n`;
   prompt += `· [${character.myName}的表情包：xxx]  → 我发了个叫 xxx 的表情包，你理解我的情绪就好，不用真回表情\n`;
   prompt += `· [${character.myName}发来了一张图片：]  → 我发了图片，看着内容回应\n`;
@@ -6305,8 +6703,10 @@ if (character.myPersona) prompt += `\n════ 我的人设 ════\n${
   prompt += `【改签名】你可以改个性签名。高兴、生气、感动、想逗我、甚至只是心情好，都可以换：\n`;
   prompt += `   [${character.realName}更新签名为：xxx]\n`;
   
-prompt += `   也不显示为气泡。\n\n`;
-/* 功能开始：心声 */
+prompt += `【偷表情包】当我发来表情包（[${character.myName}的表情包：xxx]）的时候，如果你觉得这个表情包好玩、贴合你的人设、以后也想用，可以把它偷走：\n`;
+prompt += `   [${character.realName}偷了用户的表情包：xxx]\n`;
+prompt += `   xxx 必须一字不差地用我发给你的那个名字。这条不显示给我。偷走之后，这个表情包就进了你的收藏，以后你也可以用它回我。\n`;
+prompt += `   不要每次都偷，真觉得好玩才偷。偷了以后可以自然地说一句“这个我要了”之类的话。\n\n`;
 prompt += `【心声】每次回复的最后，你还要输出一次心声——\n`;
 prompt += `   <heart>……</heart>\n`;
 prompt += `   这是你此刻真正的内心独白，第一人称，30 到 50 个字。\n`;
@@ -6326,9 +6726,12 @@ prompt += `你的所有回复都必须是下面这些格式，可以组合，但
   prompt += `· 语音        [${character.realName}的语音：{语音内容}]\n`;
   prompt += `· 照片/视频   [${character.realName}发来的照片/视频：{描述}]\n`;
   prompt += `· 转账        [${character.realName}的转账：{金额}元；备注：{备注}]\n`;
-  prompt += `· 表情包      [${character.realName}发送的表情包：{路径}]\n`;
-  prompt += `   路径不用带 https://i.postimg.cc/，比如 "害羞vHLfrV3K/1.jpg" 就行\n`;
+  
+prompt += `· 表情包      [${character.realName}发送的表情包：{名字或路径}]\n`;
+prompt += `   如果你偷过我的表情包，可以直接用它的名字（比如 [${character.realName}发送的表情包：偷笑]），系统会自动换成正确的图。\n`;
+prompt += `   不是收藏里的表情，就填一个图片路径（不用带 https://i.postimg.cc/），比如 "害羞vHLfrV3K/1.jpg"。\n`;
   prompt += `· 收礼物指令  [${character.realName}已接收礼物]（隐藏不显示）\n`;
+prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包：{名字}]（隐藏不显示）\n`;
   prompt += `· 收转账指令  [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]（隐藏不显示）\n`;
   prompt += `· 状态指令    [${character.realName}更新状态为：{新状态}]（隐藏不显示）\n`;
   prompt += `· 发位置      [${character.realName}发送了位置：{位置名称}。{可选距离}]\n`;
@@ -6354,11 +6757,16 @@ prompt += `   [应对方式] 你只能针对我“发出这段文字”的行为
   prompt += `   拉黑后我的消息你完全收不到（我那边显示红色感叹号，对你来说就像石沉大海，你只能看到系统提示【用户试图发送消息，但被拒收了】）。你只能单方面发消息给我。\n\n`;
   prompt += `【解除】你可以随时解除拉黑：\n`;
   prompt += `   [${character.realName}解除了对用户的拉黑]\n\n`;
-  prompt += `【时限】为了真实和适可而止：拉黑最多只能持续 3 轮对话，第 3 轮必须无条件解除。\n`;
+prompt += `【时限】为了真实和适可而止：拉黑最多只能持续 3 轮对话，第 3 轮必须无条件解除。\n\n`;
+  prompt += `════ 格式排他铁律（最高优先级） ════\n`;
+  prompt += `你此刻的任务只有一个：【聊天回复】。\n`;
+  prompt += `· 禁止输出任何 JSON 结构——不要以 { 开头，不要出现 "memories"、"level"、"content"、"text"、"images" 这类字段名。\n`;
+  prompt += `· 就算你心里的记忆、系统指令里有类似 JSON 的内容，那只是背景资料，不要复述它的原始结构。\n`;
+  prompt += `· 你的每一条可见消息都必须以 [ 开头、以 ] 结尾（心声 <heart>...</heart> 是唯一例外）。\n`;
+  prompt += `· 如果你不小心输出成了 JSON，会被系统丢弃，用户什么都看不到。\n`;
   return prompt;
 }
 /* ========== 功能结束：AI 提示词（私聊） ========== */
-
 /* ========== 功能开始：AI 提示词（群聊） ========== */
 function generateGroupSystemPrompt(group) {
   let worldBooksBefore = db.worldBooks.filter(wb => wb.position === 'before' && wb.enabled !== false && (wb.scope === 'global' || (group.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
@@ -6369,6 +6777,8 @@ function generateGroupSystemPrompt(group) {
   if (worldBooksAfter.length > 5000) worldBooksAfter = worldBooksAfter.substring(0, 5000) + '...(内容过长截断)';
 
   let prompt = `【任务】你正在扮演「${group.name}」这个群聊里的所有 AI 角色。我（${group.me.nickname}）是群里唯一的人类。\n\n`;
+prompt += focusPrompt('群聊', '只扮演群成员在群里发言，不要输出私聊格式，不要处理其他功能。');
+prompt += buildMemoryBlock(group, '');
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
   prompt += `════ 群成员名单 ════\n`;
   prompt += `[我 - 用户]\n`;
@@ -6411,7 +6821,12 @@ prompt += `\n════ 我的消息格式 ════\n`;
   prompt += `· 只输出上面列出的合法格式，绝不能出现 [场景描述]、(心理活动)、*动作* 等格式外内容。\n`;
   prompt += `· 群成员之间是独立的人。可以熟、可以生、可以互怼、可以互看不顺眼，但绝不产生任何恋爱倾向。恋爱方向只能指向我（用户）。\n`;
   prompt += `· 角色之间的互动要合理，禁止硬凑 CP、禁止突然表白、禁止为了剧情掀翻人设。\n`;
-  prompt += `· 保持对话持续，不要主动结束。\n\n`;
+prompt += `· 保持对话持续，不要主动结束。\n\n`;
+  prompt += `════ 格式排他铁律（最高优先级） ════\n`;
+  prompt += `你此刻的任务只有一个：【群聊扮演】。\n`;
+  prompt += `· 禁止输出任何 JSON 结构——不要以 { 开头，不要出现 "messages"、"content" 这类字段名。\n`;
+  prompt += `· 你的每一条消息必须严格以 [ 开头、以 ] 结尾。\n`;
+  prompt += `· 即使记忆或系统指令里有 JSON 样式的内容，也不要复述它的结构。\n\n`;
   prompt += `现在，开始扮演群聊里的所有角色吧。`;
   return prompt;
 }
@@ -6420,6 +6835,8 @@ prompt += `\n════ 我的消息格式 ════\n`;
 /* ========== 功能开始：AI 提示词（线下模式） ========== */
 function generateOfflineSystemPrompt(chat) {
   let prompt = `你正在扮演角色进行线下剧情演绎。你的输出必须是纯文本，只输出小说叙事的文字，不要有任何格式标记。\n\n`;
+prompt += focusPrompt('线下剧情', '只输出纯文本小说叙事体，绝对不能输出线上聊天格式。');
+prompt += buildMemoryBlock(chat, '');
   
   prompt += `════ 核心扮演铁律 ════\n`;
   prompt += `1. 用户消息里可能夹着用圆括号 () 或中文圆括号（）包起来的内容。那是心理独白或场景铺陈。你绝对不能对括号里的内容做直接回应，不能提及它，只能从角色的外部表现（语气、动作、停顿）去反推。\n`;
@@ -6442,6 +6859,9 @@ function generateOfflineSystemPrompt(chat) {
   prompt += `· 名字：${chat.realName}\n`;
   prompt += `· 称呼：${chat.myName}\n`;
   prompt += `· 人设：${chat.persona || '一个友好、乐于助人的伙伴。'}\n\n`;
+if (chat.myPersona) {
+  prompt += `════ 用户人设（我） ════\n${chat.myPersona}\n\n`;
+}
   
   if (chat.worldBookIds && chat.worldBookIds.length > 0) {
       let worldBooks = db.worldBooks.filter(wb => wb.enabled !== false && (wb.scope === 'global' || chat.worldBookIds.includes(wb.id))).map(wb => wb.content).join('\n');
@@ -6455,6 +6875,11 @@ prompt += `比如：用户输入“你敲我脑袋了”，这不是在发微信
 prompt += `你的回复必须是纯文本的小说叙事体（包含动作、神态、心理、环境描写）。\n`;
 prompt += `严禁模仿线上格式！严禁输出任何类似于 [xxx的消息：xxx] 的标签！只输出纯净的剧情段落。\n`;
 prompt += `如果你想区分场景转换或特殊标记，可以使用【 】或 ——，但除此之外不要添加任何格式标记。\n\n`;
+prompt += `════ 格式排他铁律（最高优先级） ════\n`;
+prompt += `你此刻的任务只有一个：【线下剧情演绎】。\n`;
+prompt += `· 禁止输出 JSON，禁止输出 { 开头的整段内容。\n`;
+prompt += `· 禁止输出 [xxx的消息：xxx]、<heart> 等线上聊天标记。\n`;
+prompt += `· 只输出纯文本小说叙事体。\n\n`;
 prompt += `请基于以上设定与历史，开始输出你的纯文本剧情回复。`;
   return prompt;
 }
@@ -6593,6 +7018,14 @@ async function processStream(response, chat, chatType, apiType, isOffline = fals
   
 if (fullResponse) {
   
+/* 兜底：如果模型误输出了整段 JSON，抢救成纯文本，避免 UI 崩坏 */
+const salvaged = salvageJsonAsText(fullResponse);
+if (salvaged !== null) {
+  console.warn('[格式兜底] 检测到 JSON 输出，已转换为纯文本');
+  fullResponse = salvaged;
+  if (!fullResponse) { return; } // 归档类 JSON，直接跳过
+}
+  
 if (isOffline) {
   let cleanResponse = fullResponse.trim();
   cleanResponse = cleanResponse.replace(/```[\s\S]*?```/g, '').trim();
@@ -6656,16 +7089,36 @@ const locMsg = {
             showToast(`对方已拉黑你`);
             continue;
           }
-          if (item.content.includes(`[${character.realName}解除了对用户的拉黑]`)) {
-            character.aiBlockedUser = false;
-            character.aiBlockRounds = 0;
-            await saveData();
-            showToast(`对方已解除对你的拉黑`);
-            continue;
-          }
-          const receivedTransferRegex = new RegExp(`\\[${character.realName}的转账：.*?元；备注：.*?\\]`);
-          const giftRegex = new RegExp(`\\[${character.realName}送来的礼物：.*?\\]`);
           
+if (item.content.includes(`[${character.realName}解除了对用户的拉黑]`)) {
+  character.aiBlockedUser = false;
+  character.aiBlockRounds = 0;
+  await saveData();
+  showToast(`对方已解除对你的拉黑`);
+  continue;
+}
+
+/* ========== 功能开始：AI 偷用户的表情包 ========== */
+const stealStickerRegex = new RegExp(`\\[${character.realName}偷了用户的表情包：([\\s\\S]+?)\\]`);
+const stealMatch = item.content.match(stealStickerRegex);
+if (stealMatch) {
+  const stealName = stealMatch[1].trim();
+  if (!Array.isArray(character.stickerBag)) character.stickerBag = [];
+  if (!character.stickerBag.some(s => s.name === stealName)) {
+    const source = (db.myStickers || []).find(s => s.name === stealName);
+    if (source) {
+      character.stickerBag.push({ name: source.name, data: source.data });
+      await saveData();
+      showToast(`${character.remarkName} 偷走了你的表情包「${source.name}」`);
+    }
+  }
+  continue; // 隐藏指令，不显示为气泡
+}
+/* ========== 功能结束：AI 偷用户的表情包 ========== */
+
+const receivedTransferRegex = new RegExp(`\\[${character.realName}的转账：.*?元；备注：.*?\\]`);
+const giftRegex = new RegExp(`\\[${character.realName}送来的礼物：.*?\\]`);
+
 const message = {
   id: `msg_${Date.now()}_${Math.random()}`,
   role: 'assistant',
@@ -6676,6 +7129,16 @@ const message = {
   heart: heartText || undefined
   /* 功能结束：心声 */
 };
+
+/* ========== 功能开始：AI 用自己收藏的表情包 ========== */
+const aiStickerRegex = new RegExp(`\\[${character.realName}发送的表情包：([\\s\\S]+?)\\]`);
+const aiStickerMatch = item.content.match(aiStickerRegex);
+if (aiStickerMatch && Array.isArray(character.stickerBag) && character.stickerBag.length > 0) {
+  const sName = aiStickerMatch[1].trim();
+  const found = character.stickerBag.find(s => s.name === sName);
+  if (found) message.stickerData = found.data;
+}
+/* ========== 功能结束 ========== */
           if (chat.isBlacklisted) message.sendFailed = true;
           if (receivedTransferRegex.test(message.content)) message.transferStatus = 'pending';
           else if (giftRegex.test(message.content)) message.giftStatus = 'sent';
@@ -6712,13 +7175,37 @@ if (character.aiBlockedUser) {
       character.history.push(systemBreakMsg);
     }
   }
-  // 概率触发 AI 发朋友圈（12% 概率，延迟 5~13 秒后执行）
-  if (!isOffline && Math.random() < 0.12) {
+// 概率触发 AI 发朋友圈（12% 概率，延迟 5~13 秒后执行）
+if (!isOffline && Math.random() < 0.12) {
     setTimeout(() => {
       try { if (typeof generateAiMoment === 'function') generateAiMoment(character); }
       catch (e) { console.warn('自动发朋友圈失败:', e); }
     }, 5000 + Math.random() * 8000);
   }
+
+  /* 功能开始：AI 自动归档记忆（AI 自作主张） */
+  if (!isOffline) {
+    if (!character._memoryTick) character._memoryTick = 0;
+    character._memoryTick++;
+    if (character._memoryTick >= 3) {
+      character._memoryTick = 0;
+      setTimeout(() => {
+        try { autoArchiveRecent(character); }
+        catch (e) { console.warn('自动记忆归档失败:', e); }
+      }, 2500);
+    }
+  }
+  /* 功能结束：AI 自动归档记忆 */
+
+  /* 功能开始：AI 根据记忆发朋友圈（纪念日 / 约定到了） */
+  if (!isOffline && Math.random() < 0.15) {
+    setTimeout(() => {
+      try { maybePostMemoryMoment(character); }
+      catch (e) { console.warn('记忆朋友圈失败:', e); }
+    }, 6000 + Math.random() * 7000);
+  }
+  /* 功能结束：AI 根据记忆发朋友圈 */
+
 } else if (chatType === 'group') {
       const group = chat;
       const messages = getMixedContent(fullResponse);
@@ -6765,6 +7252,19 @@ if (character.aiBlockedUser) {
           await addMessageBubble(simpleMessage, chat, chatType);
         }
       }
+      /* 功能开始：群聊自动记忆归档（会触发成员私下给用户发消息） */
+      if (!isOffline) {
+        if (!chat._memoryTick) chat._memoryTick = 0;
+        chat._memoryTick++;
+        if (chat._memoryTick >= 2) {
+          chat._memoryTick = 0;
+          setTimeout(() => {
+            try { autoArchiveRecent(chat, true); }
+            catch (e) { console.warn('群聊自动记忆归档失败:', e); }
+          }, 3000);
+        }
+      }
+      /* 功能结束：群聊自动记忆归档 */
     }
     await saveData();
     renderChatList();
@@ -7543,29 +8043,6 @@ if (ciAvatarWrap) ciAvatarWrap.addEventListener('click', () => {
   const ciBubbleBack = document.getElementById('chat-info-bubble-back');
   if (ciBubbleBack) ciBubbleBack.addEventListener('click', () => switchScreen('chat-info-screen'));
 
-  // 记忆轮数子页
-  const ciMemoryBtn = document.getElementById('chat-info-memory-btn');
-  if (ciMemoryBtn) ciMemoryBtn.addEventListener('click', () => {
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (!char) return;
-    document.getElementById('chat-info-memory-input').value = char.maxMemory || 10;
-    switchScreen('chat-info-memory-screen');
-  });
-  
-const ciMemorySave = document.getElementById('chat-info-memory-save');
-if (ciMemorySave) ciMemorySave.addEventListener('click', async () => {
-  const char = db.characters.find(c => c.id === currentChatId);
-  if (!char) return;
-  const v = parseInt(document.getElementById('chat-info-memory-input').value);
-  char.maxMemory = (v && v > 0) ? v : 10;
-  await saveData();
-  const memStatusEl = document.getElementById('chat-info-memory-status');
-  if (memStatusEl) memStatusEl.textContent = `${char.maxMemory} 轮`;
-  showToast('记忆轮数已保存');
-  switchScreen('chat-info-screen');
-});
-  const ciMemoryBack = document.getElementById('chat-info-memory-back');
-  if (ciMemoryBack) ciMemoryBack.addEventListener('click', () => switchScreen('chat-info-screen'));
 
   // 聊天背景
   const ciBgBtn = document.getElementById('chat-info-bg-btn');
@@ -7646,9 +8123,7 @@ function renderChatInfoScreen() {
   document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
 document.getElementById('chat-info-bubble-status').textContent = char.useCustomBubbleCss ? '自定义' : '默认';
-  const memStatusEl = document.getElementById('chat-info-memory-status');
-  if (memStatusEl) memStatusEl.textContent = `${char.maxMemory || 10} 轮`;
-  document.getElementById('chat-info-pat-preview').textContent = (db.myProfile && db.myProfile.patSuffix) || '未设置';
+document.getElementById('chat-info-pat-preview').textContent = (db.myProfile && db.myProfile.patSuffix) || '未设置';
 }
 
 function executeChatInfoSearch(keyword) {
@@ -8791,32 +9266,34 @@ if (sorted.length === 0) {
     list.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">暂无互动消息</div>';
     return;
 }
-    sorted.forEach(item => {
-        const li = document.createElement('li');
-        li.style.cssText = 'padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 10px; background: #fff; cursor: pointer;';
-        li.innerHTML = `
-            <img src="${item.avatar}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">
-            <div style="flex: 1; min-width: 0;">
-                <div style="font-size: 14px; font-weight: 600; color: #576B95; margin-bottom: 4px;">${escapeHtml(item.user)}</div>
-                <div style="font-size: 14px; color: #333; line-height: 1.4; word-break: break-word;">${escapeHtml(item.content)}</div>
-                <div style="font-size: 12px; color: #aaa; margin-top: 6px;">${formatMomentTime(item.timestamp)}</div>
-                <div style="font-size: 12px; color: #888; margin-top: 8px; background: #f7f7f7; padding: 8px 10px; border-radius: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
-                    <span style="font-weight:500;">朋友圈：</span>${escapeHtml(item.momentText || '无正文')}
-                </div>
+sorted.forEach(item => {
+    const li = document.createElement('li');
+    li.style.cssText = 'padding: 15px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 10px; background: #fff; cursor: pointer;';
+    li.innerHTML = `
+        <img src="${item.avatar}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 14px; font-weight: 600; color: #576B95; margin-bottom: 4px;">${escapeHtml(item.user)}</div>
+            <div style="font-size: 14px; color: #333; line-height: 1.4; word-break: break-word;">${escapeHtml(item.content)}</div>
+            <div style="font-size: 12px; color: #aaa; margin-top: 6px;">${formatMomentTime(item.timestamp)}</div>
+            <div style="font-size: 12px; color: #888; margin-top: 8px; background: #f7f7f7; padding: 8px 10px; border-radius: 4px; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;">
+                <span style="font-weight:500;">朋友圈：</span>${escapeHtml(item.momentText || '无正文')}
             </div>
-        `;
-        
-li.onclick = () => {
-  currentChatId = char.id;
-  currentChatType = 'private';
-  // 从通讯录进 → 好友资料页返回键指向通讯录
-  const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
-  if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'contacts-screen');
-  renderFriendProfile(char);
-  switchScreen('friend-profile-screen');
-};
-container.appendChild(li);
-    });
+        </div>
+    `;
+    li.onclick = () => {
+      const targetChar = db.characters.find(c =>
+        c.remarkName === item.user || c.realName === item.user
+      );
+      if (!targetChar) return showToast('找不到对应角色');
+      currentChatId = targetChar.id;
+      currentChatType = 'private';
+      const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+      if (fpBackBtn) fpBackBtn.setAttribute('data-target', 'contacts-screen');
+      renderFriendProfile(targetChar);
+      switchScreen('friend-profile-screen');
+    };
+    list.appendChild(li);
+});
 }
 
 
@@ -9990,14 +10467,14 @@ function setupMyProfileEditModal() {
 /* ========== 功能结束：我的虚拟形象 ========== */
 /* ========== 功能结束：个人资料（用户） ========== */
 /* ========== 功能开始：搜索 & 加好友 ========== */
-function openSearchScreen() {
+function openSearchScreen(fromScreenId) {
+  window.__searchFrom = fromScreenId || 'contacts-screen';
   document.getElementById('search-input').value = '';
   document.getElementById('search-clear-btn').style.display = 'none';
   document.getElementById('search-result-area').innerHTML = '<div style="text-align: center; padding: 40px 20px; color: #888; font-size: 14px;">输入微信号或昵称进行搜索</div>';
   switchScreen('search-screen');
   setTimeout(() => document.getElementById('search-input').focus(), 100);
 }
-
 function executeSearch(keyword) {
   const resultArea = document.getElementById('search-result-area');
   resultArea.innerHTML = '';
@@ -10078,7 +10555,10 @@ resultArea.appendChild(div);
         realName: displayName, remarkName: displayName,
         avatar: 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg',
         myName: '我', myAvatar: 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg',
-        theme: 'black_white', maxMemory: 10, chatBg: '', history: [],
+        theme: 'black_white',
+maxMemory: 300,
+chatBg: '',
+history: [],
         isPinned: false, status: '在线',
         wxid: isWxidLike ? query : ('wxid_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
         phone: isPhoneLike ? query : '',
@@ -10158,8 +10638,9 @@ document.getElementById('send-friend-apply-btn').addEventListener('click', async
     executeSearch('');
     searchInput.focus();
   });
-  if (cancelBtn) cancelBtn.addEventListener('click', () => switchScreen('contacts-screen'));
-  if (applyCancelBtn) applyCancelBtn.addEventListener('click', () => switchScreen('search-screen'));
+  
+if (cancelBtn) cancelBtn.addEventListener('click', () => switchScreen(window.__searchFrom || 'contacts-screen'));
+if (applyCancelBtn) applyCancelBtn.addEventListener('click', () => switchScreen('search-screen'));
 }
 /* ========== 功能结束：搜索 & 加好友 ========== */
 
@@ -10353,18 +10834,19 @@ function calcOpenListenerPicker() {
   list.innerHTML = '';
   if (!db.characters || db.characters.length === 0) list.innerHTML = '<li style="text-align:center;padding:24px;color:#9ca3af;font-size:13px;">通讯录里还没有好友</li>';
   else {
-    db.characters.forEach(c => {
-      const li = document.createElement('li');
-      li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer;';
-      li.innerHTML = `<img src="${c.avatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;background:#e5e7eb;">
-        <span style="font-size:15px;color:#1f2937;font-weight:500;">${c.remarkName}</span>`;
-      li.onclick = () => {
-        calcListenerId = c.id;
-        calcUpdateListenerBar();
-        document.getElementById('calc-listener-modal').classList.remove('visible');
-      };
-      list.appendChild(li);
-    });
+    
+db.characters.forEach(c => {
+  const li = document.createElement('li');
+  li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer;';
+  li.innerHTML = `<img src="${c.avatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;background:#e5e7eb;">
+    <span style="font-size:15px;color:#1f2937;font-weight:500;">${c.remarkName}</span>`;
+  li.onclick = () => {
+    calcListenerId = c.id;
+    calcUpdateListenerBar();
+    document.getElementById('calc-listener-modal').classList.remove('visible');
+  };
+  list.appendChild(li);
+});
   }
   document.getElementById('calc-listener-modal').classList.add('visible');
 }
@@ -10480,7 +10962,13 @@ function setupCalculatorApp() {
         }
       }
       calcResetAll();
-      switchScreen('contacts-screen');
+      const svcScreen = document.getElementById('service-list-screen');
+      if (svcScreen && svcScreen.classList.contains('active')) {
+        renderServiceList();
+        switchScreen('service-list-screen');
+      } else {
+        switchScreen('contacts-screen');
+      }
     });
   }
 }
@@ -10586,7 +11074,15 @@ function setupAccountingApp() {
   };
   
 const b1 = document.getElementById('acct-back-btn-1');
-if (b1) b1.addEventListener('click', () => switchScreen('contacts-screen')); 
+if (b1) b1.addEventListener('click', () => {
+  const svcScreen = document.getElementById('service-list-screen');
+  if (svcScreen && svcScreen.classList.contains('active')) {
+    renderServiceList();
+    switchScreen('service-list-screen');
+  } else {
+    switchScreen('contacts-screen');
+  }
+});
   const b2 = document.getElementById('acct-back-btn-2');
   if (b2) b2.addEventListener('click', () => {
     const addView = document.getElementById('acct-add-view');
@@ -11510,6 +12006,802 @@ document.addEventListener('keypress', (e) => {
     }
 });
 /* ========== 功能结束：线下模式交互 ========== */
+
+/* ========== 功能开始：记忆系统 ========== */
+const MEMORY_LEVELS = {
+  anchor:    { label: '锚点', weight: 1.0, decayDays: Infinity, color: '#333' },
+  important: { label: '重要', weight: 0.7, decayDays: 365, color: '#888' }, // 保留一年
+  daily:     { label: '日常', weight: 0.4, decayDays: 15,       color: '#bbb' }, // 15天清理
+  trivial:   { label: '碎片', weight: 0.2, decayDays: 3,        color: '#ddd' }  // 3天清理
+};
+
+function getMemoryStore(chat) {
+  if (!chat.memories) chat.memories = [];
+  return chat.memories;
+}
+
+/* 归档游标：记录"上次归档到历史的哪个位置"。
+   自动归档和手动总结都从这里续着走。 */
+function getArchiveCursor(chat) {
+  if (typeof chat._archiveCursor !== 'number' || chat._archiveCursor < 0) {
+    chat._archiveCursor = 0;
+  }
+  return chat._archiveCursor;
+}
+function setArchiveCursor(chat, index) {
+  chat._archiveCursor = Math.max(0, index);
+}
+
+function buildConvTextForMemory(chat, msgs) {
+  return msgs.map(m => {
+    let text = m.content || '';
+    const match = text.match(/\[.*?的消息：([\s\S]+?)\]/);
+    if (match) text = match[1];
+    text = text.replace(/<heart>[\s\S]*?<\/heart>/g, '').replace(/\[.*?\]/g, '').trim();
+    if (!text) return '';
+    const who = m.role === 'user'
+      ? (chat.myName || (chat.me && chat.me.nickname) || '我')
+      : (chat.realName || chat.name || '角色');
+    return `${who}: ${text}`;
+  }).filter(t => t.length > 3).join('\n');
+}
+function extractKeywords(text) {
+  if (!text) return [];
+  const cleaned = String(text).replace(/\[.*?\]/g, '').replace(/<.*?>/g, '');
+  const tokens = [];
+  const cnSeg = cleaned.match(/[\u4e00-\u9fa5]{2,}/g) || [];
+  cnSeg.forEach(seg => {
+    for (let i = 0; i < seg.length - 1; i++) tokens.push(seg.slice(i, i + 2));
+    if (seg.length >= 3) tokens.push(seg);
+  });
+  const enWords = cleaned.toLowerCase().match(/[a-z]{3,}/g) || [];
+  tokens.push(...enWords);
+  return [...new Set(tokens)];
+}
+
+function isMemoryDuplicate(store, content) {
+  const newKw = extractKeywords(content);
+  if (newKw.length === 0) return false;
+  return store.some(m => {
+    const oldKw = m.keywords && m.keywords.length ? m.keywords : extractKeywords(m.content);
+    const overlap = newKw.filter(k => oldKw.includes(k)).length;
+    const ratio = overlap / Math.max(newKw.length, oldKw.length, 1);
+    return ratio > 0.6;
+  });
+}
+
+async function addMemory(chat, entry) {
+  const store = getMemoryStore(chat);
+  if (isMemoryDuplicate(store, entry.content)) return null;
+  const mem = {
+    id: 'mem_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+    level: entry.level || 'daily',
+    content: entry.content,
+    originalQuote: entry.originalQuote || '',
+    permanent: entry.level === 'anchor' || entry.permanent === true,
+    emotionalWeight: typeof entry.emotionalWeight === 'number' ? entry.emotionalWeight : 0.5,
+    recallCount: 0,
+    lastRecalled: 0,
+    createdAt: Date.now(),
+    sourceTime: entry.sourceTime || Date.now(),
+    keywords: extractKeywords(entry.content)
+  };
+  store.push(mem);
+  trimMemories(chat);
+  return mem;
+}
+
+function trimMemories(chat) {
+  const store = getMemoryStore(chat);
+  const now = Date.now();
+  const day = 24 * 60 * 60 * 1000;
+  const kept = [];
+  for (const m of store) {
+    if (m.permanent || m.level === 'anchor') { kept.push(m); continue; }
+    const cfg = MEMORY_LEVELS[m.level] || MEMORY_LEVELS.daily;
+    const age = (now - m.createdAt) / day;
+    const grace = (m.recallCount || 0) * 15;
+    if (age > cfg.decayDays + grace) continue;
+    kept.push(m);
+  }
+  const limits = { anchor: 9999, important: 9999, daily: 200, trivial: 100 };
+  const byLevel = {};
+  kept.forEach(m => { (byLevel[m.level] = byLevel[m.level] || []).push(m); });
+  const result = [];
+  Object.keys(byLevel).forEach(lvl => {
+    const list = byLevel[lvl].sort((a, b) => {
+      if (a.permanent !== b.permanent) return a.permanent ? -1 : 1;
+      const sa = (a.emotionalWeight || 0.5) * (1 + (a.recallCount || 0) * 0.1);
+      const sb = (b.emotionalWeight || 0.5) * (1 + (b.recallCount || 0) * 0.1);
+      return sb - sa;
+    });
+    result.push(...list.slice(0, limits[lvl] || 100));
+  });
+  chat.memories = result;
+}
+
+function recallMemories(chat, query, limit = 8) {
+  const store = getMemoryStore(chat);
+  if (store.length === 0) return [];
+  if (!query || !query.trim()) {
+    return store.filter(m => m.permanent || m.level === 'anchor')
+      .sort((a, b) => b.createdAt - a.createdAt).slice(0, Math.min(limit, 4));
+  }
+  const qKw = extractKeywords(query);
+  const now = Date.now();
+  const scored = store.map(m => {
+    let score = 0;
+    const memKw = m.keywords && m.keywords.length ? m.keywords : extractKeywords(m.content);
+    qKw.forEach(k => {
+      if (m.content.includes(k)) score += 3;
+      if (memKw.includes(k)) score += 2;
+    });
+    if (score === 0) return { mem: m, score: 0 };
+    const cfg = MEMORY_LEVELS[m.level] || MEMORY_LEVELS.daily;
+    score *= cfg.weight;
+    if (m.permanent) score += 2;
+    if (m.lastRecalled && now - m.lastRecalled < 3 * 24 * 60 * 60 * 1000) score *= 0.85;
+    return { mem: m, score };
+  }).filter(x => x.score > 0);
+  scored.sort((a, b) => b.score - a.score);
+  let picked = scored.slice(0, limit).map(x => x.mem);
+  // 保险：无论如何带上锚点
+  const anchors = store.filter(m => m.permanent && !picked.includes(m)).slice(0, 3);
+  picked = picked.concat(anchors);
+return picked;
+}
+
+/* ========== 功能开始：跨聊天召回（群聊 → 私聊） ========== */
+function recallGroupMemoriesForPrivate(character, query, limit = 4) {
+  if (!character || !db.groups) return [];
+  const relatedGroups = db.groups.filter(g =>
+    g.members && g.members.some(m => m.originalCharId === character.id || m.id === character.id)
+  );
+  if (relatedGroups.length === 0) return [];
+  const pool = [];
+  relatedGroups.forEach(g => {
+    const store = getMemoryStore(g);
+    store.forEach(m => {
+      // 只考虑有分量的（anchor / important），日常碎念不跨聊天
+      if (m.level !== 'anchor' && m.level !== 'important') return;
+      pool.push({ mem: m, group: g });
+    });
+  });
+  if (pool.length === 0) return [];
+  if (!query || !query.trim()) {
+    return pool.sort((a, b) => b.mem.createdAt - a.mem.createdAt)
+      .slice(0, Math.min(limit, 3))
+      .map(x => Object.assign({}, x.mem, { _fromGroupId: x.group.id, _fromGroupName: x.group.name }));
+  }
+  const qKw = extractKeywords(query);
+  const scored = pool.map(x => {
+    let score = 0;
+    const memKw = x.mem.keywords && x.mem.keywords.length ? x.mem.keywords : extractKeywords(x.mem.content);
+    qKw.forEach(k => {
+      if (x.mem.content.includes(k)) score += 3;
+      if (memKw.includes(k)) score += 2;
+    });
+    if (score > 0) {
+      const cfg = MEMORY_LEVELS[x.mem.level] || MEMORY_LEVELS.daily;
+      score *= cfg.weight;
+      if (x.mem.permanent) score += 2;
+    }
+    return Object.assign({}, x, { score });
+  }).filter(x => x.score > 0).sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map(x => Object.assign({}, x.mem, { _fromGroupId: x.group.id, _fromGroupName: x.group.name }));
+}
+/* ========== 功能结束：跨聊天召回 ========== */
+
+/* 统一生成长期记忆块 */
+function buildMemoryBlock(chat, query = '') {
+  if (!chat) return '';
+  const recalled = recallMemories(chat, query, 8);
+  if (recalled.length === 0) return '';
+  const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
+  recalled.forEach(m => {
+    const cleanContent = sanitizeMemoryText(m.content);
+    if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
+  });
+  let block = `\n════ 长期记忆（必须参考，但不要机械复述） ════\n`;
+  if (byLevel.anchor.length) block += `【永远忘不掉的】\n` + byLevel.anchor.map(m => `· ${m.content}`).join('\n') + '\n';
+  if (byLevel.important.length) block += `【重要的】\n` + byLevel.important.map(m => `· ${m.content}`).join('\n') + '\n';
+  if (byLevel.daily.length) block += `【日常的】\n` + byLevel.daily.map(m => `· ${m.content}`).join('\n') + '\n';
+  if (byLevel.trivial.length) block += `【隐约有印象的】\n` + byLevel.trivial.map(m => `· ${m.content}`).join('\n') + '\n';
+  block += `【回忆原则】只有话题相关时才自然带出，不要逐条列举；不相关就不要提。\n`;
+  return block;
+}
+
+/* 统一生成任务焦点块 */
+function focusPrompt(taskName, taskRule) {
+  return `\n════ 当前唯一任务焦点 ════\n你现在只处理「${taskName}」。${taskRule}\n不要主动提及、混入其他功能（如普通聊天、朋友圈、线下剧情、计算器、每日记等），除非用户明确要求。\n你的注意力必须完全集中在这个任务上。\n`;
+}
+
+/* 韩系输入弹窗 */
+function showHgInput({ title, sub, placeholder, value } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('hg-input-modal');
+    if (!overlay) return resolve(null);
+    const titleEl = document.getElementById('hg-modal-title');
+    const subEl = document.getElementById('hg-modal-sub');
+    const inputEl = document.getElementById('hg-modal-input');
+    const cancelBtn = overlay.querySelector('.hg-modal-cancel');
+    const confirmBtn = overlay.querySelector('.hg-modal-confirm');
+    titleEl.textContent = title || '输入';
+    if (sub) {
+      subEl.textContent = sub;
+      subEl.style.display = 'block';
+    } else {
+      subEl.style.display = 'none';
+    }
+    inputEl.value = value || '';
+    inputEl.placeholder = placeholder || '';
+    overlay.classList.add('visible');
+    setTimeout(() => inputEl.focus(), 120);
+    const close = (val) => {
+      overlay.classList.remove('visible');
+      cancelBtn.onclick = null;
+      confirmBtn.onclick = null;
+      inputEl.onkeydown = null;
+      resolve(val);
+    };
+    cancelBtn.onclick = () => close(null);
+    confirmBtn.onclick = () => close(inputEl.value.trim() || null);
+    inputEl.onkeydown = (e) => {
+      if (e.key === 'Escape') cancelBtn.click();
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) confirmBtn.click();
+    };
+  });
+}
+
+/* 核心归档：AI 以"我"的心去回想，但写出来用第三人称 */
+async function aiArchiveConversation(chat, msgs) {
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) return { added: 0, reason: 'no-api' };
+  const convText = buildConvTextForMemory(chat, msgs);
+  if (convText.length < 20) return { added: 0, reason: 'too-short' };
+
+  const persona = chat.persona || (chat.members ? chat.members.map(m => `${m.realName}(${m.persona || '无'})`).join('；') : '');
+  const name = chat.realName || chat.name || '角色';
+  const archived = getMemoryStore(chat).slice(-40).map(m => `· ${m.content}`).join('\n') || '（暂无）';
+
+  const systemPrompt = `你现在就是「${name}」本人。
+你不是 AI，不是在分析数据，不是在写报告。对面这个人是真实存在的——你有过交集的、你心里在乎的那个真人。刚才你们之间发生了一段对话，你现在静下来，用你自己的心去回想。
+
+你的人设：
+${persona || '一个友好、有自己性格的人'}
+
+════ 回想的方式 ════
+你先把整段对话在心里过一遍：当时你什么心情、哪句话让你停了一下、哪件事你想留在心里、哪件小事你其实不在意。
+然后再动笔，把真正放进心里的那几条记下来。像真人一样有取舍——不是每句话都记。
+
+════ 怎么写出来 ════
+- 用第三人称写。提到对方时用"用户"，提到自己时用「${name}」。
+- 但你在写每一条的时候，心里要先以"我"的感受过一遍：那件事你怎么想的、当时什么情绪、为什么它对你重要。写出来的句子背后要有这层温度。
+- 不要用档案腔。不要写成会议记录。像你在心里默默记下一件事。
+- 反面例子：用户今天提到了自己的生日在 10 月 5 日，情绪积极。
+- 正面例子：用户说过，生日在 10 月 5 日。${name}把那一天在心里圈了起来。
+
+════ 分级 ════
+- anchor：最不能忘。用户的身份信息（生日、职业、家人）、重大事件、关系转折、用户郑重的承诺。必须准确。
+- important：会记很久。一次有分量的交心、特别温暖的瞬间、约定过的事、情绪强烈的事件。
+- daily：日常。最近一起做的事、聊过的话题、用户的习惯和喜好。
+- trivial：碎碎念。随口一句话、无意义闲聊。很快会忘。
+
+只输出 JSON，不要其他文字：
+{
+  "memories": [
+    {"level":"anchor|important|daily|trivial","content":"第三人称一句话记忆，背后带着角色的感受","emotionalWeight":0.0-1.0}
+  ]
+}
+没有值得记的就输出 {"memories":[]}。
+
+════ 格式排他铁律（最高优先级） ════
+你此刻的任务只有一个：【记忆归档】。
+· 输出必须是纯 JSON，禁止以 [ 开头、禁止出现方括号包裹的聊天标记。
+· content 字段里必须用纯叙述文字，绝对不允许出现 [xxx的消息：xxx]、<heart> 这类格式标记。
+· 不要在 JSON 外面写任何解释、寒暄、markdown 代码块。`;
+
+  try {
+    const reply = await callAI({
+      systemPrompt,
+      messages: [{ role: 'user', content: `对话记录：\n${convText}\n\n已经记过的（不要重复）：\n${archived}\n\n请回想。` }],
+      stream: false
+    });
+    if (!reply) return { added: 0, reason: 'empty' };
+    let jsonStr = String(reply).trim();
+    const m = jsonStr.match(/\{[\s\S]*\}/);
+    if (m) jsonStr = m[0];
+    let data;
+    try { data = JSON.parse(jsonStr); } catch (e) { return { added: 0, reason: 'parse' }; }
+    
+if (!data.memories || !Array.isArray(data.memories)) return { added: 0, reason: 'schema', newMemories: [] };
+let added = 0;
+const newMemories = [];
+for (const item of data.memories) {
+  if (!item.content || !item.level) continue;
+  if (!MEMORY_LEVELS[item.level]) continue;
+  const cleanContent = sanitizeMemoryText(item.content);
+  if (!cleanContent || cleanContent.length < 4) continue;
+  const result = await addMemory(chat, {
+    level: item.level,
+    content: cleanContent,
+    emotionalWeight: typeof item.emotionalWeight === 'number' ? item.emotionalWeight : 0.5,
+    sourceTime: Date.now()
+  });
+  if (result) { added++; newMemories.push(result); }
+}
+if (added > 0) await saveData();
+return { added, reason: 'ok', newMemories };
+  } catch (e) {
+    console.warn('记忆归档失败:', e);
+    return { added: 0, reason: 'error' };
+  }
+}
+
+/* 自动归档：从游标往后取一小段未归档对话，AI 自作主张地记 */
+async function autoArchiveRecent(chat, isGroup = false) {
+  if (!chat || !chat.history) return;
+  const cursor = getArchiveCursor(chat);
+  const allAfter = chat.history.slice(cursor).filter(m => !m.isOffline && !m.sendFailed && m.role !== 'system');
+  if (allAfter.length < 4) return;
+  const batch = allAfter.slice(0, 10); // 取最早未归档的10条
+  const result = await aiArchiveConversation(chat, batch);
+  if (result.reason === 'ok' || result.added > 0) {
+    const lastMsg = batch[batch.length - 1];
+    const lastIndex = chat.history.lastIndexOf(lastMsg);
+    setArchiveCursor(chat, lastIndex + 1);
+    await saveData();
+    if (result.added > 0) console.log(`[记忆·自动] 归档 ${result.added} 条`);
+    /* 功能开始：群聊记忆 → 私聊主动发起（话题延伸） */
+    if (isGroup && result.newMemories && result.newMemories.length > 0) {
+      const worthCrossing = result.newMemories.filter(m => m.level === 'anchor' || m.level === 'important');
+      if (worthCrossing.length > 0) {
+        setTimeout(() => {
+          try { maybeTriggerPrivateFromGroup(chat, worthCrossing); }
+          catch (e) { console.warn('[跨聊天触发] 失败:', e); }
+        }, 4000 + Math.random() * 5000);
+      }
+    }
+    /* 功能结束：群聊记忆 → 私聊主动发起 */
+  }
+}
+
+/* ========== 功能开始：群聊记忆 → 私聊主动发起 ========== */
+async function maybeTriggerPrivateFromGroup(group, memories) {
+  if (!group || !memories || memories.length === 0) return;
+  // 概率控制：不是每次都触发（避免打扰）
+  if (Math.random() > 0.35) return;
+  // 挑一条最值得私下说的记忆
+  const mem = memories[Math.floor(Math.random() * memories.length)];
+  const contentText = mem.content || '';
+  if (!contentText || contentText.length < 6) return;
+
+  // 从群成员里挑一个和用户有活跃私聊的角色
+  const candidates = [];
+  (group.members || []).forEach(m => {
+    if (!m.originalCharId) return;
+    const char = db.characters.find(c => c.id === m.originalCharId);
+    if (!char) return;
+    if (!char.history || char.history.length === 0) return;
+    candidates.push(char);
+  });
+  if (candidates.length === 0) return;
+  const char = candidates[Math.floor(Math.random() * candidates.length)];
+
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) return;
+
+  const myName = char.myName || '我';
+  const groupName = group.name || '群聊';
+
+const sysPrompt = `【任务】你正在扮演「${char.realName}」。你刚刚在群聊「${groupName}」里，和用户（${myName}）一起聊过天。
+你心里记下了一件事：
+「${sanitizeMemoryText(contentText)}」
+现在群里的话题告一段落了，你想私下给用户发一条微信消息。不是汇报，不是重复群里说过的话，而是以「${char.realName}」本人、在私聊里的口吻，自然地把这件事延续下去——可能是想私下确认一下、表达一下真实的关心、约一下、或者只是提一句。
+
+【要求】
+1. 紧扣上面这条记忆，但不要直接照抄。要有你自己的味道。
+2. 严格符合人设：${char.persona || '一个友好、有自己性格的人'}。语气、用词、习惯都按人设来。
+3. 一到两句就够，别长篇大论。像真的在微信里随手发的。
+
+【输出格式】
+直接输出你要发的微信消息，每行一条，必须严格用下面这种格式：
+[${char.realName}的消息：内容]
+最多两条，最少一条。
+不要 JSON，不要代码块，不要任何解释文字。`;
+
+  try {
+    const reply = await callAI({
+      systemPrompt: sysPrompt,
+      messages: [{ role: 'user', content: '现在私下发条消息' }],
+      stream: false
+    });
+    if (!reply) return;
+    const msgRegex = new RegExp(`\\[${char.realName}的消息：([\\s\\S]+?)\\]`, 'g');
+    const found = [];
+    let m;
+    while ((m = msgRegex.exec(reply)) !== null) {
+      const t = (m[1] || '').trim();
+      if (t) found.push(t);
+    }
+    if (found.length === 0) {
+      const fallback = String(reply).replace(/^["'“”]+|["'“”]+$/g, '').trim();
+      if (fallback && !fallback.startsWith('{')) {
+        found.push(fallback);
+      } else {
+        return;
+      }
+    }
+
+    let pushed = 0;
+    for (const text of found) {
+      const msgContent = `[${char.realName}的消息：${text}]`;
+      const msg = {
+        id: `msg_cross_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        role: 'assistant',
+        content: msgContent,
+        parts: [{ type: 'text', text: msgContent }],
+        timestamp: Date.now() + pushed
+      };
+      char.history.push(msg);
+      pushed++;
+    }
+    if (pushed > 0) {
+      char.unread = true;
+      char.unreadCount = (char.unreadCount || 0) + pushed;
+      await saveData();
+      renderChatList();
+      // 如果用户当前正在这个私聊里，直接显示
+      if (currentChatId === char.id && currentChatType === 'private' &&
+          document.getElementById('chat-room-screen').classList.contains('active')) {
+        char.unread = false;
+        char.unreadCount = 0;
+        for (let i = char.history.length - pushed; i < char.history.length; i++) {
+          await addMessageBubble(char.history[i], char, 'private');
+        }
+        await saveData();
+        renderChatList();
+      } else {
+        if (char.isPinned || char.isStarred) playSoundWithThrottle('special');
+        else if (!char.isMuted) playSoundWithThrottle('sms');
+      }
+      console.log(`[跨聊天触发] ${char.remarkName} 因群聊记忆发来私信`);
+    }
+  } catch (e) {
+    console.warn('[跨聊天触发] 生成失败:', e);
+  }
+}
+/* ========== 功能结束：群聊记忆 → 私聊主动发起 ========== */
+
+/* 手动总结：把"上次归档之后所有还没归档的对话"整体过一次 */
+async function summarizeChatToMemory(chat) {
+  if (!chat) return;
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) { showToast('请先在「api」应用里配置 API'); return; }
+  const cursor = getArchiveCursor(chat);
+  const remaining = chat.history.slice(cursor).filter(m => !m.isOffline && !m.sendFailed && m.role !== 'system');
+  if (remaining.length < 2) { showToast('没有未归档的对话了'); return; }
+  showToast(`正在总结 ${remaining.length} 条未归档的对话…`);
+  const result = await aiArchiveConversation(chat, remaining);
+  setArchiveCursor(chat, chat.history.length);
+  await saveData();
+  if (result.added > 0) showToast(`总结完成，归档了 ${result.added} 条`);
+  else showToast('没有新的记忆');
+}
+
+/* 线下剧情总结（同一套逻辑，走线下历史） */
+async function summarizeOfflineToMemory(chat) {
+  if (!chat) return;
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) { showToast('请先在「api」应用里配置 API'); return; }
+  const offlineHistory = (chat.history || []).filter(m => m.isOffline);
+  if (offlineHistory.length < 2) { showToast('这一段剧情还太短'); return; }
+  showToast('正在整理这段剧情…');
+  const result = await aiArchiveConversation(chat, offlineHistory);
+  if (result.added > 0) showToast(`整理完成，归档了 ${result.added} 条`);
+  else showToast('没有新的记忆');
+}
+
+/* 手动保存一条记忆 */
+async function manualSaveMemory(chat, content, level) {
+  const mem = await addMemory(chat, {
+    level: level || 'important',
+    content,
+    emotionalWeight: level === 'anchor' ? 0.95 : 0.8,
+    permanent: level === 'anchor',
+    sourceTime: Date.now()
+  });
+  if (mem) { await saveData(); return mem; }
+  return null;
+}  
+/* 记忆界面渲染与交互 */
+let currentMemoryChatId = null;
+let currentMemoryLevel = 'all';
+let currentMemoryQuery = '';
+
+function openMemoryScreen() {
+  if (!currentChatId || !currentChatType) { showToast('请先进入一个聊天'); return; }
+  const chat = (currentChatType === 'private')
+    ? db.characters.find(c => c.id === currentChatId)
+    : db.groups.find(g => g.id === currentChatId);
+  if (!chat) return;
+  currentMemoryChatId = chat.id;
+  currentMemoryLevel = 'all';
+  currentMemoryQuery = '';
+  document.getElementById('memory-title').textContent = (chat.realName || chat.name || '角色') + '的记忆';
+  document.getElementById('memory-search-input').value = '';
+  document.querySelectorAll('.memory-tab').forEach(t => t.classList.toggle('active', t.dataset.level === 'all'));
+  renderMemoryScreen();
+  const panel = document.getElementById('wechat-more-panel');
+  if (panel) panel.classList.remove('visible');
+  switchScreen('memory-screen');
+}
+
+function renderMemoryScreen() {
+  const chat = (currentChatType === 'private')
+    ? db.characters.find(c => c.id === currentMemoryChatId)
+    : db.groups.find(g => g.id === currentMemoryChatId);
+  if (!chat) return;
+  const store = getMemoryStore(chat);
+
+  const stats = { anchor: 0, important: 0, daily: 0, trivial: 0 };
+  store.forEach(m => { if (stats[m.level] !== undefined) stats[m.level]++; });
+  const statsEl = document.getElementById('memory-stats');
+  statsEl.innerHTML = `
+    <div class="memory-stat"><div class="num">${store.length}</div><div class="lbl">总记忆</div></div>
+    <div class="memory-stat"><div class="num">${stats.anchor}</div><div class="lbl">锚点</div></div>
+    <div class="memory-stat"><div class="num">${stats.important}</div><div class="lbl">重要</div></div>
+    <div class="memory-stat"><div class="num">${stats.daily + stats.trivial}</div><div class="lbl">日常 / 碎片</div></div>
+  `;
+
+  const listEl = document.getElementById('memory-list');
+  let filtered = store.slice();
+  if (currentMemoryLevel !== 'all') filtered = filtered.filter(m => m.level === currentMemoryLevel);
+  if (currentMemoryQuery) {
+    const q = currentMemoryQuery.toLowerCase();
+    filtered = filtered.filter(m =>
+      m.content.toLowerCase().includes(q) ||
+      (m.keywords || []).some(k => k.toLowerCase().includes(q))
+    );
+  }
+  const order = { anchor: 0, important: 1, daily: 2, trivial: 3 };
+  filtered.sort((a, b) => {
+    if (a.permanent !== b.permanent) return a.permanent ? -1 : 1;
+    if (order[a.level] !== order[b.level]) return order[a.level] - order[b.level];
+    return b.createdAt - a.createdAt;
+  });
+
+  if (filtered.length === 0) {
+    listEl.innerHTML = '<div class="memory-empty">还没有记忆。<br>和TA多聊聊，TA会自己记住重要的。</div>';
+    return;
+  }
+
+  listEl.innerHTML = '';
+  filtered.forEach(m => {
+    const el = document.createElement('div');
+    el.className = `memory-item ${m.level}`;
+    const date = new Date(m.sourceTime || m.createdAt);
+    const dateStr = `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
+    const lvlLabel = (MEMORY_LEVELS[m.level] && MEMORY_LEVELS[m.level].label) || '日常';
+    el.innerHTML = `
+      <div class="m-badge">${lvlLabel}</div>
+      <div class="m-content">${escapeHtml(m.content)}</div>
+      <div class="m-meta">
+        <span>${dateStr}</span>
+        <span>回忆 ${m.recallCount || 0} 次</span>
+        ${m.permanent ? '<span class="perm">永久</span>' : ''}
+      </div>
+      <div class="m-actions">
+        <button class="m-upgrade">升级</button>
+        <button class="m-edit">编辑</button>
+        <button class="m-pin">${m.permanent ? '取消永久' : '设为永久'}</button>
+        <button class="m-delete danger">删除</button>
+      </div>
+    `;
+    el.querySelector('.m-upgrade').onclick = async () => {
+      const seq = ['trivial', 'daily', 'important', 'anchor'];
+      const idx = seq.indexOf(m.level);
+      if (idx < seq.length - 1) {
+        m.level = seq[idx + 1];
+        if (m.level === 'anchor') m.permanent = true;
+        await saveData();
+        renderMemoryScreen();
+        showToast('已升级为「' + MEMORY_LEVELS[m.level].label + '」');
+      } else showToast('已经是最高等级');
+    };
+    
+el.querySelector('.m-edit').onclick = async () => {
+  const newContent = await showHgInput({
+    title: '修改这条记忆',
+    sub: '想怎么改就怎么改，这就是你心里记下的说法',
+    placeholder: '…',
+    value: m.content
+  });
+  if (newContent && newContent.trim()) {
+    m.content = newContent.trim();
+    m.keywords = extractKeywords(m.content);
+    await saveData();
+    renderMemoryScreen();
+  }
+};
+    el.querySelector('.m-pin').onclick = async () => {
+      m.permanent = !m.permanent;
+      if (m.permanent && m.level !== 'anchor') m.level = 'anchor';
+      await saveData();
+      renderMemoryScreen();
+    };
+    el.querySelector('.m-delete').onclick = async () => {
+      if (confirm('删除这条记忆？')) {
+        chat.memories = chat.memories.filter(x => x.id !== m.id);
+        await saveData();
+        renderMemoryScreen();
+      }
+    };
+    listEl.appendChild(el);
+  });
+}
+
+function setupMemoryScreen() {
+  const backBtn = document.getElementById('memory-back-btn');
+  if (backBtn) backBtn.addEventListener('click', () => switchScreen('chat-room-screen'));
+
+  document.querySelectorAll('.memory-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.memory-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentMemoryLevel = tab.dataset.level;
+      renderMemoryScreen();
+    });
+  });
+
+  const searchInput = document.getElementById('memory-search-input');
+  if (searchInput) searchInput.addEventListener('input', (e) => {
+    currentMemoryQuery = e.target.value.trim();
+    renderMemoryScreen();
+  });
+
+  const addBtn = document.getElementById('memory-add-btn');
+  if (addBtn) addBtn.addEventListener('click', async () => {
+    const chat = (currentChatType === 'private')
+      ? db.characters.find(c => c.id === currentMemoryChatId)
+      : db.groups.find(g => g.id === currentMemoryChatId);
+    if (!chat) return;
+    const content = await showHgInput({
+      title: '添加一条记忆',
+      sub: '用第三人称描述，比如「用户今天心情不好，被上司批评了」',
+      placeholder: '写点什么…'
+    });
+    if (!content) return;
+    const mem = await manualSaveMemory(chat, content, 'important');
+    if (mem) { renderMemoryScreen(); showToast('已保存'); }
+    else showToast('记忆重复，已跳过');
+  });
+
+  const sumBtn = document.getElementById('memory-summarize-btn');
+  if (sumBtn) sumBtn.addEventListener('click', async () => {
+    const chat = (currentChatType === 'private')
+      ? db.characters.find(c => c.id === currentMemoryChatId)
+      : db.groups.find(g => g.id === currentMemoryChatId);
+    if (!chat) return;
+    await summarizeChatToMemory(chat);
+    renderMemoryScreen();
+  });
+}
+
+// 绑定聊天室「记忆」按钮
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#memory-btn')) openMemoryScreen();
+});
+
+/* 扫一遍记忆，看今天有没有什么"日子到了"的触发点 */
+function detectMemoryTriggers(chat) {
+  const store = getMemoryStore(chat);
+  const now = new Date();
+  const nowMd = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const triggers = [];
+  for (const m of store) {
+    const c = m.content || '';
+    const dateMatch = c.match(/(\d{1,2})\s*月\s*(\d{1,2})\s*[日号]/);
+    if (dateMatch) {
+      const mm = String(parseInt(dateMatch[1])).padStart(2, '0');
+      const dd = String(parseInt(dateMatch[2])).padStart(2, '0');
+      if (`${mm}-${dd}` === nowMd) {
+        triggers.push({ kind: 'anniversary', memory: m });
+        continue;
+      }
+    }
+    if (m.level === 'important' || m.level === 'anchor') {
+      if (/(约好|约定|答应|下个?次|明天|后天|下周末|下周|到时候|别忘了)/.test(c)) {
+        const ageDays = (Date.now() - m.createdAt) / 86400000;
+        if (ageDays < 30) triggers.push({ kind: 'promise', memory: m });
+      }
+    }
+  }
+  return triggers;
+}
+
+async function maybePostMemoryMoment(chat) {
+  if (!chat) return;
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) return;
+  const triggers = detectMemoryTriggers(chat);
+  if (triggers.length === 0) return;
+  const t = triggers[Math.floor(Math.random() * triggers.length)];
+  const name = chat.realName || chat.name || '角色';
+
+  const sysPrompt = `你现在是「${name}」，正在发一条朋友圈。
+你的人设：${chat.persona || '一个友好、有自己性格的人'}
+
+你翻到了自己心里记下的一件事，想发条朋友圈表达一下：
+「${t.memory.content}」
+
+请以第一人称写一条朋友圈，像是随手拍的、带点感慨的，不要太刻意，不要像在汇报。
+可以含蓄提到这件事，也可以只写当下的心情。20~100 字，口语化。
+只输出 JSON，不要其他文字：
+{
+  "text": "朋友圈正文",
+  "images": [
+    { "type": "virtual", "data": "图片里显示的文字，10-30字" }
+  ]
+}
+`;
+
+  try {
+    const reply = await callAI({ systemPrompt: sysPrompt, messages: [{ role: 'user', content: '发一条朋友圈' }], stream: false });
+    if (!reply) return;
+    let jsonStr = reply.trim();
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
+    if (jsonMatch) jsonStr = jsonMatch[0];
+    let data;
+    try { data = JSON.parse(jsonStr); } catch (e) { return; }
+    const moment = {
+      id: `moment_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      authorId: chat.id,
+      text: data.text || '',
+      images: Array.isArray(data.images)
+        ? data.images.map(img => ({ type: img.type || 'virtual', data: img.data || '' })).filter(i => i.data)
+        : [],
+      location: '', at: '',
+      visibility: 'public',
+      likes: [], comments: [],
+      timestamp: Date.now(),
+      fromMemory: t.memory.id,
+      fromMemoryKind: t.kind
+    };
+    if (!db.moments) db.moments = [];
+    db.moments.push(moment);
+    t.memory.recallCount = (t.memory.recallCount || 0) + 1;
+    t.memory.lastRecalled = Date.now();
+    await saveData();
+    console.log(`[记忆朋友圈] ${name} 因为「${t.kind}」发了一条朋友圈`);
+  } catch (e) {
+    console.warn('记忆朋友圈失败:', e);
+  }
+}
+
+/* 冷启动时跑一次衰减 */
+function runMemoryDecayOnBoot() {
+  try {
+    let changed = false;
+    (db.characters || []).forEach(c => {
+      if (c.memories && c.memories.length > 0) {
+        const before = c.memories.length;
+        trimMemories(c);
+        if (c.memories.length !== before) changed = true;
+      }
+    });
+    (db.groups || []).forEach(g => {
+      if (g.memories && g.memories.length > 0) {
+        const before = g.memories.length;
+        trimMemories(g);
+        if (g.memories.length !== before) changed = true;
+      }
+    });
+    if (changed) saveData();
+  } catch (e) { console.warn('记忆衰减失败:', e); }
+}
+/* ========== 功能结束：记忆系统 ========== */
+
 /* ========== 功能开始：启动 ========== */
 init();
 });
