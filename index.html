@@ -6953,15 +6953,64 @@ if (isOffline) {
         } else content = msg.content;
         messages.push({ role: msg.role, content });
       });
-      requestBody = { model, messages, stream: true };
-    }
-    const endpoint = (provider === 'gemini') ? `${url}/v1beta/models/${model}:streamGenerateContent?key=${getRandomValue(key)}` : `${url}/v1/chat/completions`;
-    const apiKey = getRandomValue(key);
-    const headers = (provider === 'gemini') ? { 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` };
-    const response = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(requestBody) });
+requestBody = { model, messages, stream: false };
+}
+const isGeminiApi = (provider === 'gemini');
+const endpoint = isGeminiApi
+  ? `${url}/v1beta/models/${model}:generateContent?key=${getRandomValue(key)}`
+  : `${url}/v1/chat/completions`;
+const apiKey = getRandomValue(key);
+const headers = isGeminiApi
+  ? { 'Content-Type': 'application/json' }
+  : { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` };
+
+let fullResponse = '';
+let lastError = null;
+for (let attempt = 1; attempt <= 3; attempt++) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10 * 60 * 1000);
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(requestBody),
+      signal: controller.signal
+    });
+    clearTimeout(timeoutId);
     if (!response.ok) throw new Error(`API Error: ${response.status} ${await response.text()}`);
+    const data = await response.json();
+
+    let finishReason = '';
+    if (isGeminiApi) {
+      const cand = (data.candidates && data.candidates[0]) || {};
+      finishReason = cand.finishReason || '';
+      fullResponse = ((cand.content && cand.content.parts) || [])
+        .map(p => p.text || '').join('');
+    } else {
+      const choice = (data.choices && data.choices[0]) || {};
+      finishReason = choice.finish_reason || '';
+      fullResponse = (choice.message && choice.message.content) || '';
+    }
+
+    if (fullResponse && fullResponse.trim()) {
+      lastError = null;
+      if (finishReason === 'length' || finishReason === 'MAX_TOKENS') {
+        showToast('提示：本次输出被模型的长度上限截断了，可换用支持更长输出的模型');
+      }
+      break;
+    }
+    throw new Error('返回内容为空');
+  } catch (err) {
+    clearTimeout(timeoutId);
+    lastError = err;
+    // 页面刚切回来时网络可能还没恢复，退避一下再重试
+    if (attempt < 3) await new Promise(r => setTimeout(r, 1200 * attempt));
+  }
+}
+if (lastError) throw lastError;
+
 const capturedType = currentChatType;
-    await processStream(response, chat, capturedType, provider, isOffline);
+await processFullResponse(fullResponse, chat, capturedType, provider, isOffline);
   } catch (error) {
     console.error('AI回复失败:', error);
     showToast(`AI回复失败: ${error.message}`);
@@ -6979,44 +7028,8 @@ const capturedType = currentChatType;
 }
 }
 
-async function processStream(response, chat, chatType, apiType, isOffline = false) {
-  const reader = response.body.getReader(), decoder = new TextDecoder();
-  let fullResponse = "", accumulatedChunk = "";
-  for (; ;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    accumulatedChunk += decoder.decode(value, { stream: true });
-    if (apiType === "openai" || apiType === "deepseek" || apiType === "newapi") {
-      const parts = accumulatedChunk.split("\n\n");
-      accumulatedChunk = parts.pop();
-      for (const part of parts) {
-        if (part.startsWith("data: ")) {
-          const data = part.substring(6);
-          if (data.trim() !== "[DONE]") {
-            try { fullResponse += JSON.parse(data).choices[0].delta?.content || ""; } catch (e) { }
-          }
-        }
-      }
-    }
-  }
-  if (apiType === "gemini") {
-    try {
-      const parsedStream = JSON.parse(accumulatedChunk);
-      if (Array.isArray(parsedStream)) {
-        fullResponse = parsedStream.map(item => item.candidates?.[0]?.content?.parts?.[0]?.text || "").join('');
-      } else {
-        console.error("Gemini 返回了非数组:", parsedStream);
-        showToast("Gemini 返回格式异常，请检查API设置");
-        return;
-      }
-    } catch (e) {
-      console.error("Error parsing Gemini stream:", e, "Chunk:", accumulatedChunk);
-      showToast("解析Gemini响应失败");
-      return;
-    }
-  }
-  
-if (fullResponse) {
+async function processFullResponse(fullResponse, chat, chatType, apiType, isOffline = false) {
+if (fullResponse && fullResponse.trim()) {
   
 /* 兜底：如果模型误输出了整段 JSON，抢救成纯文本，避免 UI 崩坏 */
 const salvaged = salvageJsonAsText(fullResponse);
