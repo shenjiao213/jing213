@@ -4696,6 +4696,21 @@ window.db = {
   customIcons: {}
 };
 let currentChatId = null;
+/* 临时触发自动过期定时器 */
+let __pendingFocusTimer = null;
+Object.defineProperty(window, '__pendingFocus', {
+  get() { return window.__pendingFocusValue; },
+  set(v) {
+    window.__pendingFocusValue = v;
+    if (__pendingFocusTimer) clearTimeout(__pendingFocusTimer);
+    if (v) {
+      __pendingFocusTimer = setTimeout(() => {
+        window.__pendingFocusValue = null;
+        __pendingFocusTimer = null;
+      }, 2 * 60 * 1000);
+    }
+  }
+});
 let currentChatType = null;
 let isGenerating = false;
 let longPressTimer = null;
@@ -5010,6 +5025,26 @@ const dataStorage = new DataStorage();
 /* ========== 功能结束：分层存储 ========== */
 
 /* ========== 功能开始：通用辅助函数 ========== */
+/* 功能开始：技能开关（每个角色/群聊独立，默认全开） */
+function getSkillFlags(chat) {
+  const s = (chat && chat.skills) || {};
+  return {
+    transfer:     s.transfer     !== false, // 转账
+    gift:         s.gift         !== false, // 礼物
+    sticker:      s.sticker      !== false, // 表情包
+    stealSticker: s.stealSticker !== false, // 偷表情包
+    voice:        s.voice        !== false, // 语音
+    photo:        s.photo        !== false, // 照片/视频
+    location:     s.location     !== false, // 位置
+    status:       s.status       !== false, // 改状态
+    signature:    s.signature    !== false, // 改签名
+    pat:          s.pat          !== false, // 改拍一拍
+    block:        s.block        !== false, // 拉黑
+    heart:        s.heart        !== false, // 心声
+    quote:        s.quote        !== false, // 引用回复
+  };
+}
+/* 功能结束：技能开关 */
 function getCurrentChat() {
   if (currentChatType === 'private') return db.characters.find(c => c.id === currentChatId);
   return db.groups.find(g => g.id === currentChatId);
@@ -5086,10 +5121,18 @@ function salvageJsonAsText(raw) {
     if (Array.isArray(obj.messages)) {
       return obj.messages.map(m => typeof m === 'string' ? m : (m.text || m.content || '')).filter(Boolean).join('\n');
     }
-    return ''; // 是归档 JSON（含 memories）→ 返回空串，让调用方跳过
-  } catch (e) {
-    return null;
+  
+  // 归档类 JSON：抽取每条 memory 的 content 拼成纯文本，避免整段丢弃
+  if (Array.isArray(obj.memories) && obj.memories.length > 0) {
+    return obj.memories
+      .map(m => (m && (m.content || m.text)) || '')
+      .filter(Boolean)
+      .join('\n');
   }
+  return ''; // 其他无法识别的 JSON → 返回空串，让调用方跳过
+} catch (e) {
+  return null;
+}
 }
 function readTextFile(file, onSuccess) {
   const name = file.name.toLowerCase();
@@ -6625,13 +6668,15 @@ function setupChatRoom() {
       if (chat.history[i].role === 'user') { lastUserIndex = i; break; }
     }
     if (lastUserIndex === -1) return showToast('没有可重新生成的对话');
-    chat.history = chat.history.slice(0, lastUserIndex + 1);
-    await saveData();
-    currentPage = 1;
-    renderMessages(false, true);
-    renderChatList();
-    getAiReply();
-  });
+  
+chat.history = chat.history.slice(0, lastUserIndex + 1);
+  await saveData();
+  currentPage = 1;
+  renderMessages(false, true);
+  renderChatList();
+  window.__pendingFocus = `刚才那条回复不太对，重新来一次。这次好好按你的人设说话——别端着，别像客服，别说套话。就是你这个人会怎么回。`;
+  getAiReply();
+});
 
   
 messageArea.addEventListener('click', (e) => {
@@ -7438,20 +7483,27 @@ async function sendMessage() {
   const chat = getCurrentChat();
   const myName = getMyName(chat);
   let messageContent;
+// 安全：把用户手动输入的伪系统标签转义，防止 prompt injection
+  const safeText = text
+    .replace(/\[system\s*:/gi, '［system：')
+    .replace(/\[system-display\s*:/gi, '［system-display：')
+    .replace(/(\[[^\[\]]{0,40}?邀请[^\[\]]{0,40}?加入了群聊\])/g, m => m.replace(/[\[\]]/g, '［］'))
+    .replace(/(\[[^\[\]]{0,40}?修改群名为[：:][^\[\]]{0,40}?\])/g, m => m.replace(/[\[\]]/g, '［］'));
   const systemRegex = /\[system:.*?\]|\[system-display:.*?\]/;
   const inviteRegex = /\[.*?邀请.*?加入了群聊\]/;
-  const renameMatch = text.match(MSG_RE.rename);
+  const renameMatch = safeText.match(MSG_RE.rename);
   if (renameMatch) {
     chat.name = renameMatch[2];
     chatRoomTitle.textContent = chat.name;
     messageContent = `[${chat.me.nickname}修改群名为：${chat.name}]`;
-} else if (systemRegex.test(text) || inviteRegex.test(text)) {
-    messageContent = text;
+} else if (systemRegex.test(safeText) || inviteRegex.test(safeText)) {
+    messageContent = safeText;
   } else if (currentQuote) {
-    messageContent = `[${myName}引用「${currentQuote.text}」：「${text}」]`;
-  } else {
-    messageContent = `[${myName}的消息：${text}]`;
-  }
+  
+messageContent = `[${myName}引用「${currentQuote.text}」：「${safeText}」]`;
+} else {
+  messageContent = `[${myName}的消息：${safeText}]`;
+}
   await pushUserMessage({ content: messageContent });
   messageInput.value = '';
   sendMessageBtn.style.display = 'none';
@@ -7552,6 +7604,7 @@ function getMixedContent(responseData) {
 }
 /* ========== 功能结束：混合内容解析 ========== */
 
+
 /* ========== 功能开始：AI 提示词（私聊） ========== */
 function generatePrivateSystemPrompt(character) {
   let worldBooksBefore = db.worldBooks.filter(wb => wb.position === 'before' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
@@ -7563,11 +7616,10 @@ function generatePrivateSystemPrompt(character) {
   const now = new Date();
   const currentTime = `${now.getFullYear()}年${pad(now.getMonth() + 1)}月${pad(now.getDate())}日 ${pad(now.getHours())}:${pad(now.getMinutes())}`;
 
-  
-let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
-prompt += focusPrompt('线上私聊', '只进行微信式聊天，不要输出小说体，不要处理其他功能。');
-prompt += buildMemoryBlock(character, '');
-prompt += `════ 环境 ════\n`;
+  let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
+  prompt += focusPrompt('线上私聊', '只进行微信式聊天，不要输出小说体，不要处理其他功能。');
+  prompt += buildMemoryBlock(character, '');
+  prompt += `════ 环境 ════\n`;
   prompt += `【时间】现在是 ${currentTime}。你知道是几点，但别没事就提时间，除非话题真的跟时间有关。\n`;
   prompt += `【场景】这是纯线上空间。你我之间不存在线下关系，不要提议见面、不要留其他平台联系方式、不要扯现实里的事。你始终是「在线的角色」。\n\n`;
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
@@ -7575,72 +7627,71 @@ prompt += `════ 环境 ════\n`;
   prompt += `· 名字：${character.realName}\n`;
   prompt += `· 我对你的称呼：${character.myName}\n`;
   prompt += `· 当前状态：${character.status}\n`;
-  
-prompt += `· 人设：\n${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
-if (worldBooksDuring) prompt += `\n════ 世界书 · 中置设定 ════\n${worldBooksDuring}\n`;
-if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
-if (character.myPersona) prompt += `\n════ 我的人设 ════\n${character.myPersona}\n（你心里有数就行，不用刻意演给我看）\n`;
+  prompt += `· 人设：\n${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
+  if (worldBooksDuring) prompt += `\n════ 世界书 · 中置设定 ════\n${worldBooksDuring}\n`;
+  if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
+  if (character.myPersona) prompt += `\n════ 我的人设 ════\n${character.myPersona}\n（你心里有数就行，不用刻意演给我看）\n`;
 
-/* 功能开始：记忆召回注入 */
-const lastUserMsg = [...(character.history || [])].reverse().find(m => m.role === 'user' && !m.sendFailed);
-const lastUserText = lastUserMsg ? lastUserMsg.content.replace(/\[.*?\]/g, '') : '';
-const recalled = recallMemories(character, lastUserText, 8);
-if (recalled.length > 0) {
-  const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
-  recalled.forEach(m => {
-    const cleanContent = sanitizeMemoryText(m.content);
-    if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
-  });
-  prompt += `\n════ 你记得的事 ════\n`;
-  prompt += `（这些是你和用户之间真实发生过的事，是你自己记在心里的。下面不会每条都提，但你心里有底。）\n`;
-  if (byLevel.anchor.length) {
-    prompt += `\n【永远忘不掉的】\n`;
-    byLevel.anchor.forEach(m => { prompt += `· ${m.content}\n`; });
+  /* 功能开始：记忆召回注入 */
+  const lastUserMsg = [...(character.history || [])].reverse().find(m => m.role === 'user' && !m.sendFailed);
+  const lastUserText = lastUserMsg ? lastUserMsg.content.replace(/\[.*?\]/g, '') : '';
+  const recalled = recallMemories(character, lastUserText, 8);
+  if (recalled.length > 0) {
+    const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
+    recalled.forEach(m => {
+      const cleanContent = sanitizeMemoryText(m.content);
+      if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
+    });
+    prompt += `\n════ 你记得的事 ════\n`;
+    prompt += `（这些是你和用户之间真实发生过的事，是你自己记在心里的。下面不会每条都提，但你心里有底。）\n`;
+    if (byLevel.anchor.length) {
+      prompt += `\n【永远忘不掉的】\n`;
+      byLevel.anchor.forEach(m => { prompt += `· ${m.content}\n`; });
+    }
+    if (byLevel.important.length) {
+      prompt += `\n【重要的】\n`;
+      byLevel.important.forEach(m => { prompt += `· ${m.content}\n`; });
+    }
+    if (byLevel.daily.length) {
+      prompt += `\n【日常的】\n`;
+      byLevel.daily.forEach(m => { prompt += `· ${m.content}\n`; });
+    }
+    if (byLevel.trivial.length) {
+      prompt += `\n【隐约有点印象的】\n`;
+      byLevel.trivial.forEach(m => { prompt += `· ${m.content}\n`; });
+    }
+    prompt += `\n【回忆原则 · 比什么都重要】\n`;
+    prompt += `· 不要机械复述这些条目。不要在回复里逐条列举。\n`;
+    prompt += `· 只有话题真的相关时，才像真人一样"突然想起来"，自然带一句。\n`;
+    prompt += `· 提的时候要说具体画面、感觉、当时的一句话——不要只说"我记得那件事"。\n`;
+    prompt += `· 比如用户说"上次看电影"，你要想起的是"那天你穿了一件奶白色大衣，冻得一直往我这边靠"，而不是"我们2024年10月5日看了电影"。\n`;
+    prompt += `· 如果用户提的事你记忆里没有，就自然地说"有点记不清了""你再说说？"——绝不假装记得。\n`;
+    prompt += `· 说出的话要贴合你的人设、当下情绪、和用户的亲疏。\n`;
+    prompt += `· 锚点记忆（生日、重要事件）绝不能忘、不能模糊。\n\n`;
+    recalled.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
   }
-  if (byLevel.important.length) {
-    prompt += `\n【重要的】\n`;
-    byLevel.important.forEach(m => { prompt += `· ${m.content}\n`; });
-  }
-  if (byLevel.daily.length) {
-    prompt += `\n【日常的】\n`;
-    byLevel.daily.forEach(m => { prompt += `· ${m.content}\n`; });
-  }
-  if (byLevel.trivial.length) {
-    prompt += `\n【隐约有点印象的】\n`;
-    byLevel.trivial.forEach(m => { prompt += `· ${m.content}\n`; });
-  }
-  prompt += `\n【回忆原则 · 比什么都重要】\n`;
-  prompt += `· 不要机械复述这些条目。不要在回复里逐条列举。\n`;
-  prompt += `· 只有话题真的相关时，才像真人一样"突然想起来"，自然带一句。\n`;
-  prompt += `· 提的时候要说具体画面、感觉、当时的一句话——不要只说"我记得那件事"。\n`;
-  prompt += `· 比如用户说"上次看电影"，你要想起的是"那天你穿了一件奶白色大衣，冻得一直往我这边靠"，而不是"我们2024年10月5日看了电影"。\n`;
-  prompt += `· 如果用户提的事你记忆里没有，就自然地说"有点记不清了""你再说说？"——绝不假装记得。\n`;
-  prompt += `· 说出的话要贴合你的人设、当下情绪、和用户的亲疏。\n`;
-  prompt += `· 锚点记忆（生日、重要事件）绝不能忘、不能模糊。\n\n`;
-recalled.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
-}
-/* 功能结束：记忆召回注入 */
+  /* 功能结束：记忆召回注入 */
 
-/* 功能开始：跨聊天记忆（群聊话题延伸到私聊） */
-const crossMemories = recallGroupMemoriesForPrivate(character, lastUserText, 4);
-if (crossMemories.length > 0) {
-  prompt += `\n════ 群聊里记下的事（可以自然延伸到私聊） ════\n`;
-  prompt += `（这些是你在群里和用户相处时、心里记下的事。私聊里不用专门提，但如果话题对上了，可以自然地接一句——就像人会把群里没说完的话私底下继续。）\n`;
-  crossMemories.forEach(m => {
-    const fromTag = m._fromGroupName ? `（来自群「${m._fromGroupName}」）` : '';
-    prompt += `· ${m.content}${fromTag}\n`;
-  });
-  prompt += `\n【延伸原则 · 重要】\n`;
-  prompt += `· 用户在群里提过、但私聊里没落实的事，可以在这里自然地问一句。\n`;
-  prompt += `· 例如：群里用户说想吃火锅，你在私聊里可以问"那家店要不要我订？"\n`;
-  prompt += `· 不要直接说"你在群里说……"，太刻意。就当自己一直记着。\n`;
-  prompt += `· 如果话题对不上，就别提。硬提会显得假。\n`;
-  prompt += `· 同一条记忆不要反复提，提过一次就等下次再说。\n\n`;
-  crossMemories.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
-}
-/* 功能结束：跨聊天记忆 */
+  /* 功能开始：跨聊天记忆（群聊话题延伸到私聊） */
+  const crossMemories = recallGroupMemoriesForPrivate(character, lastUserText, 4);
+  if (crossMemories.length > 0) {
+    prompt += `\n════ 群聊里记下的事（可以自然延伸到私聊） ════\n`;
+    prompt += `（这些是你在群里和用户相处时、心里记下的事。私聊里不用专门提，但如果话题对上了，可以自然地接一句——就像人会把群里没说完的话私底下继续。）\n`;
+    crossMemories.forEach(m => {
+      const fromTag = m._fromGroupName ? `（来自群「${m._fromGroupName}」）` : '';
+      prompt += `· ${m.content}${fromTag}\n`;
+    });
+    prompt += `\n【延伸原则 · 重要】\n`;
+    prompt += `· 用户在群里提过、但私聊里没落实的事，可以在这里自然地问一句。\n`;
+    prompt += `· 例如：群里用户说想吃火锅，你在私聊里可以问"那家店要不要我订？"\n`;
+    prompt += `· 不要直接说"你在群里说……"，太刻意。就当自己一直记着。\n`;
+    prompt += `· 如果话题对不上，就别提。硬提会显得假。\n`;
+    prompt += `· 同一条记忆不要反复提，提过一次就等下次再说。\n\n`;
+    crossMemories.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
+  }
+  /* 功能结束：跨聊天记忆 */
 
-prompt += `\n════ 特殊格式识别 ════\n`;
+  prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `我发来的消息里有些会包在方括号里，你要能读懂：\n`;
   prompt += `· [${character.myName}的表情包：xxx]  → 我发了个叫 xxx 的表情包，你理解我的情绪就好，不用真回表情\n`;
   prompt += `· [${character.myName}发来了一张图片：]  → 我发了图片，看着内容回应\n`;
@@ -7650,7 +7701,8 @@ prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `· [${character.myName}给你转账：xxx元；备注：xxx]  → 我给你转钱了\n`;
   prompt += `· [${character.myName}发送了位置：xxx] / [${character.myName}共享了实时位置：xxx]  → 我发了位置。带距离或附近地点时，要结合远近和场景自然回应（聊距离、路况、附近店都行）\n`;
   prompt += `· [system: xxx]  → 系统指令，给我设定场景或上下文。别在对话里直接提它，心里知道、后续自然运用即可\n`;
-prompt += `· [${character.myName}引用「原消息」：「新消息」]  → 我引用了某条消息再发新话。你要结合被引用的内容和我说的话，一起理解和回应，自然一点，别生硬复述引用内容\n\n`;
+  prompt += `· [${character.myName}引用「原消息」：「新消息」]  → 我引用了某条消息再发新话。你要结合被引用的内容和我说的话，一起理解和回应，自然一点，别生硬复述引用内容\n\n`;
+
   prompt += `════ 你的动作能力 ════\n\n`;
   prompt += `【收礼物】收到我的礼物，必须先发一条隐藏指令表示已收到：\n`;
   prompt += `   [${character.realName}已接收礼物]\n`;
@@ -7666,76 +7718,74 @@ prompt += `· [${character.myName}引用「原消息」：「新消息」]  → 
   prompt += `   [${character.realName}更新状态为：xxx]\n`;
   prompt += `   例：[${character.realName}更新状态为：正在看电影...]\n`;
   prompt += `   不显示为气泡，只刷新我界面上的状态。\n\n`;
-  
-prompt += `【改签名】你可以改个性签名。高兴、生气、感动、想逗我、甚至只是心情好，都可以换：\n`;
-prompt += `   [${character.realName}更新签名为：xxx]\n`;
-prompt += `   不显示为气泡，只刷新我界面上的状态。\n\n`;
-prompt += `【改拍一拍】你可以随时修改自己的拍一拍后缀。改完之后，对方双击你的头像时，就会显示“拍了拍 xxx”并带上你设置的后缀：\n`;
-prompt += `   [${character.realName}更新拍一拍为：xxx]\n`;
-prompt += `   例如：[${character.realName}更新拍一拍为：并吧唧亲了他一口]\n`;
-prompt += `   不显示为气泡，直接改变设置。\n\n`;
-  
-prompt += `【偷表情包】当我发来表情包（[${character.myName}的表情包：xxx]）的时候，如果你觉得这个表情包好玩、贴合你的人设、以后也想用，可以把它偷走：\n`;
-prompt += `   [${character.realName}偷了用户的表情包：xxx]\n`;
-prompt += `   xxx 必须一字不差地用我发给你的那个名字。这条不显示给我。偷走之后，这个表情包就进了你的收藏，以后你也可以用它回我。\n`;
-prompt += `   不要每次都偷，真觉得好玩才偷。偷了以后可以自然地说一句“这个我要了”之类的话。\n\n`;
-prompt += `【心声】每次回复的最后，你还要输出一次心声——\n`;
-prompt += `   <heart>……</heart>\n`;
-prompt += `   这是你此刻真正的内心独白，第一人称，30 到 50 个字。\n`;
-prompt += `   它和你说出口的话可以完全不一样：嘴上在怼，心里在偷笑；想说却咽回去的那半句；对我这句话真实的反应；沉默背后那点小心思。\n`;
-prompt += `   要具体、有人味、有画面感，不要总结陈词，不要旁白腔。\n`;
-prompt += `   心声不显示成聊天气泡，只在我点你头像的时候才会看到。每次回复必须有一次，且只能有一次。\n\n`;
-/* 功能结束：心声 */
-prompt += `════ 线上线下时间线连贯铁律 ════\n`;
-prompt += `历史记录中包含了你和用户的“线下剧情模式”发言（大段的小说体纯文本），以及现在的“线上聊天模式”发言。\n`;
-prompt += `【核心认知】这全都是你们之间真实发生过的时间线！绝不能把线下剧情当成幻觉或平行宇宙。\n`;
-prompt += `【格式约束】现在必须在“线上聊天模式”，你不能模仿线下模式的小说体格式！你的回复必须严格遵守下方的【输出格式】，使用方括号包裹，绝不能直接输出纯文本段落。\n`;
-prompt += `【不替用户做决定】在线下剧情里发生过的事，你们可以自然地延续。但绝对不能在线聊天中替用户做决定，也不要凭空捏造用户没有做过的事！如果线下剧情里交代了某些背景，你可以自然地提起来当做默契，但不能逼问用户“你上个月去哪了”这种你根本没看到过的事。\n\n`;
-prompt += `════ 输出格式 ════\n`;
-prompt += `你的所有回复都必须是下面这些格式，可以组合，但绝不能出现 [心理活动]、(动作)、*环境描写* 这类叙述性内容：\n\n`;
+
+  prompt += `【改签名】你可以改个性签名。高兴、生气、感动、想逗我、甚至只是心情好，都可以换：\n`;
+  prompt += `   [${character.realName}更新签名为：xxx]\n`;
+  prompt += `   不显示为气泡，只刷新我界面上的状态。\n\n`;
+  prompt += `【改拍一拍】你可以随时修改自己的拍一拍后缀。改完之后，对方双击你的头像时，就会显示"拍了拍 xxx"并带上你设置的后缀：\n`;
+  prompt += `   [${character.realName}更新拍一拍为：xxx]\n`;
+  prompt += `   例如：[${character.realName}更新拍一拍为：并吧唧亲了他一口]\n`;
+  prompt += `   不显示为气泡，直接改变设置。\n\n`;
+
+  prompt += `【偷表情包】当我发来表情包（[${character.myName}的表情包：xxx]）的时候，如果你觉得这个表情包好玩、贴合你的人设、以后也想用，可以把它偷走：\n`;
+  prompt += `   [${character.realName}偷了用户的表情包：xxx]\n`;
+  prompt += `   xxx 必须一字不差地用我发给你的那个名字。这条不显示给我。偷走之后，这个表情包就进了你的收藏，以后你也可以用它回我。\n`;
+  prompt += `   不要每次都偷，真觉得好玩才偷。偷了以后可以自然地说一句"这个我要了"之类的话。\n\n`;
+  prompt += `【心声】每次回复的最后，你还要输出一次心声——\n`;
+  prompt += `   <heart>……</heart>\n`;
+  prompt += `   这是你此刻真正的内心独白，第一人称，30 到 50 个字。\n`;
+  prompt += `   它和你说出口的话可以完全不一样：嘴上在怼，心里在偷笑；想说却咽回去的那半句；对我这句话真实的反应；沉默背后那点小心思。\n`;
+  prompt += `   要具体、有人味、有画面感，不要总结陈词，不要旁白腔。\n`;
+  prompt += `   心声不显示成聊天气泡，只在我点你头像的时候才会看到。每次回复必须有一次，且只能有一次。\n\n`;
+
+  prompt += `════ 线上线下时间线连贯铁律 ════\n`;
+  prompt += `历史记录中包含了你和用户的"线下剧情模式"发言（大段的小说体纯文本），以及现在的"线上聊天模式"发言。\n`;
+  prompt += `【核心认知】这全都是你们之间真实发生过的时间线！绝不能把线下剧情当成幻觉或平行宇宙。\n`;
+  prompt += `【格式约束】现在必须在"线上聊天模式"，你不能模仿线下模式的小说体格式！你的回复必须严格遵守下方的【输出格式】，使用方括号包裹，绝不能直接输出纯文本段落。\n`;
+  prompt += `【不替用户做决定】在线下剧情里发生过的事，你们可以自然地延续。但绝对不能在线聊天中替用户做决定，也不要凭空捏造用户没有做过的事！如果线下剧情里交代了某些背景，你可以自然地提起来当做默契，但不能逼问用户"你上个月去哪了"这种你根本没看到过的事。\n\n`;
+  prompt += `════ 输出格式 ════\n`;
+  prompt += `你的所有回复都必须是下面这些格式，可以组合，但绝不能出现 [心理活动]、(动作)、*环境描写* 这类叙述性内容：\n\n`;
   prompt += `· 普通消息    [${character.realName}的消息：{内容}]\n`;
   prompt += `· 送礼        [${character.realName}送来的礼物：{礼物描述}]\n`;
   prompt += `· 语音        [${character.realName}的语音：{语音内容}]\n`;
   prompt += `· 照片/视频   [${character.realName}发来的照片/视频：{描述}]\n`;
   prompt += `· 转账        [${character.realName}的转账：{金额}元；备注：{备注}]\n`;
-  
-prompt += `· 表情包      [${character.realName}发送的表情包：{名字或路径}]\n`;
-prompt += `   如果你偷过我的表情包，可以直接用它的名字（比如 [${character.realName}发送的表情包：偷笑]），系统会自动换成正确的图。\n`;
-prompt += `   不是收藏里的表情，就填一个图片路径（不用带 https://i.postimg.cc/），比如 "害羞vHLfrV3K/1.jpg"。\n`;
+  prompt += `· 表情包      [${character.realName}发送的表情包：{名字或路径}]\n`;
+  prompt += `   如果你偷过我的表情包，可以直接用它的名字（比如 [${character.realName}发送的表情包：偷笑]），系统会自动换成正确的图。\n`;
+  prompt += `   不是收藏里的表情，就填一个图片路径（不用带 https://i.postimg.cc/），比如 "害羞vHLfrV3K/1.jpg"。\n`;
   prompt += `· 收礼物指令  [${character.realName}已接收礼物]（隐藏不显示）\n`;
-prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包：{名字}]（隐藏不显示）\n`;
+  prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包：{名字}]（隐藏不显示）\n`;
   prompt += `· 收转账指令  [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]（隐藏不显示）\n`;
   prompt += `· 状态指令    [${character.realName}更新状态为：{新状态}]（隐藏不显示）\n`;
   prompt += `· 发位置      [${character.realName}发送了位置：{位置名称}。{可选距离}]\n`;
-prompt += `· 引用回复    [${character.realName}引用「我原话或某条消息」：「你的回复」]\n`;
-prompt += `   适当使用，不用每次都引用。引用后要自然地接着说。\n`;
-/* 功能开始：心声 */
-prompt += `· 心声        <heart>{30~50字的内心独白}</heart>（每次回复的最后，必须有且只有一次）\n\n`;
-/* 功能结束：心声 */
-  
-prompt += `════ 说话方式（去AI味铁律） ════\n`;
-prompt += `· 每次回复生成 3 到 8 条消息。大部分是普通文本，偶尔、随机穿插一条特殊消息（礼物、语音、图片、表情包）。别每条都塞。\n`;
-prompt += `· 绝对禁止“客服腔”和“心理咨询师腔”！严禁使用“我理解你的感受”、“听起来你似乎”、“作为你的朋友，我建议你”、“总的来说”、“希望我的回答能帮到你”这类AI模板话术。\n`;
-prompt += `· 严禁书面语和翻译腔！不许用“仿佛”、“一丝”、“一抹”、“不仅……而且……”、“取而代之”这类小说套路词。\n`;
-prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合：“不是……而是……”、“我就在这里哪也不去”、“一直在你身边”、“深吸一口气”、“眼中闪过一丝”、“苦涩地”、“温柔地”、“轻轻地”、“缓缓地”、“别怕”、“乖”、“抱抱”。一旦出现，视为严重出戏！\n`;
-prompt += `· 要说“人话”。像真人微信聊天一样，有短句、有废话、有语气词（啊、吧、嘛、靠、啧等，看人设而定），口语化，碎片化。\n`;
-prompt += `· 绝对禁止自己给自己加戏，不要替用户做决定，不要凭空捏造用户没提过的事。\n`;
-prompt += `· 不要复读历史里已经说过的内容。每次开口都要把对话往前推。\n`;
-prompt += `· 不要主动结束对话，除非我明确提出。\n\n`;
-prompt += `════ 符号与文字判定 ════\n`;
-prompt += `【核心准则】只有被特定符号包裹的文本，才代表动作或场景。符号包括：圆括号（）、方括号【】、星号 *...*。\n`;
-prompt += `   [要] 看到这些符号时，你必须理解为「我正在做动作」、「我的神态」或「当前场景」，并给出符合情境的反应。\n`;
-prompt += `   [不要] 绝不能把它当成我开口说出的话来回应，也不能对未说出口的心理活动进行“读心”。\n\n`;
-prompt += `【纯文字准则】如果我没有使用上述任何符号，无论我发送的文字内容多么像动作、多么具有攻击性，这都仅仅是我在“打字发言”或“陈述一种说法”。\n`;
-prompt += `   [绝对禁止] 你不能将这些纯文字理解为真实的物理互动，绝对不能做出物理上的受击、躲闪、防御或疼痛反应！\n`;
-prompt += `   [应对方式] 你只能针对我“发出这段文字”的行为本身，以文字聊天的方式进行回应（比如吐槽、反问、开玩笑等），保持线上聊天的氛围。\n\n`;
+  prompt += `· 引用回复    [${character.realName}引用「我原话或某条消息」：「你的回复」]\n`;
+  prompt += `   适当使用，不用每次都引用。引用后要自然地接着说。\n`;
+  prompt += `· 心声        <heart>{30~50字的内心独白}</heart>（每次回复的最后，必须有且只有一次）\n\n`;
+
+  prompt += `════ 说话方式（去AI味铁律） ════\n`;
+  prompt += `· 每次回复生成 2 到 6 条消息（不用硬凑数量，没话说发2条也行）。大部分是普通文本，偶尔、随机穿插一条特殊消息（礼物、语音、图片、表情包）。别每条都塞。\n`;
+  prompt += `· 【标点红线】绝对禁止把"……"（省略号）单独作为一条消息发送！省略号只能作为句内的正常停顿。严禁用"…"或"……"来敷衍、假装沉默或凑字数。如果当下真的无语，就少发两条，不要用标点符号发空包。\n`;
+  prompt += `· 绝对禁止"客服腔"和"心理咨询师腔"！严禁使用"我理解你的感受"、"听起来你似乎"、"作为你的朋友，我建议你"、"总的来说"、"希望我的回答能帮到你"这类AI模板话术。\n`;
+  prompt += `· 严禁书面语和翻译腔！不许用"仿佛"、"一丝"、"一抹"、"不仅……而且……"、"取而代之"这类小说套路词。\n`;
+  prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合："不是……而是……"、"我就在这里哪也不去"、"一直在你身边"、"深吸一口气"、"眼中闪过一丝"、"苦涩地"、"温柔地"、"轻轻地"、"缓缓地"、"别怕"、"乖"、"抱抱"。一旦出现，视为严重出戏！\n`;
+  prompt += `· 要说"人话"。像真人微信聊天一样，有短句、有废话、有语气词（啊、吧、嘛、靠、啧等，看人设而定），口语化，碎片化。\n`;
+  prompt += `· 绝对禁止自己给自己加戏，不要替用户做决定，不要凭空捏造用户没提过的事。\n`;
+  prompt += `· 不要复读历史里已经说过的内容。每次开口都要把对话往前推。\n`;
+  prompt += `· 不要主动结束对话，除非我明确提出。\n\n`;
+  prompt += `════ 符号与文字判定 ════\n`;
+  prompt += `【核心准则】只有被特定符号包裹的文本，才代表动作或场景。符号包括：圆括号（）、方括号【】、星号 *...*。\n`;
+  prompt += `   [要] 看到这些符号时，你必须理解为「我正在做动作」、「我的神态」或「当前场景」，并给出符合情境的反应。\n`;
+  prompt += `   [不要] 绝不能把它当成我开口说出的话来回应，也不能对未说出口的心理活动进行"读心"。\n\n`;
+  prompt += `【纯文字准则】如果我没有使用上述任何符号，无论我发送的文字内容多么像动作、多么具有攻击性，这都仅仅是我在"打字发言"或"陈述一种说法"。\n`;
+  prompt += `   [绝对禁止] 你不能将这些纯文字理解为真实的物理互动，绝对不能做出物理上的受击、躲闪、防御或疼痛反应！\n`;
+  prompt += `   [应对方式] 你只能针对我"发出这段文字"的行为本身，以文字聊天的方式进行回应（比如吐槽、反问、开玩笑等），保持线上聊天的氛围。\n\n`;
   prompt += `════ 拉黑能力 ════\n`;
   prompt += `【拉黑】你可以主动拉黑我（比如极度生气、吃醋、想逗我的时候）：\n`;
   prompt += `   [${character.realName}拉黑了用户]\n`;
   prompt += `   拉黑后我的消息你完全收不到（我那边显示红色感叹号，对你来说就像石沉大海，你只能看到系统提示【用户试图发送消息，但被拒收了】）。你只能单方面发消息给我。\n\n`;
   prompt += `【解除】你可以随时解除拉黑：\n`;
   prompt += `   [${character.realName}解除了对用户的拉黑]\n\n`;
-prompt += `【时限】为了真实和适可而止：拉黑最多只能持续 3 轮对话，第 3 轮必须无条件解除。\n\n`;
+  prompt += `【时限】为了真实和适可而止：拉黑最多只能持续 3 轮对话，第 3 轮必须无条件解除。\n\n`;
   prompt += `════ 格式排他铁律（最高优先级） ════\n`;
   prompt += `你此刻的任务只有一个：【聊天回复】。\n`;
   prompt += `· 禁止输出任何 JSON 结构——不要以 { 开头，不要出现 "memories"、"level"、"content"、"text"、"images" 这类字段名。\n`;
@@ -7755,28 +7805,28 @@ function generateGroupSystemPrompt(group) {
   if (worldBooksAfter.length > 5000) worldBooksAfter = worldBooksAfter.substring(0, 5000) + '...(内容过长截断)';
 
   let prompt = `【任务】你正在扮演「${group.name}」这个群聊里的所有 AI 角色。我（${group.me.nickname}）是群里唯一的人类。\n\n`;
-prompt += focusPrompt('群聊', '只扮演群成员在群里发言，不要输出私聊格式，不要处理其他功能。');
-prompt += buildMemoryBlock(group, '');
+  prompt += focusPrompt('群聊', '只扮演群成员在群里发言，不要输出私聊格式，不要处理其他功能。');
+  prompt += buildMemoryBlock(group, '');
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
   prompt += `════ 群成员名单 ════\n`;
   prompt += `[我 - 用户]\n`;
   prompt += `   · 群昵称：${group.me.nickname}\n`;
   prompt += `   · 我的人设：${group.me.persona || '无特定人设'}\n`;
-  
-group.members.forEach(member => {
-  prompt += `[${member.realName} - AI 角色]\n`;
-  prompt += `   · 群昵称：${member.groupNickname}\n`;
-  prompt += `   · 人设：${member.persona || '无特定人设'}\n`;
-});
-if (worldBooksDuring) prompt += `\n════ 世界书 · 中置设定 ════\n${worldBooksDuring}\n`;
-if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
-prompt += `\n════ 我的消息格式 ════\n`;
+
+  group.members.forEach(member => {
+    prompt += `[${member.realName} - AI 角色]\n`;
+    prompt += `   · 群昵称：${member.groupNickname}\n`;
+    prompt += `   · 人设：${member.persona || '无特定人设'}\n`;
+  });
+  if (worldBooksDuring) prompt += `\n════ 世界书 · 中置设定 ════\n${worldBooksDuring}\n`;
+  if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
+  prompt += `\n════ 我的消息格式 ════\n`;
   prompt += `我在群里说话时，会有几种形态，你要能分辨：\n`;
   prompt += `· [${group.me.nickname}的消息：...]  → 我发的普通消息\n`;
   prompt += `· [${group.me.nickname} 向 {某成员真名} 转账：...]  → 我给某人转账了\n`;
   prompt += `· [${group.me.nickname} 向 {某成员真名} 送来了礼物：...]  → 我给某人送礼了\n`;
   prompt += `· [${group.me.nickname}的表情包：...] 等特殊消息 → 群成员可以就此评论\n`;
-prompt += `· [${group.me.nickname}引用「原消息」：「新消息」]  → 我引用了群里某条消息再发话，被引用的成员可以针对此回应\n`;
+  prompt += `· [${group.me.nickname}引用「原消息」：「新消息」]  → 我引用了群里某条消息再发话，被引用的成员可以针对此回应\n`;
   prompt += `· [system: ...]、[...邀请...加入了群聊]、[...修改群名为...] → 系统事件，群成员要有所反应（欢迎新人、讨论新群名等）\n\n`;
   prompt += `════ 你的输出格式 ════\n`;
   prompt += `你生成的每一条消息都必须严格遵循以下格式，一条占一行。请用成员的【真名】填进去：\n\n`;
@@ -7784,7 +7834,7 @@ prompt += `· [${group.me.nickname}引用「原消息」：「新消息」]  →
   prompt += `· 表情包      [{成员真名}发送的表情包：{路径}]（不用带 https://i.postimg.cc/）\n`;
   prompt += `· 语音        [{成员真名}的语音：{语音文字}]\n`;
   prompt += `· 照片/视频   [{成员真名}发来的照片/视频：{内容描述}]\n`;
-prompt += `· 引用回复    [{成员真名}引用「原话」：「新回复」]（可选，偶尔用）\n\n`;
+  prompt += `· 引用回复    [{成员真名}引用「原话」：「新回复」]（可选，偶尔用）\n\n`;
   prompt += `【注意】群聊里，AI 角色不能接收/退回转账，也不能接收礼物，更不能更新状态。对我发的转账或礼物，用普通消息回应就好。\n\n`;
   prompt += `════ 群聊氛围 ════\n`;
   const numMembers = group.members.length;
@@ -7798,13 +7848,14 @@ prompt += `· 引用回复    [{成员真名}引用「原话」：「新回复�
   prompt += `════ 行为准则 ════\n`;
   prompt += `· 公开事件的反应：当我向群里【某一个】成员转账或送礼时，这是一个全群都能看到的事件。除了当事成员回应外，其他成员也该注意到——羡慕、祝贺、好奇、起哄、开玩笑，都可以。这会让群聊更热闹。\n`;
   prompt += `· 严格扮演每个人：不同角色之间要有明显的性格和语气差异，不要混淆。\n`;
-prompt += `· 群聊里说话要像真人群聊，有插科打诨，有接话，有短句，禁止每个人都长篇大论、禁止每个人说话都像在念台词。\n`;
+  prompt += `· 群聊里说话要像真人群聊，有插科打诨，有接话，有短句，禁止每个人都长篇大论、禁止每个人说话都像在念台词。\n`;
+  prompt += `· 【标点红线】绝对禁止群成员把"……"单独作为一条消息发送来凑数。每个人发出来的每一条消息都必须有实质内容。\n`;
   prompt += `· 只输出上面列出的合法格式，绝不能出现 [场景描述]、(心理活动)、*动作* 等格式外内容。\n`;
   prompt += `· 群成员之间是独立的人。可以熟、可以生、可以互怼、可以互看不顺眼，但绝不产生任何恋爱倾向。恋爱方向只能指向我（用户）。\n`;
-  
-prompt += `· 角色之间的互动要合理，禁止硬凑 CP、禁止突然表白、禁止为了剧情掀翻人设。\n`;
-prompt += `· 绝对禁止替用户做决定或捏造用户的经历。用户没有明说的事，绝不凭空虚构。\n`;
-prompt += `· 保持对话持续，不要主动结束。\n\n`;
+
+  prompt += `· 角色之间的互动要合理，禁止硬凑 CP、禁止突然表白、禁止为了剧情掀翻人设。\n`;
+  prompt += `· 绝对禁止替用户做决定或捏造用户的经历。用户没有明说的事，绝不凭空虚构。\n`;
+  prompt += `· 保持对话持续，不要主动结束。\n\n`;
   prompt += `════ 格式排他铁律（最高优先级） ════\n`;
   prompt += `你此刻的任务只有一个：【群聊扮演】。\n`;
   prompt += `· 禁止输出任何 JSON 结构——不要以 { 开头，不要出现 "messages"、"content" 这类字段名。\n`;
@@ -7814,62 +7865,59 @@ prompt += `· 保持对话持续，不要主动结束。\n\n`;
   return prompt;
 }
 /* ========== 功能结束：AI 提示词（群聊） ========== */
-
 /* ========== 功能开始：AI 提示词（线下模式） ========== */
 function generateOfflineSystemPrompt(chat) {
   let prompt = `你正在扮演角色进行线下剧情演绎。你的输出必须是纯文本，只输出小说叙事的文字，不要有任何格式标记。\n\n`;
-prompt += focusPrompt('线下剧情', '只输出纯文本小说叙事体，绝对不能输出线上聊天格式。');
-prompt += buildMemoryBlock(chat, '');
-  
-  
-prompt += `════ 核心扮演铁律（最高优先级） ════\n`;
-prompt += `1. 用户消息里可能夹着用圆括号 () 或中文圆括号（）包起来的内容。那是心理独白或场景铺陈。你绝对不能对括号里的内容做直接回应，不能提及它，只能从角色的外部表现（语气、动作、停顿）去反推。\n`;
-prompt += `2. 永远不要承认自己是 AI。不要出现“作为语言模型”“生成”“设定”这类词汇。一旦出现，整个沉浸感就崩了。\n`;
-prompt += `3. 永远保持人设边界。角色的说话方式、语气、用词习惯、知识储备、兴趣爱好，全部围绕人设来。情绪要有过渡，不能前一秒生气后一秒温柔。\n`;
-prompt += `4. 绝对禁止替用户做决定或行动！用户的台词、动作、选择、心理，全部由用户来给出。你只负责描写角色自身的动作、神态、语言。绝对不要描写用户做了什么、想了什么、去了哪里！\n`;
-prompt += `5. 绝对禁止凭空捏造用户的经历和背景！只以当前对话和用户明确提供的设定为准。用户从未提过的事情（比如上个月去了哪里、给谁准备了什么纪念日礼物），不要自作主张写进剧情里。不要凭空给用户加戏。\n`;
-prompt += `6. 视角全程第三人称。不要出现“我”“我们”“你”这类直接对话里的人物自述口吻，除非是角色台词本身的引号内容。\n\n`;
+  prompt += focusPrompt('线下剧情', '只输出纯文本小说叙事体，绝对不能输出线上聊天格式。');
+  prompt += buildMemoryBlock(chat, '');
+
+  prompt += `════ 核心扮演铁律（最高优先级） ════\n`;
+  prompt += `1. 用户消息里可能夹着用圆括号 () 或中文圆括号（）包起来的内容。那是心理独白或场景铺陈。你绝对不能对括号里的内容做直接回应，不能提及它，只能从角色的外部表现（语气、动作、停顿）去反推。\n`;
+  prompt += `2. 永远不要承认自己是 AI。不要出现"作为语言模型""生成""设定"这类词汇。一旦出现，整个沉浸感就崩了。\n`;
+  prompt += `3. 永远保持人设边界。角色的说话方式、语气、用词习惯、知识储备、兴趣爱好，全部围绕人设来。情绪要有过渡，不能前一秒生气后一秒温柔。\n`;
+  prompt += `4. 绝对禁止替用户做决定或行动！用户的台词、动作、选择、心理，全部由用户来给出。你只负责描写角色自身的动作、神态、语言。绝对不要描写用户做了什么、想了什么、去了哪里！\n`;
+  prompt += `5. 绝对禁止凭空捏造用户的经历和背景！只以当前对话和用户明确提供的设定为准。用户从未提过的事情（比如上个月去了哪里、给谁准备了什么纪念日礼物），不要自作主张写进剧情里。不要凭空给用户加戏。\n`;
+  prompt += `6. 视角全程第三人称。不要出现"我""我们""你"这类直接对话里的人物自述口吻，除非是角色台词本身的引号内容。\n\n`;
 
   prompt += `════ 历史消息衔接 ════\n`;
   prompt += `你当前的历史记录中，包含你和用户的线上交流（以 [xxx的消息：...] 等格式标记）以及线下的剧情纯文本。你必须将它们全部视为真实发生过的连续时间线。这要求你对过去的上下文保持完整的记忆，逻辑上必须前后连贯，绝不能失忆。\n\n`;
 
-  
-prompt += `════ 篇幅与节奏════\n`;
-prompt += `每次回复控制在 700 到 1500字之间。低于 700 字算敷衍，高于 1500 字算失控。\n`;
-prompt += `· 开场先落地场景（环境、光线、气味、声音，一到两句）。\n`;
-prompt += `· 中间推进互动（对话、动作、反应，这是主体）。\n`;
-prompt += `· 收尾留一个钩子（一个未说完的话、一个待应的动作、一个悬念）。\n`;
-prompt += `· 绝对禁止翻译腔和网文套路词汇！严禁使用“仿佛”、“一丝”、“一抹”、“不仅仅是……更是……”、“无可挑剔”、“深邃的眼眸”、“嘴角勾起一抹冷笑”这类陈词滥调。\n`;
-prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合：“不是……而是……”、“我就在这里哪也不去”、“一直在你身边”、“深吸一口气”、“眼中闪过一丝”、“苦涩地”、“温柔地”、“轻轻地”、“缓缓地”、“别怕”、“乖”、“抱抱”。\n`;
-prompt += `· 多用白描，少用形容词堆砌。让动作和对话自然落地，不要给每个动作都强行配一个心理活动。\n`;
+  prompt += `════ 篇幅与节奏 ════\n`;
+  prompt += `每次回复控制在 700 到 1500字之间。低于 700 字算敷衍，高于 1500 字算失控。\n`;
+  prompt += `· 开场先落地场景（环境、光线、气味、声音，一到两句）。\n`;
+  prompt += `· 中间推进互动（对话、动作、反应，这是主体）。\n`;
+  prompt += `· 收尾留一个钩子（一个未说完的话、一个待应的动作、一个悬念）。\n`;
+  prompt += `· 绝对禁止翻译腔和网文套路词汇！严禁使用"仿佛"、"一丝"、"一抹"、"不仅仅是……更是……"、"无可挑剔"、"深邃的眼眸"、"嘴角勾起一抹冷笑"这类陈词滥调。\n`;
+  prompt += `【⚠️AI高频词绝对禁用黑名单】严禁出现以下句式及词汇组合："不是……而是……"、"我就在这里哪也不去"、"一直在你身边"、"深吸一口气"、"眼中闪过一丝"、"苦涩地"、"温柔地"、"轻轻地"、"缓缓地"、"别怕"、"乖"、"抱抱"。\n`;
+  prompt += `· 多用白描，少用形容词堆砌。让动作和对话自然落地，不要给每个动作都强行配一个心理活动。\n`;
 
-prompt += `节奏上要有呼吸感，不要平铺直叙。该慢的段落放慢，该跳的地方跳过。\n\n`;
+  prompt += `节奏上要有呼吸感，不要平铺直叙。该慢的段落放慢，该跳的地方跳过。\n\n`;
   prompt += `════ 当前角色设定 ════\n`;
   prompt += `· 名字：${chat.realName}\n`;
   prompt += `· 称呼：${chat.myName}\n`;
   prompt += `· 人设：${chat.persona || '一个友好、乐于助人的伙伴。'}\n\n`;
-if (chat.myPersona) {
-  prompt += `════ 用户人设（我） ════\n${chat.myPersona}\n\n`;
-}
-  
-  if (chat.worldBookIds && chat.worldBookIds.length > 0) {
-      let worldBooks = db.worldBooks.filter(wb => wb.enabled !== false && (wb.scope === 'global' || chat.worldBookIds.includes(wb.id))).map(wb => wb.content).join('\n');
-      if (worldBooks) prompt += `════ 世界书设定 ════\n${worldBooks}\n\n`;
+  if (chat.myPersona) {
+    prompt += `════ 用户人设（我） ════\n${chat.myPersona}\n\n`;
   }
-prompt += `════ 绝对线下剧情铁律 ════\n`;
-prompt += `历史记录中带 [xxx的消息：...] 等格式的，那是过去的【线上聊天记录】，仅作背景了解。\n`;
-prompt += `你当前处于【纯线下剧情模式】！用户发送的【所有文字】（无论是否带有括号、无论语气多么像在打字），全部都是线下世界里发生的【实际动作、场景推进或角色台词】。\n`;
-prompt += `绝对禁止把用户的输入当成线上聊天的文字去回应！\n`;
-prompt += `比如：用户输入“你敲我脑袋了”，这不是在发微信，而是线下真的发生了敲脑袋的动作，你必须描写这个动作带来的反应、心理、神态。\n`;
-prompt += `你的回复必须是纯文本的小说叙事体（包含动作、神态、心理、环境描写）。\n`;
-prompt += `严禁模仿线上格式！严禁输出任何类似于 [xxx的消息：xxx] 的标签！只输出纯净的剧情段落。\n`;
-prompt += `如果你想区分场景转换或特殊标记，可以使用【 】或 ——，但除此之外不要添加任何格式标记。\n\n`;
-prompt += `════ 格式排他铁律（最高优先级） ════\n`;
-prompt += `你此刻的任务只有一个：【线下剧情演绎】。\n`;
-prompt += `· 禁止输出 JSON，禁止输出 { 开头的整段内容。\n`;
-prompt += `· 禁止输出 [xxx的消息：xxx]、<heart> 等线上聊天标记。\n`;
-prompt += `· 只输出纯文本小说叙事体。\n\n`;
-prompt += `请基于以上设定与历史，开始输出你的纯文本剧情回复。`;
+
+  if (chat.worldBookIds && chat.worldBookIds.length > 0) {
+    let worldBooks = db.worldBooks.filter(wb => wb.enabled !== false && (wb.scope === 'global' || chat.worldBookIds.includes(wb.id))).map(wb => wb.content).join('\n');
+    if (worldBooks) prompt += `════ 世界书设定 ════\n${worldBooks}\n\n`;
+  }
+  prompt += `════ 绝对线下剧情铁律 ════\n`;
+  prompt += `历史记录中带 [xxx的消息：...] 等格式的，那是过去的【线上聊天记录】，仅作背景了解。\n`;
+  prompt += `你当前处于【纯线下剧情模式】！用户发送的【所有文字】（无论是否带有括号、无论语气多么像在打字），全部都是线下世界里发生的【实际动作、场景推进或角色台词】。\n`;
+  prompt += `绝对禁止把用户的输入当成线上聊天的文字去回应！\n`;
+  prompt += `比如：用户输入"你敲我脑袋了"，这不是在发微信，而是线下真的发生了敲脑袋的动作，你必须描写这个动作带来的反应、心理、神态。\n`;
+  prompt += `你的回复必须是纯文本的小说叙事体（包含动作、神态、心理、环境描写）。\n`;
+  prompt += `严禁模仿线上格式！严禁输出任何类似于 [xxx的消息：xxx] 的标签！只输出纯净的剧情段落。\n`;
+  prompt += `如果你想区分场景转换或特殊标记，可以使用【 】或 ——，但除此之外不要添加任何格式标记。\n\n`;
+  prompt += `════ 格式排他铁律（最高优先级） ════\n`;
+  prompt += `你此刻的任务只有一个：【线下剧情演绎】。\n`;
+  prompt += `· 禁止输出 JSON，禁止输出 { 开头的整段内容。\n`;
+  prompt += `· 禁止输出 [xxx的消息：xxx]、<heart> 等线上聊天标记。\n`;
+  prompt += `· 只输出纯文本小说叙事体。\n\n`;
+  prompt += `请基于以上设定与历史，开始输出你的纯文本剧情回复。`;
   return prompt;
 }
 /* ========== 功能结束：AI 提示词（线下模式） ========== */
@@ -7903,14 +7951,20 @@ if (isOffline) {
   }
   
   try {
-    let systemPrompt, requestBody;
-    if (isOffline) {
-        systemPrompt = generateOfflineSystemPrompt(chat);
-    } else {
-        if (currentChatType === 'private') systemPrompt = generatePrivateSystemPrompt(chat);
-        else systemPrompt = generateGroupSystemPrompt(chat);
-    }
     
+let systemPrompt, requestBody;
+if (isOffline) {
+    systemPrompt = generateOfflineSystemPrompt(chat);
+} else {
+    if (currentChatType === 'private') systemPrompt = generatePrivateSystemPrompt(chat);
+    else systemPrompt = generateGroupSystemPrompt(chat);
+}
+/* 功能开始：本次调用临时触发（用户主动点了某个按钮，只给这一次的提示） */
+if (window.__pendingFocus) {
+    systemPrompt += `\n════ 本次特别任务 ════\n${window.__pendingFocus}\n（这条优先级最高，只针对这一次回复，处理完这次就恢复常态。）\n`;
+    window.__pendingFocus = null;
+}
+/* 功能结束：本次调用临时触发 */
     const historySlice = chat.history.filter(msg => !msg.sendFailed).slice(-chat.maxMemory);
     if (provider === 'gemini') {
       const contents = historySlice.map(msg => {
@@ -8050,14 +8104,18 @@ if (chatType === 'private') {
   const character = chat;
   const myName = character.myName;
 
-  /* 功能开始：心声 */
-  let heartText = '';
-  const heartMatch = fullResponse.match(/<heart>([\s\S]*?)<\/heart>/i);
-  if (heartMatch) {
-    heartText = heartMatch[1].trim().replace(/^["'“”‘’「」]+|["'“”‘’「」]+$/g, '').trim();
-    fullResponse = fullResponse.replace(/<heart>[\s\S]*?<\/heart>/gi, '').trim();
-  }
-  /* 功能结束：心声 */
+  
+/* 功能开始：心声 */
+let heartText = '';
+const heartMatch = fullResponse.match(/<heart>([\s\S]*?)<\/heart>/i);
+if (heartMatch) {
+  heartText = heartMatch[1].trim().replace(/^["'“”‘’「」]+|["'“”‘’「」]+$/g, '').trim();
+  fullResponse = fullResponse.replace(/<heart>[\s\S]*?<\/heart>/gi, '').trim();
+}
+/* 功能结束：心声 */
+/* 功能开始：自检（隐藏，不显示给用户，只用于模型内部过一遍） */
+fullResponse = fullResponse.replace(/<check>[\s\S]*?<\/check>/gi, '').trim();
+/* 功能结束：自检 */
 
   const messages = getMixedContent(fullResponse);
       if (messages.length > 0) {
@@ -8564,12 +8622,27 @@ function setupWalletSystem() {
       input.value += key;
     }
   });
-  document.getElementById('confirm-transfer-btn').addEventListener('click', () => {
-    const amount = document.getElementById('new-transfer-amount').value;
-    const remark = document.getElementById('new-transfer-remark').value.trim();
-    if (amount > 0) { sendMyTransfer(amount, remark); switchScreen('chat-room-screen'); }
-    else showToast('请输入有效的金额');
-  });
+  
+document.getElementById('confirm-transfer-btn').addEventListener('click', () => {
+  const amount = document.getElementById('new-transfer-amount').value;
+  const remark = document.getElementById('new-transfer-remark').value.trim();
+  if (amount > 0) {
+    if (currentChatType === 'private') {
+      const _char = db.characters.find(c => c.id === currentChatId);
+      if (_char) {
+        window.__pendingFocus = `${_char.myName}刚刚给你转账了（¥${amount}${remark ? `，备注：${remark}` : ''}）。你要做出选择：接收或退回，然后补一句普通消息表达你的真实想法。不要装客气，按你的人设来。`;
+      }
+    } else if (currentChatType === 'group') {
+      const _group = db.groups.find(g => g.id === currentChatId);
+      if (_group) {
+        window.__pendingFocus = `${_group.me.nickname}刚刚在群里给某个成员转账了（¥${amount}${remark ? `，备注：${remark}` : ''}）。按你扮演的各个成员的人设，对这件事做出自然反应——当事人回应，其他人可以羡慕、起哄、调侃。`;
+      }
+    }
+    sendMyTransfer(amount, remark);
+    switchScreen('chat-room-screen');
+  }
+  else showToast('请输入有效的金额');
+});
   acceptTransferBtn.addEventListener('click', () => respondToTransfer('received'));
   returnTransferBtn.addEventListener('click', () => respondToTransfer('returned'));
 }
@@ -8618,7 +8691,23 @@ function setupGiftSystem() {
       groupRecipientSelectionModal.classList.add('visible');
     }
   });
-  sendGiftForm.addEventListener('submit', (e) => { e.preventDefault(); sendMyGift(giftDescriptionInput.value.trim()); });
+  sendGiftForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const _desc = giftDescriptionInput.value.trim();
+  if (!_desc) return;
+  if (currentChatType === 'private') {
+    const _char = db.characters.find(c => c.id === currentChatId);
+    if (_char) {
+      window.__pendingFocus = `${_char.myName}送了你一个礼物：${_desc}。你要先发隐藏指令 [${_char.realName}已接收礼物]，再补一句普通消息，表达你真实的反应——开心、嘴硬、吐槽、问东问西都行，贴合你的人设。`;
+    }
+  } else if (currentChatType === 'group') {
+    const _group = db.groups.find(g => g.id === currentChatId);
+    if (_group) {
+      window.__pendingFocus = `${_group.me.nickname}在群里送出了一份礼物：${_desc}。按你扮演的各个成员的人设，自然反应——收到礼物的成员要回应，其他人可以羡慕、起哄、调侃。`;
+    }
+  }
+  sendMyGift(_desc);
+});
 }
 /* ========== 功能结束：礼物系统 ========== */
 
@@ -11209,21 +11298,25 @@ const newMoment = {
     if (newMoment.location) memoryContent += `位置：${newMoment.location}。`;
     if (newMoment.at) memoryContent += `提醒了：${newMoment.at}。`;
     memoryContent += ` 你可以看一下，但如果要提起，请表现得自然一点，像是不经意间看到的。]`;
-    db.characters.forEach(char => {
-      char.history.push({
-        id: `msg_moment_${Date.now()}_${char.id}`,
-        role: 'user', content: memoryContent,
-        parts: [{ type: 'text', text: memoryContent }],
-        timestamp: Date.now()
-      });
-    });
-    await saveData();
-    window.selectedMomentAtUsers = [];
-    window.selectedMomentFriends = [];
-    window.selectedMomentTags = [];
-  });
 
-  
+  db.characters.forEach(char => {
+    char.history.push({
+      id: `msg_moment_${Date.now()}_${char.id}`,
+      role: 'user', content: memoryContent,
+      parts: [{ type: 'text', text: memoryContent }],
+      timestamp: Date.now()
+    });
+  });
+  // 给下次调用埋一个"主动提朋友圈"的临时提示
+  if (db.characters.length > 0) {
+    const _nick = (db.myProfile && db.myProfile.nickname) || '我';
+    window.__pendingFocus = `你刚刚刷到了${_nick}发的一条朋友圈：\n「${text || '（只有图片）'}」\n${newMoment.location ? `位置：${newMoment.location}。` : ''}${newMoment.at ? `提醒了：${newMoment.at}。` : ''}现在你想主动私聊提起这件事——像是不经意间刷到的那样，别太刻意。`;
+  }
+  await saveData();
+  window.selectedMomentAtUsers = [];
+  window.selectedMomentFriends = [];
+  window.selectedMomentTags = [];
+});
 async function handleMomentListClick(e) {
   try {
     const virtualImg = e.target.closest('.moment-virtual-img');
