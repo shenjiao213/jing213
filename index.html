@@ -1557,7 +1557,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   background: #ffffff;
   border-bottom: 1px solid #eaeaea;
   display: flex; gap: 8px;
-  position: sticky; top: 0; z-index: 3;
+  flex-shrink: 0;
 }
 .memory-stat { flex: 1; text-align: center; }
 .memory-stat .num { font-size: 22px; font-weight: 600; color: #333; }
@@ -1567,7 +1567,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   display: flex; gap: 8px; padding: 12px 16px;
   background: #ffffff; border-bottom: 1px solid #eaeaea;
   overflow-x: auto; scrollbar-width: none;
-  position: sticky; top: 79px; z-index: 2;
+  flex-shrink: 0;
 }
 .memory-tabs::-webkit-scrollbar { display: none; }
 .memory-tab {
@@ -1579,7 +1579,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 .memory-tab.active { background: #333; color: #fff; }
 
-.memory-search-bar { padding: 12px 16px 12px; background: #ffffff; border-bottom: 1px solid #eaeaea; position: sticky; top: 133px; z-index: 1; }
+.memory-search-bar { padding: 12px 16px 12px; background: #ffffff; border-bottom: 1px solid #eaeaea; flex-shrink: 0; }
 .memory-search-bar input {
   width: 100%; padding: 10px 14px;
   border: 1px solid #e8e8e8; border-radius: 8px;
@@ -1589,7 +1589,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 .memory-search-bar input:focus { border-color: #ccc; background: #fff; }
 
-#memory-list { padding: 12px 0 30px 0; }
+#memory-list { padding: 12px 0 30px 0; flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .memory-item {
   background: #ffffff; margin: 10px 15px;
   padding: 16px 18px; border-radius: 10px;
@@ -3338,7 +3338,7 @@ input:checked + .slider:before { transform: translateX(22px); }
     <button class="action-btn" id="memory-add-btn" style="width:auto; padding:6px 12px; font-size:13px; font-weight:500; background:#333; color:#fff; border-radius:10px;">添加</button>
   </div>
 </header>
-  <main class="content" style="padding:0; overflow-y:auto; display:flex; flex-direction:column;">
+  <main class="content" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
     <div class="memory-stats" id="memory-stats"></div>
     <div class="memory-tabs" id="memory-tabs">
       <div class="memory-tab active" data-level="all">全部</div>
@@ -13532,11 +13532,23 @@ function setupMemoryScreen() {
     });
   });
 
-  const searchInput = document.getElementById('memory-search-input');
-  if (searchInput) searchInput.addEventListener('input', (e) => {
+  
+const searchInput = document.getElementById('memory-search-input');
+if (searchInput) {
+  searchInput.addEventListener('input', (e) => {
     currentMemoryQuery = e.target.value.trim();
     renderMemoryScreen();
   });
+  searchInput.addEventListener('focus', () => {
+    const list = document.getElementById('memory-list');
+    if (list) {
+      const st = list.scrollTop;
+      requestAnimationFrame(() => { list.scrollTop = st; });
+    }
+    // 防止页面级滚动
+    requestAnimationFrame(() => { window.scrollTo(0, 0); });
+  });
+}
 
   const addBtn = document.getElementById('memory-add-btn');
   if (addBtn) addBtn.addEventListener('click', async () => {
