@@ -1946,7 +1946,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 .dec-view { display: none; flex: 1; min-height: 0; flex-direction: column; }
 .dec-view.active { display: flex; }
-.dec-scroll { flex: 1; overflow-y: auto; padding: 16px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
+.dec-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 16px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
 
 .dec-home-lead {
   text-align: center; color: #9ca3af; font-size: 13px;
@@ -2049,35 +2049,29 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 /* 随机数 */
-.dec-num-stage { display: flex; justify-content: center; padding: 30px 0 16px 0; }
+.dec-num-stage { display: flex; justify-content: center; align-items: center; width: 100%; box-sizing: border-box; padding: 30px 0 16px 0; }
 .dec-num-window {
   width: 220px; height: 138px; background: #fff;
   border-radius: 22px; overflow: hidden; position: relative;
   box-shadow: 0 8px 30px rgba(0,0,0,0.06), inset 0 0 0 1px #f0f0f0;
-}
-.dec-num-window::before,
-.dec-num-window::after {
-  content: ''; position: absolute; left: 0; right: 0;
-  height: 34px; z-index: 2; pointer-events: none;
-}
-.dec-num-window::before {
-  top: 0; background: linear-gradient(to bottom, #fff 40%, rgba(255,255,255,0));
-}
-.dec-num-window::after {
-  bottom: 0; background: linear-gradient(to top, #fff 40%, rgba(255,255,255,0));
+  /* 强制裁剪，防止子元素外溢 */
+  isolation: isolate;
 }
 .dec-num-track {
-  position: absolute; left: 0; right: 0; top: 0;
+  position: absolute; left: 0; top: 0; width: 100%;
   display: flex; flex-direction: column; align-items: center;
+  will-change: transform; overflow: hidden;
 }
 .dec-num-cell {
   height: 46px; display: flex; align-items: center; justify-content: center;
   font-size: 28px; font-weight: 700; color: #1f2937;
   font-variant-numeric: tabular-nums; letter-spacing: 1px;
+  flex-shrink: 0;
 }
+
 .dec-range-row { display: flex; align-items: center; gap: 12px; padding: 6px 4px; }
 .dec-range-input {
-  flex: 1; padding: 10px 12px; border: 1px solid #e8e8ea;
+  flex: 1; width: 0; min-width: 0; padding: 10px 12px; border: 1px solid #e8e8ea;
   border-radius: 10px; background: #fafafa; font-size: 16px;
   font-family: inherit; color: #333; outline: none; text-align: center;
   box-sizing: border-box;
@@ -2116,32 +2110,53 @@ input:checked + .slider:before { transform: translateX(22px); }
 /* 硬币 */
 .dec-coin-stage {
   display: flex; justify-content: center;
-  padding: 30px 0 20px 0; perspective: 800px;
+  padding: 30px 0 20px 0; perspective: 1000px;
 }
 .dec-coin {
   width: 120px; height: 120px; position: relative;
   transform-style: preserve-3d;
-  transition: transform 1.6s cubic-bezier(.2,.8,.2,1);
+  transition: transform 1.6s cubic-bezier(.2, .9, .3, 1);
 }
 .dec-coin-face {
   position: absolute; inset: 0; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 36px; font-weight: 700; letter-spacing: 2px;
+  font-size: 38px; font-weight: 900; letter-spacing: 2px;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
-  box-shadow: inset 0 0 0 4px #fff, 0 6px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+  /* 金属质感：多层次内阴影 + 浮雕立体感 */
+  box-shadow:
+    inset 0 0 0 4px rgba(255, 255, 255, 0.7), /* 内圈高光 */
+    inset 0 0 0 6px rgba(0, 0, 0, 0.15),      /* 内圈暗部 */
+    inset 0 0 20px rgba(0, 0, 0, 0.3),        /* 整体阴影 */
+    0 10px 25px rgba(0, 0, 0, 0.2),           /* 底部外阴影 */
+    0 0 0 1px rgba(0,0,0,0.1);               /* 边缘细线 */
 }
-.dec-coin-front { background: linear-gradient(135deg, #f8e9c9, #e2c48a); color: #7a5a1f; }
-.dec-coin-back  { background: linear-gradient(135deg, #e4e6ea, #c5c9d0); color: #4b5563; transform: rotateY(180deg); }
-
-/* 卡片 */
-.dec-cards-stage { display: flex; justify-content: center; gap: 10px; padding: 24px 4px 16px 0; }
-.dec-card { width: 88px; height: 132px; perspective: 800px; cursor: pointer; flex-shrink: 0; }
-.dec-card-inner {
-  position: relative; width: 100%; height: 100%;
-  transition: transform 0.7s cubic-bezier(.3,.9,.3,1);
-  transform-style: preserve-3d;
+/* 硬币边缘厚度（伪元素模拟） */
+.dec-coin-face::before {
+  content: ''; position: absolute; inset: -3px;
+  border-radius: 50%; background: inherit;
+  z-index: -1;
+  filter: brightness(0.7);
 }
-.dec-card.flipped .dec-card-inner { transform: rotateY(180deg); }
+.dec-coin-front {
+  background: 
+    radial-gradient(circle at 30% 30%, #fffbea 0%, #f7d87b 30%, #d4a84d 65%, #8f6319 100%);
+  color: #5c3b08;
+  text-shadow: 1px 1px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(0,0,0,0.3); /* 文字浮雕 */
+}
+.dec-coin-back {
+  background: 
+    radial-gradient(circle at 30% 30%, #ffffff 0%, #e1e5eb 30%, #a8b0b8 65%, #5f686e 100%);
+  color: #2b3136;
+  text-shadow: 1px 1px 0px rgba(255,255,255,0.8), -1px -1px 0px rgba(0,0,0,0.3); /* 文字浮雕 */
+  transform: rotateY(180deg);
+}
+.dec-coin::after {
+  content: ''; position: absolute; inset: 4px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+  pointer-events: none;
+}
 .dec-card-face {
   position: absolute; inset: 0; border-radius: 12px;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
@@ -2173,7 +2188,50 @@ input:checked + .slider:before { transform: translateX(22px); }
   box-shadow: 0 3px 10px rgba(31,41,55,0.2);
   font-size: 13px;
 }
+.dec-dice-mode {
+  display: flex; justify-content: center; gap: 10px;
+  margin: 10px 0 14px 0;
+}
+.dec-mode-btn {
+  padding: 6px 16px; border-radius: 20px; border: none;
+  font-size: 13px; font-weight: 500; font-family: inherit;
+  background: #f0f1f3; color: #6b7280; cursor: pointer;
+  transition: all 0.2s;
+}
+.dec-mode-btn.active {
+  background: #1f2937; color: #fff;
+}
 /* ============ 功能结束：小决定 ============ */
+
+/* ========== 抽卡卡片样式 ========== */
+.dec-card { width: 88px; height: 132px; perspective: 800px; cursor: pointer; flex-shrink: 0; }
+.dec-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transition: transform 0.7s cubic-bezier(.3,.9,.3,1);
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+}
+.dec-card.flipped .dec-card-inner {
+  transform: rotateY(180deg);
+}
+.dec-card:active { transform: scale(0.97); }
+.dec-card-face {
+  position: absolute; inset: 0; border-radius: 12px;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08), inset 0 0 0 1px #f0f0f0;
+  padding: 10px; box-sizing: border-box;
+}
+.dec-card-front {
+  background: linear-gradient(145deg, #f7f8fa, #e8eaee);
+  color: #c9c9d0; font-size: 32px;
+}
+.dec-card-back {
+  background: #fff; color: #1f2937; font-size: 13px;
+  text-align: center; line-height: 1.4; font-weight: 500;
+  transform: rotateY(180deg); word-break: break-word;
+}
+.dec-cards-stage { display: flex; justify-content: center; gap: 10px; padding: 24px 4px 16px 0; }
 </style>
 </head>
 <body>
@@ -3334,33 +3392,41 @@ input:checked + .slider:before { transform: translateX(22px); }
       </div>
     </div>
 
-    <!-- 骰子 -->
-    <div id="decision-view-dice" class="dec-view">
-      <div class="dec-scroll">
-        <div class="dec-versus">
-          <div class="dec-vs-side">
-            <div class="dec-vs-label">你</div>
-            <div class="dec-die" id="dec-die-me"></div>
-            <div class="dec-vs-score" id="dec-dice-me-score">—</div>
-          </div>
-          <div class="dec-vs-mid">VS</div>
-          <div class="dec-vs-side">
-            <div class="dec-vs-label" id="dec-dice-ta-label">TA</div>
-            <div class="dec-die" id="dec-die-ta"></div>
-            <div class="dec-vs-score" id="dec-dice-ta-score">—</div>
-          </div>
-        </div>
-        <div class="dec-result" id="dec-dice-result">点下面的按钮开始</div>
-        <div class="dec-panel">
-          <div class="dec-panel-head"><span>规则</span></div>
-          <div class="dec-rule">点数大的一方说了算。平局就再来一次。</div>
-        </div>
+    
+<!-- 骰子 -->
+<div id="decision-view-dice" class="dec-view">
+  <div class="dec-scroll">
+    <!-- 模式切换 -->
+    <div class="dec-dice-mode">
+      <button class="dec-mode-btn active" data-mode="single">自己摇</button>
+      <button class="dec-mode-btn" data-mode="vs">和TA比</button>
+    </div>
+
+    <div class="dec-versus">
+      <div class="dec-vs-side">
+        <div class="dec-vs-label">你</div>
+        <div class="dec-die" id="dec-die-me"></div>
+        <div class="dec-vs-score" id="dec-dice-me-score">—</div>
       </div>
-      <div class="dec-footbar">
-        <button class="dec-btn primary" id="dec-dice-roll">摇骰子</button>
-        <button class="dec-btn ghost" id="dec-dice-ai">让TA摇</button>
+      <div class="dec-vs-mid" id="dec-dice-vs-mid" style="display: none;">VS</div>
+      <div class="dec-vs-side" id="dec-dice-ta-wrap" style="display: none;">
+        <div class="dec-vs-label" id="dec-dice-ta-label">TA</div>
+        <div class="dec-die" id="dec-die-ta"></div>
+        <div class="dec-vs-score" id="dec-dice-ta-score">—</div>
       </div>
     </div>
+
+    <div class="dec-result" id="dec-dice-result">点下面的按钮开始</div>
+    <div class="dec-panel">
+      <div class="dec-panel-head"><span>规则</span></div>
+      <div class="dec-rule" id="dec-dice-rule">自己摇，点数就是你的运气。</div>
+    </div>
+  </div>
+  <div class="dec-footbar">
+    <button class="dec-btn primary" id="dec-dice-roll">摇骰子</button>
+    <button class="dec-btn ghost" id="dec-dice-ai">让TA摇</button>
+  </div>
+</div>
 
     <!-- 硬币 -->
     <div id="decision-view-coin" class="dec-view">
@@ -12455,23 +12521,33 @@ function rollDecisionNumber(targetValue) {
   const max = Math.max(rawMin, rawMax);
   const range = max - min + 1;
   if (range < 1) return showToast('范围不对');
+
   const target = (typeof targetValue === 'number' && targetValue >= min && targetValue <= max)
     ? targetValue : (min + Math.floor(Math.random() * range));
+
   const track = document.getElementById('dec-num-track');
   const cellH = 46;
-  const spinCount = 22 + Math.floor(Math.random() * 12);
+
+  // 生成滚动序列
+  const spinCount = 18 + Math.floor(Math.random() * 10);
   const seq = [];
   for (let i = 0; i < spinCount; i++) seq.push(min + Math.floor(Math.random() * range));
   seq.push(target);
+
   track.innerHTML = seq.map(v => `<div class="dec-num-cell">${v}</div>`).join('');
+
+  // 强制重置到初始位置
   track.style.transition = 'none';
-  track.style.transform = 'translateY(0)';
+  track.style.transform = 'translateY(0px)';
   void track.offsetWidth;
+
+  // 计算最终位移
   const targetY = -(seq.length - 2) * cellH;
   requestAnimationFrame(() => {
     track.style.transition = 'transform 2.4s cubic-bezier(.15,.85,.25,1)';
     track.style.transform = `translateY(${targetY}px)`;
   });
+
   setTimeout(() => {
     document.getElementById('dec-num-result').textContent = '抽到：' + target;
     decLastAction = { tool: '随机数', result: String(target) };
@@ -12479,47 +12555,96 @@ function rollDecisionNumber(targetValue) {
 }
 
 /* ---------------- 骰子 ---------------- */
+let decDiceMode = 'single'; // 'single' 或 'vs'
+function renderDie(container, value) {
+  if (!container) return;
+  container.innerHTML = ''; // 清空旧的点数
+  // 3x3 网格中各点数对应的位置 [行, 列]
+  const dotPositions = {
+    1: [[2, 2]],
+    2: [[1, 1], [3, 3]],
+    3: [[1, 1], [2, 2], [3, 3]],
+    4: [[1, 1], [1, 3], [3, 1], [3, 3]],
+    5: [[1, 1], [1, 3], [2, 2], [3, 1], [3, 3]],
+    6: [[1, 1], [1, 3], [2, 1], [2, 3], [3, 1], [3, 3]]
+  };
+  const positions = dotPositions[value] || [[2, 2]];
+  positions.forEach(pos => {
+    const pip = document.createElement('div');
+    pip.className = 'dec-pip';
+    pip.style.gridRow = pos[0];
+    pip.style.gridColumn = pos[1];
+    container.appendChild(pip);
+  });
+}
 function setupDecisionDice() {
   renderDie(document.getElementById('dec-die-me'), 1);
   renderDie(document.getElementById('dec-die-ta'), 1);
+
+  // 模式切换
+  document.querySelectorAll('#decision-view-dice .dec-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#decision-view-dice .dec-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      decDiceMode = btn.dataset.mode;
+
+      if (decDiceMode === 'single') {
+        document.getElementById('dec-dice-vs-mid').style.display = 'none';
+        document.getElementById('dec-dice-ta-wrap').style.display = 'none';
+        document.getElementById('dec-dice-rule').textContent = '自己摇，点数就是你的运气。';
+      } else {
+        document.getElementById('dec-dice-vs-mid').style.display = 'block';
+        document.getElementById('dec-dice-ta-wrap').style.display = 'flex';
+        document.getElementById('dec-dice-rule').textContent = '点数大的一方说了算。平局就再来一次。';
+      }
+      document.getElementById('dec-dice-result').textContent = '点下面的按钮开始';
+      document.getElementById('dec-dice-me-score').textContent = '—';
+      document.getElementById('dec-dice-ta-score').textContent = '—';
+      renderDie(document.getElementById('dec-die-me'), 1);
+      renderDie(document.getElementById('dec-die-ta'), 1);
+    });
+  });
+
   document.getElementById('dec-dice-roll').addEventListener('click', () => rollDecisionDice());
   document.getElementById('dec-dice-ai').addEventListener('click', () => openDecisionAIPicker('dice'));
-}
-
-function renderDie(el, value) {
-  if (!el) return;
-  const layouts = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
-  const pips = layouts[value] || [];
-  el.innerHTML = '';
-  for (let i = 0; i < 9; i++) {
-    const p = document.createElement('div');
-    if (pips.includes(i)) p.className = 'dec-pip';
-    el.appendChild(p);
-  }
 }
 
 function rollDecisionDice(aiValue) {
   const dieMe = document.getElementById('dec-die-me');
   const dieTa = document.getElementById('dec-die-ta');
-  dieMe.classList.add('rolling'); dieTa.classList.add('rolling');
+
+  dieMe.classList.add('rolling');
+  if (decDiceMode === 'vs') dieTa.classList.add('rolling');
+
   let c = 0;
   const iv = setInterval(() => {
     renderDie(dieMe, 1 + Math.floor(Math.random() * 6));
-    renderDie(dieTa, 1 + Math.floor(Math.random() * 6));
+    if (decDiceMode === 'vs') renderDie(dieTa, 1 + Math.floor(Math.random() * 6));
+
     if (++c > 12) {
       clearInterval(iv);
-      dieMe.classList.remove('rolling'); dieTa.classList.remove('rolling');
+      dieMe.classList.remove('rolling');
+      if (decDiceMode === 'vs') dieTa.classList.remove('rolling');
+
       const mine = 1 + Math.floor(Math.random() * 6);
-      const theirs = (typeof aiValue === 'number' && aiValue >= 1 && aiValue <= 6)
-        ? aiValue : (1 + Math.floor(Math.random() * 6));
-      renderDie(dieMe, mine); renderDie(dieTa, theirs);
+      renderDie(dieMe, mine);
       document.getElementById('dec-dice-me-score').textContent = mine;
-      document.getElementById('dec-dice-ta-score').textContent = theirs;
-      const r = document.getElementById('dec-dice-result');
-      if (mine > theirs) r.textContent = `你赢了！${mine} > ${theirs} —— 听你的`;
-      else if (mine < theirs) r.textContent = `TA赢了。${mine} < ${theirs} —— 听TA的`;
-      else r.textContent = `平局，${mine} = ${theirs}，再来一次？`;
-      decLastAction = { tool: '摇骰子', result: `${mine} vs ${theirs}` };
+
+      if (decDiceMode === 'single') {
+        document.getElementById('dec-dice-result').textContent = `你摇到了：${mine}`;
+        decLastAction = { tool: '摇骰子', result: String(mine) };
+      } else {
+        const theirs = (typeof aiValue === 'number' && aiValue >= 1 && aiValue <= 6)
+          ? aiValue : (1 + Math.floor(Math.random() * 6));
+        renderDie(dieTa, theirs);
+        document.getElementById('dec-dice-ta-score').textContent = theirs;
+
+        const r = document.getElementById('dec-dice-result');
+        if (mine > theirs) r.textContent = `你赢了！${mine} > ${theirs} —— 听你的`;
+        else if (mine < theirs) r.textContent = `TA赢了。${mine} < ${theirs} —— 听TA的`;
+        else r.textContent = `平局，${mine} = ${theirs}，再来一次？`;
+        decLastAction = { tool: '摇骰子', result: `${mine} vs ${theirs}` };
+      }
     }
   }, 80);
 }
@@ -12533,17 +12658,25 @@ function setupDecisionCoin() {
 function flipDecisionCoin(targetFace) {
   if (decCoinFlipping) return;
   decCoinFlipping = true;
+
   const coin = document.getElementById('dec-coin');
   const face = (targetFace === '正' || targetFace === '反')
     ? targetFace : (Math.random() < 0.5 ? '正' : '反');
+
+  // 让硬币带一点自然倾斜，模拟真实抛掷
+  const tilt = (Math.random() - 0.5) * 20; 
   const spins = 4 + Math.floor(Math.random() * 3);
   const extra = face === '正' ? 0 : 180;
   const total = spins * 360 + extra;
+
   coin.style.transition = 'none';
-  coin.style.transform = 'rotateY(0deg)';
+  coin.style.transform = `rotateY(0deg) rotateX(0deg)`;
   void coin.offsetWidth;
-  coin.style.transition = 'transform 1.6s cubic-bezier(.2,.8,.2,1)';
-  coin.style.transform = `rotateY(${total}deg)`;
+
+  // 分两段动画：先向上抛，再落下
+  coin.style.transition = 'transform 1.6s cubic-bezier(.2, .9, .3, 1)';
+  coin.style.transform = `rotateY(${total}deg) rotateX(${tilt}deg)`;
+
   setTimeout(() => {
     decCoinFlipping = false;
     document.getElementById('dec-coin-result').textContent = `结果：${face}面`;
@@ -12593,20 +12726,29 @@ function renderDecisionCards() {
   });
   document.getElementById('dec-card-result').textContent = '选一张翻开';
 }
-
 function onDecisionCardClick(card) {
   if (decCardsRevealed) return;
+
+  // 只让当前点击的这张卡片翻转
+  card.classList.add('flipped');
   decCardsRevealed = true;
+
+  // 其他卡片变为不可点击状态（但保持背面朝上）
   document.querySelectorAll('#dec-cards-stage .dec-card').forEach(c => {
-    c.classList.add('flipped');
-    if (c === card) c.style.transform = 'translateY(-8px)';
+    if (c !== card) {
+      c.style.opacity = '0.5';
+      c.style.pointerEvents = 'none';
+    }
   });
+
+  card.style.transform = 'translateY(-8px)';
+  card.style.transition = 'transform 0.3s ease';
+
   const idx = parseInt(card.dataset.idx);
   const result = db.decisionState.cardTexts[idx];
   document.getElementById('dec-card-result').textContent = '抽到：' + result;
   decLastAction = { tool: '抽卡', result };
 }
-
 /* ---------------- AI 决策 ---------------- */
 function setupDecisionAIPicker() {
   const modal = document.getElementById('dec-ai-picker');
