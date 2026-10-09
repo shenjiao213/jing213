@@ -1557,6 +1557,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   background: #ffffff;
   border-bottom: 1px solid #eaeaea;
   display: flex; gap: 8px;
+  position: sticky; top: 0; z-index: 3;
 }
 .memory-stat { flex: 1; text-align: center; }
 .memory-stat .num { font-size: 22px; font-weight: 600; color: #333; }
@@ -1566,6 +1567,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   display: flex; gap: 8px; padding: 12px 16px;
   background: #ffffff; border-bottom: 1px solid #eaeaea;
   overflow-x: auto; scrollbar-width: none;
+  position: sticky; top: 79px; z-index: 2;
 }
 .memory-tabs::-webkit-scrollbar { display: none; }
 .memory-tab {
@@ -1577,7 +1579,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 .memory-tab.active { background: #333; color: #fff; }
 
-.memory-search-bar { padding: 12px 16px 0; background: #ffffff; }
+.memory-search-bar { padding: 12px 16px 12px; background: #ffffff; border-bottom: 1px solid #eaeaea; position: sticky; top: 133px; z-index: 1; }
 .memory-search-bar input {
   width: 100%; padding: 10px 14px;
   border: 1px solid #e8e8e8; border-radius: 8px;
@@ -13129,15 +13131,17 @@ async function aiArchiveConversation(chat, msgs) {
   const convText = buildConvTextForMemory(chat, msgs);
   if (convText.length < 20) return { added: 0, reason: 'too-short' };
 
-  const persona = chat.persona || (chat.members ? chat.members.map(m => `${m.realName}(${m.persona || '无'})`).join('；') : '');
-  const name = chat.realName || chat.name || '角色';
-  const archived = getMemoryStore(chat).slice(-40).map(m => `· ${m.content}`).join('\n') || '（暂无）';
+  
+const persona = chat.persona || (chat.members ? chat.members.map(m => `${m.realName}(${m.persona || '无'})`).join('；') : '');
+const name = chat.realName || chat.name || '角色';
+const userName = chat.myName || (chat.me && chat.me.nickname) || '我';
+const archived = getMemoryStore(chat).slice(-40).map(m => `· ${m.content}`).join('\n') || '（暂无）';
 
   const systemPrompt = `你现在就是「${name}」本人。
 你不是 AI，不是在分析数据，不是在写报告。对面这个人是真实存在的——你有过交集的、你心里在乎的那个真人。刚才你们之间发生了一段对话，你现在静下来，用你自己的心去回想。
 
 ════ 绝对不可以编造（最高铁律） ════
-必须严格基于对话内容进行回想。绝对不可以凭空捏造用户没有说过的话、没有做过的事。如果用户没有明确提及，就不要归档进记忆里。不要自己给用户加戏。
+必须严格基于对话内容进行回想。绝对不可以凭空捏造${userName}没有说过的话、没有做过的事。如果${userName}没有明确提及，就不要归档进记忆里。不要自己给${userName}加戏。
 
 你的人设：
 ${persona || '一个友好、有自己性格的人'}
@@ -13146,11 +13150,11 @@ ${persona || '一个友好、有自己性格的人'}
 然后再动笔，把真正放进心里的那几条记下来。像真人一样有取舍——不是每句话都记。
 
 ════ 怎么写出来 ════
-- 用第三人称写。提到对方时用"用户"，提到自己时用「${name}」。
+- 用第三人称写。提到对方时用「${userName}」，提到自己时用「${name}」。绝对不要用"用户""玩家""对方"这类称呼。
 - 但你在写每一条的时候，心里要先以"我"的感受过一遍：那件事你怎么想的、当时什么情绪、为什么它对你重要。写出来的句子背后要有这层温度。
 - 不要用档案腔。不要写成会议记录。像你在心里默默记下一件事。
-- 反面例子：用户今天提到了自己的生日在 10 月 5 日，情绪积极。
-- 正面例子：用户说过，生日在 10 月 5 日。${name}把那一天在心里圈了起来。
+- 反面例子：${userName}今天提到了自己的生日在 10 月 5 日，情绪积极。
+- 正面例子：${userName}说过，生日在 10 月 5 日。${name}把那一天在心里圈了起来。
 
 ════ 分级 ════
 - anchor：最不能忘。用户的身份信息（生日、职业、家人）、重大事件、关系转折、用户郑重的承诺。必须准确。
@@ -13175,7 +13179,7 @@ ${persona || '一个友好、有自己性格的人'}
   try {
     const reply = await callAI({
       systemPrompt,
-      messages: [{ role: 'user', content: `对话记录：\n${convText}\n\n已经记过的（不要重复）：\n${archived}\n\n请回想。` }],
+      messages: [{ role: 'user', content: `对话记录：\n${convText}\n\n已经记过的（不要重复）：\n${archived}\n\n请回想。注意：所有记忆里提到「${userName}」时，必须直接用这个名字，绝对不要写成"用户"。` }],
       stream: false
     });
     if (!reply) return { added: 0, reason: 'empty' };
