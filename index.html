@@ -377,7 +377,7 @@ body {
   line-height: 1.4; margin: 0 8px;
   cursor: pointer; font-size: 15px; position: relative;
 }
-.message-bubble.sent { border-bottom-right-radius: 2px; background-color: var(--bubble-sent-bg, #95ec69); color: var(--bubble-sent-text, #000000); }
+.message-bubble.sent { border-bottom-right-radius: 4px; background-color: var(--bubble-sent-bg, #95ec69); color: var(--bubble-sent-text, #000000); }
 .message-bubble.sent::after {
   content: ''; position: absolute; right: -6px; top: 12px;
   width: 0; height: 0;
@@ -386,6 +386,7 @@ body {
   border-color: transparent transparent transparent var(--bubble-sent-bg, #95ec69);
 }
 .message-bubble.received { background-color: var(--bubble-received-bg, #ffffff); color: var(--bubble-received-text, #000000); }
+.message-bubble.received::after {
   content: ''; position: absolute; left: -6px; top: 12px;
   width: 0; height: 0;
   border-style: solid;
@@ -1932,6 +1933,247 @@ input:checked + .slider:before { transform: translateX(22px); }
 .tpl-toolbar .tpl-save-btn:active { background: #111; }
 .tpl-toolbar .tpl-del-btn:active { background: #ffd0d0; }
 /* 功能结束：模板工具条 */
+/* ============ 功能开始：小决定 ============ */
+#decision-screen { background: #f7f7f8; }
+#decision-screen .app-header {
+  background: rgba(255,255,255,0.94);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid #eee;
+}
+#decision-screen .app-header .title { color: #1f2937; font-weight: 600; }
+#decision-screen .app-header .back-btn,
+#decision-screen .app-header .action-btn { color: #4b5563; }
+
+.dec-view { display: none; flex: 1; min-height: 0; flex-direction: column; }
+.dec-view.active { display: flex; }
+.dec-scroll { flex: 1; overflow-y: auto; padding: 16px; box-sizing: border-box; -webkit-overflow-scrolling: touch; }
+
+.dec-home-lead {
+  text-align: center; color: #9ca3af; font-size: 13px;
+  letter-spacing: 3px; margin: 6px 0 22px 0;
+}
+.dec-home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dec-home-card {
+  background: #fff; border-radius: 18px; padding: 18px 16px;
+  display: flex; align-items: center; gap: 14px; cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03), 0 1px 0 rgba(0,0,0,0.02);
+  border: 1px solid #f0f0f0;
+  transition: transform .15s ease, background .15s ease;
+}
+.dec-home-card:active { transform: scale(0.97); background: #fafafa; }
+.dec-home-card.wide { grid-column: span 2; }
+.dec-home-glyph {
+  width: 44px; height: 44px; border-radius: 14px;
+  background: #f4f5f7; color: #4b5563;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.dec-home-glyph svg { width: 24px; height: 24px; }
+.dec-home-name { font-size: 15px; font-weight: 600; color: #1f2937; }
+.dec-home-desc { font-size: 11px; color: #9ca3af; margin-top: 3px; letter-spacing: .5px; }
+
+.dec-footbar {
+  display: flex; gap: 10px; padding: 12px 16px;
+  padding-bottom: calc(12px + var(--safe-bottom));
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid #eee; flex-shrink: 0;
+}
+.dec-btn {
+  flex: 1; padding: 14px 0; border-radius: 14px; border: none;
+  font-size: 15px; font-weight: 600; font-family: inherit;
+  cursor: pointer; transition: transform .12s ease, background .15s ease;
+}
+.dec-btn:active { transform: scale(0.98); }
+.dec-btn.primary { background: #1f2937; color: #fff; }
+.dec-btn.ghost { background: #f0f1f3; color: #4b5563; }
+
+.dec-result {
+  text-align: center; padding: 14px 20px; min-height: 48px;
+  font-size: 15px; color: #1f2937; font-weight: 500; line-height: 1.5;
+}
+
+/* 转盘 */
+.dec-wheel-stage { display: flex; justify-content: center; padding: 20px 0 12px 0; }
+.dec-wheel-holder { position: relative; width: 260px; height: 260px; }
+#dec-wheel-canvas {
+  width: 260px; height: 260px; display: block; border-radius: 50%;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08), 0 0 0 8px #fff, 0 0 0 9px #f0f0f0;
+  transition: transform 4s cubic-bezier(.18,.8,.22,1);
+}
+.dec-wheel-pointer {
+  position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 20px solid #1f2937;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.15)); z-index: 3;
+}
+.dec-wheel-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px; height: 64px; border-radius: 50%;
+  background: #fff; border: none; color: #1f2937;
+  font-size: 14px; font-weight: 700; font-family: inherit;
+  letter-spacing: 1px; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12), inset 0 0 0 2px #f0f0f0;
+  z-index: 4;
+}
+.dec-wheel-center:active { transform: translate(-50%, -50%) scale(0.95); }
+
+.dec-panel {
+  background: #fff; border-radius: 16px; padding: 14px 16px;
+  margin-top: 10px; border: 1px solid #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.dec-panel-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 12px; font-size: 13px; color: #6b7280;
+  font-weight: 500; letter-spacing: .5px;
+}
+.dec-mini-btn {
+  background: #f0f1f3; color: #4b5563; border: none; border-radius: 8px;
+  padding: 5px 12px; font-size: 12px; font-family: inherit; cursor: pointer;
+}
+.dec-opt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.dec-opt-row:last-child { margin-bottom: 0; }
+.dec-opt-input {
+  flex: 1; padding: 9px 12px; border: 1px solid #e8e8ea;
+  border-radius: 10px; background: #fafafa; font-size: 14px;
+  font-family: inherit; color: #333; outline: none; box-sizing: border-box;
+}
+.dec-opt-input:focus { border-color: #c9c9d0; background: #fff; }
+.dec-opt-del {
+  width: 30px; height: 30px; border-radius: 8px; border: none;
+  background: #f4f5f7; color: #9ca3af; font-size: 16px;
+  line-height: 1; cursor: pointer; flex-shrink: 0;
+}
+
+/* 随机数 */
+.dec-num-stage { display: flex; justify-content: center; padding: 30px 0 16px 0; }
+.dec-num-window {
+  width: 220px; height: 138px; background: #fff;
+  border-radius: 22px; overflow: hidden; position: relative;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.06), inset 0 0 0 1px #f0f0f0;
+}
+.dec-num-window::before,
+.dec-num-window::after {
+  content: ''; position: absolute; left: 0; right: 0;
+  height: 34px; z-index: 2; pointer-events: none;
+}
+.dec-num-window::before {
+  top: 0; background: linear-gradient(to bottom, #fff 40%, rgba(255,255,255,0));
+}
+.dec-num-window::after {
+  bottom: 0; background: linear-gradient(to top, #fff 40%, rgba(255,255,255,0));
+}
+.dec-num-track {
+  position: absolute; left: 0; right: 0; top: 0;
+  display: flex; flex-direction: column; align-items: center;
+}
+.dec-num-cell {
+  height: 46px; display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 700; color: #1f2937;
+  font-variant-numeric: tabular-nums; letter-spacing: 1px;
+}
+.dec-range-row { display: flex; align-items: center; gap: 12px; padding: 6px 4px; }
+.dec-range-input {
+  flex: 1; padding: 10px 12px; border: 1px solid #e8e8ea;
+  border-radius: 10px; background: #fafafa; font-size: 16px;
+  font-family: inherit; color: #333; outline: none; text-align: center;
+  box-sizing: border-box;
+}
+.dec-range-input:focus { border-color: #c9c9d0; background: #fff; }
+.dec-range-sep { color: #c9c9d0; font-weight: 600; }
+
+/* 骰子 */
+.dec-versus {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; padding: 20px 0 10px 0;
+}
+.dec-vs-side { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.dec-vs-label { font-size: 12px; color: #9ca3af; letter-spacing: 1px; }
+.dec-vs-score { font-size: 12px; color: #6b7280; font-variant-numeric: tabular-nums; }
+.dec-vs-mid { font-size: 13px; color: #c9c9d0; font-weight: 700; letter-spacing: 1px; }
+.dec-die {
+  width: 84px; height: 84px; border-radius: 18px; background: #fff;
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 12px; box-sizing: border-box; gap: 2px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08), inset 0 0 0 1px #f0f0f0;
+}
+.dec-die.rolling { animation: decShake .5s ease infinite; }
+@keyframes decShake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+.dec-pip {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #1f2937; align-self: center; justify-self: center;
+}
+.dec-rule { font-size: 13px; color: #6b7280; line-height: 1.6; }
+
+/* 硬币 */
+.dec-coin-stage {
+  display: flex; justify-content: center;
+  padding: 30px 0 20px 0; perspective: 800px;
+}
+.dec-coin {
+  width: 120px; height: 120px; position: relative;
+  transform-style: preserve-3d;
+  transition: transform 1.6s cubic-bezier(.2,.8,.2,1);
+}
+.dec-coin-face {
+  position: absolute; inset: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; letter-spacing: 2px;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: inset 0 0 0 4px #fff, 0 6px 20px rgba(0,0,0,0.1);
+}
+.dec-coin-front { background: linear-gradient(135deg, #f8e9c9, #e2c48a); color: #7a5a1f; }
+.dec-coin-back  { background: linear-gradient(135deg, #e4e6ea, #c5c9d0); color: #4b5563; transform: rotateY(180deg); }
+
+/* 卡片 */
+.dec-cards-stage { display: flex; justify-content: center; gap: 10px; padding: 24px 4px 16px 0; }
+.dec-card { width: 88px; height: 132px; perspective: 800px; cursor: pointer; flex-shrink: 0; }
+.dec-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transition: transform 0.7s cubic-bezier(.3,.9,.3,1);
+  transform-style: preserve-3d;
+}
+.dec-card.flipped .dec-card-inner { transform: rotateY(180deg); }
+.dec-card-face {
+  position: absolute; inset: 0; border-radius: 12px;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08), inset 0 0 0 1px #f0f0f0;
+  padding: 10px; box-sizing: border-box;
+}
+.dec-card-front {
+  background: linear-gradient(145deg, #f7f8fa, #e8eaee);
+  color: #c9c9d0; font-size: 32px;
+}
+.dec-card-back {
+  background: #fff; color: #1f2937; font-size: 13px;
+  text-align: center; line-height: 1.4; font-weight: 500;
+  transform: rotateY(180deg); word-break: break-word;
+}
+
+/* 计算器音乐键盘底部按钮微调（修掉之前过大过丑的问题） */
+.calc-music-keypad .calc-key.fn,
+.calc-music-keypad .calc-key.eq {
+  font-size: 14px; font-weight: 500; letter-spacing: 1px;
+  border-radius: 14px;
+}
+.calc-music-keypad .calc-key.fn {
+  background: #f3f4f6; color: #6b7280; border-color: #eceef2;
+}
+.calc-music-keypad .calc-key.eq {
+  background: linear-gradient(135deg, #1f2937, #374151);
+  box-shadow: 0 3px 10px rgba(31,41,55,0.2);
+  font-size: 13px;
+}
+/* ============ 功能结束：小决定 ============ */
 </style>
 </head>
 <body>
@@ -3010,7 +3252,165 @@ input:checked + .slider:before { transform: translateX(22px); }
 <div id="customize-screen" class="screen"></div>
 <div id="tutorial-screen" class="screen"></div>
 <!-- 功能结束：动态注入屏幕 -->
+<!-- 功能开始：小决定 -->
+<div id="decision-screen" class="screen">
+  <header class="app-header">
+    <button class="back-btn" id="decision-back-btn">‹</button>
+    <div class="title-container"><h1 class="title" id="decision-title">小决定</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
 
+    <!-- 首页 -->
+    <div id="decision-view-home" class="dec-view active">
+      <div class="dec-scroll">
+        <div class="dec-home-lead">今天，把决定交给…</div>
+        <div class="dec-home-grid">
+          <div class="dec-home-card" data-view="wheel">
+            <div class="dec-home-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 12 L12 3"/><path d="M12 12 L19.8 16.5"/><path d="M12 12 L4.2 16.5"/></svg></div>
+            <div><div class="dec-home-name">转盘</div><div class="dec-home-desc">选项自己填</div></div>
+          </div>
+          <div class="dec-home-card" data-view="number">
+            <div class="dec-home-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h4.5c1.8 0 1.8-5 0-5H5"/><path d="M5 13h4.5c1.8 0 1.8 5 0 5H5"/><path d="M14.5 19V5l5 14V5"/></svg></div>
+            <div><div class="dec-home-name">随机数</div><div class="dec-home-desc">滚动出结果</div></div>
+          </div>
+          <div class="dec-home-card" data-view="dice">
+            <div class="dec-home-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="9" cy="9" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/></svg></div>
+            <div><div class="dec-home-name">摇骰子</div><div class="dec-home-desc">比大小定输赢</div></div>
+          </div>
+          <div class="dec-home-card" data-view="coin">
+            <div class="dec-home-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.2"/></svg></div>
+            <div><div class="dec-home-name">抛硬币</div><div class="dec-home-desc">正还是反</div></div>
+          </div>
+          <div class="dec-home-card wide" data-view="card">
+            <div class="dec-home-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="9" y="3" width="11" height="15" rx="2.6"/><path d="M6 6.5v12a3 3 0 0 0 3 3h8"/></svg></div>
+            <div><div class="dec-home-name">抽卡</div><div class="dec-home-desc">三张卡，翻一张</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 转盘 -->
+    <div id="decision-view-wheel" class="dec-view">
+      <div class="dec-scroll">
+        <div class="dec-wheel-stage">
+          <div class="dec-wheel-holder">
+            <canvas id="dec-wheel-canvas"></canvas>
+            <div class="dec-wheel-pointer"></div>
+            <button class="dec-wheel-center" id="dec-wheel-center">开始</button>
+          </div>
+        </div>
+        <div class="dec-result" id="dec-wheel-result"></div>
+        <div class="dec-panel">
+          <div class="dec-panel-head"><span>选项</span><button class="dec-mini-btn" id="dec-wheel-add">＋ 添加</button></div>
+          <div id="dec-wheel-options"></div>
+        </div>
+      </div>
+      <div class="dec-footbar">
+        <button class="dec-btn primary" id="dec-wheel-spin">转一下</button>
+        <button class="dec-btn ghost" id="dec-wheel-ai">让TA来定</button>
+      </div>
+    </div>
+
+    <!-- 随机数 -->
+    <div id="decision-view-number" class="dec-view">
+      <div class="dec-scroll">
+        <div class="dec-num-stage">
+          <div class="dec-num-window"><div class="dec-num-track" id="dec-num-track"></div></div>
+        </div>
+        <div class="dec-result" id="dec-num-result"></div>
+        <div class="dec-panel">
+          <div class="dec-panel-head"><span>范围</span></div>
+          <div class="dec-range-row">
+            <input type="number" class="dec-range-input" id="dec-num-min" value="1">
+            <span class="dec-range-sep">—</span>
+            <input type="number" class="dec-range-input" id="dec-num-max" value="100">
+          </div>
+        </div>
+      </div>
+      <div class="dec-footbar">
+        <button class="dec-btn primary" id="dec-num-roll">抽一个</button>
+        <button class="dec-btn ghost" id="dec-num-ai">让TA来定</button>
+      </div>
+    </div>
+
+    <!-- 骰子 -->
+    <div id="decision-view-dice" class="dec-view">
+      <div class="dec-scroll">
+        <div class="dec-versus">
+          <div class="dec-vs-side">
+            <div class="dec-vs-label">你</div>
+            <div class="dec-die" id="dec-die-me"></div>
+            <div class="dec-vs-score" id="dec-dice-me-score">—</div>
+          </div>
+          <div class="dec-vs-mid">VS</div>
+          <div class="dec-vs-side">
+            <div class="dec-vs-label" id="dec-dice-ta-label">TA</div>
+            <div class="dec-die" id="dec-die-ta"></div>
+            <div class="dec-vs-score" id="dec-dice-ta-score">—</div>
+          </div>
+        </div>
+        <div class="dec-result" id="dec-dice-result">点下面的按钮开始</div>
+        <div class="dec-panel">
+          <div class="dec-panel-head"><span>规则</span></div>
+          <div class="dec-rule">点数大的一方说了算。平局就再来一次。</div>
+        </div>
+      </div>
+      <div class="dec-footbar">
+        <button class="dec-btn primary" id="dec-dice-roll">摇骰子</button>
+        <button class="dec-btn ghost" id="dec-dice-ai">让TA摇</button>
+      </div>
+    </div>
+
+    <!-- 硬币 -->
+    <div id="decision-view-coin" class="dec-view">
+      <div class="dec-scroll">
+        <div class="dec-coin-stage">
+          <div class="dec-coin" id="dec-coin">
+            <div class="dec-coin-face dec-coin-front">正</div>
+            <div class="dec-coin-face dec-coin-back">反</div>
+          </div>
+        </div>
+        <div class="dec-result" id="dec-coin-result">抛一枚硬币</div>
+        <div class="dec-panel">
+          <div class="dec-panel-head"><span>上一次</span></div>
+          <div class="dec-rule" id="dec-coin-history">还没有记录</div>
+        </div>
+      </div>
+      <div class="dec-footbar">
+        <button class="dec-btn primary" id="dec-coin-flip">抛硬币</button>
+        <button class="dec-btn ghost" id="dec-coin-ai">让TA猜</button>
+      </div>
+    </div>
+
+    <!-- 抽卡 -->
+    <div id="decision-view-card" class="dec-view">
+      <div class="dec-scroll">
+        <div class="dec-cards-stage" id="dec-cards-stage"></div>
+        <div class="dec-result" id="dec-card-result">选一张翻开</div>
+        <div class="dec-panel">
+          <div class="dec-panel-head"><span>卡片内容</span></div>
+          <div id="dec-card-inputs"></div>
+        </div>
+      </div>
+      <div class="dec-footbar">
+        <button class="dec-btn primary" id="dec-card-reset">重新洗牌</button>
+        <button class="dec-btn ghost" id="dec-card-ai">让TA抽</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- 小决定 · 选择AI -->
+<div id="dec-ai-picker" class="modal-overlay" style="z-index: 3000;">
+  <div class="modal-window" style="padding: 22px 20px;">
+    <h3 style="margin-top:0;">选一位帮你拿主意</h3>
+    <ul id="dec-ai-list" style="list-style:none;padding:0;margin:14px 0 0;max-height:45vh;overflow-y:auto;"></ul>
+    <button class="btn btn-neutral" id="dec-ai-cancel" style="margin-top:16px;">取消</button>
+  </div>
+</div>
+<!-- 功能结束：小决定 -->
 <!-- 功能开始：搜索界面 -->
 <div id="search-screen" class="screen" style="background: #ededed;">
   <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 10px 15px; display: flex; align-items: center; gap: 10px;">
@@ -4720,11 +5120,13 @@ if (!db.customCssSettings) {
   if (!db.customIcons) db.customIcons = {};
 
   const JJWXC_AVATAR = 'https://imgbed.heliar.top/i/v0j0LZ9JnUpYd8Fl_Camera_XHS_1791160783952notes_pre_post_1040g3k031ioe3v3ngu505o2pjhpg8uc1abad9p0.jpg';
-  const DEFAULT_SERVICES = [
-    { id: 'service_jjwxc', name: '晋江文学城', avatar: JJWXC_AVATAR, url: 'https://m.jjwxc.net/', group: 'J' },
-    { id: 'service_calc', name: '计算器', avatar: 'https://imgbed.heliar.top/i/u_n0iyzmfsUScTKc_(39).png', url: '', group: 'J', isCalculator: true },
-    { id: 'service_daily', name: '每日记', avatar: 'https://imgbed.heliar.top/i/sx7iCxb0fS46b3_3_(4).png', url: '', group: 'M', isAccounting: true }
-  ];
+  
+const DEFAULT_SERVICES = [
+  { id: 'service_jjwxc', name: '晋江文学城', avatar: JJWXC_AVATAR, url: 'https://m.jjwxc.net/', group: 'J' },
+  { id: 'service_calc', name: '计算器', avatar: 'https://imgbed.heliar.top/i/u_n0iyzmfsUScTKc_(39).png', url: '', group: 'J', isCalculator: true },
+  { id: 'service_daily', name: '每日记', avatar: 'https://imgbed.heliar.top/i/sx7iCxb0fS46b3_3_(4).png', url: '', group: 'M', isAccounting: true },
+  { id: 'service_decide', name: '小决定', avatar: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#1f2937"/><circle cx="50" cy="50" r="26" fill="none" stroke="#fff" stroke-width="3.4"/><path d="M50 50 L50 26" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><path d="M50 50 L71 62" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><path d="M50 50 L29 62" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="50" r="4.5" fill="#fff"/></svg>'), url: '', group: 'X', isDecision: true }
+];
   if (!db.serviceAccounts) {
     db.serviceAccounts = DEFAULT_SERVICES.map(s => ({ ...s }));
   } else {
@@ -5104,6 +5506,7 @@ safely('发现页', setupDiscoverScreen);
 safely('评论键盘适配', setupCommentInputKeyboardAdaptation); 
 safely('计算器', setupCalculatorApp);
   safely('每日记', setupAccountingApp);
+safely('小决定', setupDecisionApp);
 safely('记忆屏', setupMemoryScreen);
 safely('记忆衰减', runMemoryDecayOnBoot);
 };
@@ -5472,12 +5875,14 @@ function renderServiceList() {
         <img src="${avatarSrc}" class="service-avatar" alt="${service.name}" onerror="this.src='https://i.postimg.cc/GtbTnxhP/o-o-1.jpg'">
         <span class="service-name">${service.name}</span>
         <span class="service-arrow">›</span>`;
-      item.onclick = () => {
-        if (service.isCalculator) { calcResetAll(); switchScreen('calculator-screen'); }
-        else if (service.isAccounting) { window.openAccountingApp(); }
-        else if (service.url) { window.open(service.url, '_blank'); }
-        else showToast('该服务号暂未配置链接');
-      };
+      
+item.onclick = () => {
+  if (service.isCalculator) { calcResetAll(); switchScreen('calculator-screen'); }
+  else if (service.isAccounting) { window.openAccountingApp(); }
+  else if (service.isDecision) { openDecisionApp(); }
+  else if (service.url) { window.open(service.url, '_blank'); }
+  else showToast('该服务号暂未配置链接');
+};
       container.appendChild(item);
     });
   });
@@ -8798,12 +9203,12 @@ const DEFAULT_HEART_CSS = `/* ===== 心声遮罩层 ===== */
 .heart-card-icon { stroke: #b9b9c6; }`;
 
 const DEFAULT_BUBBLE_CSS = `/* ===== 微信绿聊天气泡 ===== */
-.message-bubble { max-width: 260px; padding: 8px 12px; border-radius: 18px; line-height: 1.4; margin: 0 8px; font-size: 15px; position: relative; }
+.message-bubble { max-width: 260px; padding: 8px 12px; border-radius: 4px; line-height: 1.4; margin: 0 8px; font-size: 15px; position: relative; }
 /* 我方发送气泡 */
-.message-bubble.sent { background-color: #95ec69; color: #000; border-radius: 18px; border-bottom-right-radius: 5px; }
+.message-bubble.sent { background-color: #95ec69; color: #000; border-radius: 4px; border-bottom-right-radius: 4px; }
 .message-bubble.sent::after { content: ''; position: absolute; right: -6px; top: 12px; border-style: solid; border-width: 5px 0 5px 6px; border-color: transparent transparent transparent #95ec69; }
 /* 对方接收气泡 */
-.message-bubble.received { background-color: #ffffff; color: #000; border-radius: 18px; border-bottom-left-radius: 5px; }
+.message-bubble.received { background-color: #ffffff; color: #000; border-radius: 4px; border-bottom-left-radius: 4px; }
 .message-bubble.received::after { content: ''; position: absolute; left: -6px; top: 12px; border-style: solid; border-width: 5px 6px 5px 0; border-color: transparent #ffffff transparent transparent; }`;
 const DEFAULT_LIST_CSS = `/* ===== 聊天列表整体容器 ===== */
 #chat-list-screen .content { background-color: #ededed; }
@@ -8837,10 +9242,10 @@ const DEFAULT_ONLINE_CSS = `/* ==========================================
 #chat-room-screen .app-header .back-btn { color: #000; }
 #chat-room-screen .app-header .action-btn { color: #333; }
 /* ===== 2. 消息气泡 ===== */
-.message-bubble { max-width: 260px; padding: 8px 12px; border-radius: 18px; line-height: 1.4; margin: 0 8px; font-size: 15px; position: relative; }
-.message-bubble.sent { background-color: #95ec69; color: #000; border-radius: 18px; border-bottom-right-radius: 5px; }
+.message-bubble { max-width: 260px; padding: 8px 12px; border-radius: 4px; line-height: 1.4; margin: 0 8px; font-size: 15px; position: relative; }
+.message-bubble.sent { background-color: #95ec69; color: #000; border-radius: 4px; border-bottom-right-radius: 4px; }
 .message-bubble.sent::after { content: ''; position: absolute; right: -6px; top: 12px; border-style: solid; border-width: 5px 0 5px 6px; border-color: transparent transparent transparent #95ec69; }
-.message-bubble.received { background-color: #ffffff; color: #000; border-radius: 18px; border-bottom-left-radius: 5px; }
+.message-bubble.received { background-color: #ffffff; color: #000; border-radius: 4px; border-bottom-left-radius: 4px; }
 .message-bubble.received::after { content: ''; position: absolute; left: -6px; top: 12px; border-style: solid; border-width: 5px 6px 5px 0; border-color: transparent #ffffff transparent transparent; }
 /* ===== 3. 语音 / 图片 / 照片视频 ===== */
 .voice-bubble { background-color: rgba(255, 255, 255, 0.5); border-radius: 18px; backdrop-filter: blur(5px); }
@@ -9853,8 +10258,8 @@ if (img.type === 'virtual') {
   imagesHtml += `<div class="moment-virtual-img" data-text="${escapeHtml(img.data)}" style="width: 32%; aspect-ratio: 1; max-width: 100px; border-radius:6px;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.1);">
     <div style="position:absolute;top:0;left:0;width:100%;height:100%;background:url('https://imgbed.heliar.top/i/fVtR3hV7WUuvn3og_IMG_20261004_171614.jpg') center/cover;z-index:1;"></div>
     
-<!-- 文字遮罩层，默认隐藏 -->
-<div class="virtual-text-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#ffffff;z-index:3;display:none;align-items:center;justify-content:center;color:#333333;font-size:11px;padding:6px;text-align:center;box-sizing:border-box;word-break:break-all;line-height:1.4;">
+<!-- 文字遮罩层，默认隐藏。修复：增加 overflow-y 以支持上下滑动 -->
+<div class="virtual-text-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#ffffff;z-index:3;display:none;flex-direction:column;align-items:flex-start;justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;color:#333333;font-size:11px;padding:8px;text-align:left;box-sizing:border-box;word-break:break-all;line-height:1.5;">
   ${escapedText}
 </div>
     <!-- 默认显示的“点击查看”层 -->
@@ -11842,19 +12247,470 @@ function setupCalculatorApp() {
           return;
         }
       }
-      calcResetAll();
-      const svcScreen = document.getElementById('service-list-screen');
-      if (svcScreen && svcScreen.classList.contains('active')) {
-        renderServiceList();
-        switchScreen('service-list-screen');
-      } else {
-        switchScreen('contacts-screen');
-      }
+      
+calcResetAll();
+renderServiceList();
+switchScreen('service-list-screen');
     });
   }
 }
 /* ========== 功能结束：计算器 / 音乐模式 ========== */
+/* ========== 功能开始：小决定 ========== */
+const DEC_DEFAULT_WHEEL = ['吃火锅', '吃日料', '吃烧烤', '吃快餐', '点外卖', '自己做'];
+const DEC_DEFAULT_CARDS = ['今天休息', '再想想', '立刻去做'];
+const DEC_WHEEL_COLORS = ['#eceef1', '#dfe3e8', '#d3d8df', '#c7cdd5', '#bcc3cc', '#b0b8c2'];
 
+let decCurrentView = 'home';
+let decAiCharId = null;
+let decLastAction = null;
+let decWheelAngle = 0;
+let decWheelSpinning = false;
+let decCoinFlipping = false;
+let decCardsRevealed = false;
+let decSaveTimer = null;
+
+function decDebouncedSave() {
+  clearTimeout(decSaveTimer);
+  decSaveTimer = setTimeout(() => saveData(), 400);
+}
+
+function openDecisionApp() {
+  if (!db.decisionState) {
+    db.decisionState = {
+      wheelOptions: [...DEC_DEFAULT_WHEEL],
+      numberMin: 1,
+      numberMax: 100,
+      cardTexts: [...DEC_DEFAULT_CARDS]
+    };
+  }
+  decAiCharId = null;
+  decLastAction = null;
+  switchDecisionView('home');
+  switchScreen('decision-screen');
+}
+
+function switchDecisionView(view) {
+  decCurrentView = view;
+  document.querySelectorAll('#decision-screen .dec-view').forEach(v => v.classList.remove('active'));
+  const el = document.getElementById('decision-view-' + view);
+  if (el) el.classList.add('active');
+  const titleMap = { home: '小决定', wheel: '转盘', number: '随机数', dice: '摇骰子', coin: '抛硬币', card: '抽卡' };
+  document.getElementById('decision-title').textContent = titleMap[view] || '小决定';
+  if (view === 'wheel') setTimeout(renderDecisionWheel, 30);
+  if (view === 'card') renderDecisionCards();
+}
+
+function setupDecisionApp() {
+  if (!db.decisionState) {
+    db.decisionState = {
+      wheelOptions: [...DEC_DEFAULT_WHEEL],
+      numberMin: 1,
+      numberMax: 100,
+      cardTexts: [...DEC_DEFAULT_CARDS]
+    };
+  }
+
+  // 首页卡片
+  document.querySelectorAll('#decision-screen .dec-home-card').forEach(card => {
+    card.addEventListener('click', () => switchDecisionView(card.dataset.view));
+  });
+
+  // 返回按钮
+  document.getElementById('decision-back-btn').addEventListener('click', () => {
+    if (decCurrentView !== 'home') { switchDecisionView('home'); return; }
+    // 退出小决定：若有 AI 参与，触发回复
+    if (decAiCharId && decLastAction) triggerDecisionAIReply();
+    decAiCharId = null;
+    decLastAction = null;
+    renderServiceList();
+    switchScreen('service-list-screen');
+  });
+
+  // 子模块
+  setupDecisionWheel();
+  setupDecisionNumber();
+  setupDecisionDice();
+  setupDecisionCoin();
+  setupDecisionCards();
+  setupDecisionAIPicker();
+}
+
+/* ---------------- 转盘 ---------------- */
+function setupDecisionWheel() {
+  renderDecisionWheelOptions();
+  document.getElementById('dec-wheel-add').addEventListener('click', () => {
+    if (db.decisionState.wheelOptions.length >= 12) return showToast('最多 12 个选项');
+    db.decisionState.wheelOptions.push('选项' + (db.decisionState.wheelOptions.length + 1));
+    saveData(); renderDecisionWheelOptions(); renderDecisionWheel();
+  });
+  const doSpin = () => spinDecisionWheel();
+  document.getElementById('dec-wheel-spin').addEventListener('click', doSpin);
+  document.getElementById('dec-wheel-center').addEventListener('click', doSpin);
+  document.getElementById('dec-wheel-ai').addEventListener('click', () => openDecisionAIPicker('wheel'));
+}
+
+function renderDecisionWheelOptions() {
+  const container = document.getElementById('dec-wheel-options');
+  if (!container) return;
+  container.innerHTML = '';
+  db.decisionState.wheelOptions.forEach((opt, i) => {
+    const row = document.createElement('div');
+    row.className = 'dec-opt-row';
+    row.innerHTML = `<input type="text" class="dec-opt-input" value="${escapeHtml(opt)}" data-idx="${i}"><button class="dec-opt-del" data-idx="${i}">×</button>`;
+    container.appendChild(row);
+  });
+  container.querySelectorAll('.dec-opt-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      db.decisionState.wheelOptions[parseInt(inp.dataset.idx)] = inp.value;
+      renderDecisionWheel(); decDebouncedSave();
+    });
+  });
+  container.querySelectorAll('.dec-opt-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (db.decisionState.wheelOptions.length <= 2) return showToast('至少保留 2 个选项');
+      db.decisionState.wheelOptions.splice(parseInt(btn.dataset.idx), 1);
+      saveData(); renderDecisionWheelOptions(); renderDecisionWheel();
+    });
+  });
+}
+
+function renderDecisionWheel() {
+  const canvas = document.getElementById('dec-wheel-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const size = 260;
+  canvas.width = size * dpr; canvas.height = size * dpr;
+  canvas.style.width = size + 'px'; canvas.style.height = size + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const opts = db.decisionState.wheelOptions;
+  const n = opts.length;
+  const cx = size / 2, cy = size / 2, r = size / 2 - 4;
+  const anglePer = (Math.PI * 2) / n;
+  ctx.clearRect(0, 0, size, size);
+  const startOffset = -Math.PI / 2 - anglePer / 2;
+  for (let i = 0; i < n; i++) {
+    const sa = startOffset + i * anglePer;
+    const ea = sa + anglePer;
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, sa, ea); ctx.closePath();
+    ctx.fillStyle = DEC_WHEEL_COLORS[i % DEC_WHEEL_COLORS.length]; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+    const mid = sa + anglePer / 2;
+    const tx = cx + Math.cos(mid) * (r * 0.62);
+    const ty = cy + Math.sin(mid) * (r * 0.62);
+    ctx.save();
+    ctx.translate(tx, ty); ctx.rotate(mid + Math.PI / 2);
+    ctx.fillStyle = '#1f2937';
+    const fs = n > 8 ? 10 : n > 6 ? 11 : 12;
+    ctx.font = `600 ${fs}px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const t = opts[i].length > 6 ? opts[i].slice(0, 5) + '…' : opts[i];
+    ctx.fillText(t, 0, 0);
+    ctx.restore();
+  }
+}
+
+function spinDecisionWheel(targetIndex) {
+  if (decWheelSpinning) return;
+  const opts = db.decisionState.wheelOptions;
+  if (opts.length < 2) return;
+  decWheelSpinning = true;
+  const canvas = document.getElementById('dec-wheel-canvas');
+  const n = opts.length;
+  const anglePer = 360 / n;
+  const idx = (typeof targetIndex === 'number' && targetIndex >= 0 && targetIndex < n)
+    ? targetIndex : Math.floor(Math.random() * n);
+  const rotations = 5 + Math.floor(Math.random() * 3);
+  const targetMod = ((360 - (idx * anglePer) % 360) % 360 + 360) % 360;
+  const currentMod = ((decWheelAngle % 360) + 360) % 360;
+  let diff = targetMod - currentMod;
+  if (diff < 0) diff += 360;
+  const newAngle = decWheelAngle + rotations * 360 + diff;
+  decWheelAngle = newAngle;
+  canvas.style.transform = `rotate(${newAngle}deg)`;
+  setTimeout(() => {
+    decWheelSpinning = false;
+    const result = opts[idx];
+    document.getElementById('dec-wheel-result').textContent = '选到的是：' + result;
+    decLastAction = { tool: '转盘', result };
+  }, 4200);
+}
+
+/* ---------------- 随机数 ---------------- */
+function setupDecisionNumber() {
+  const minInput = document.getElementById('dec-num-min');
+  const maxInput = document.getElementById('dec-num-max');
+  minInput.value = db.decisionState.numberMin;
+  maxInput.value = db.decisionState.numberMax;
+  minInput.addEventListener('change', () => { db.decisionState.numberMin = parseInt(minInput.value) || 0; saveData(); });
+  maxInput.addEventListener('change', () => { db.decisionState.numberMax = parseInt(maxInput.value) || 0; saveData(); });
+  document.getElementById('dec-num-roll').addEventListener('click', () => rollDecisionNumber());
+  document.getElementById('dec-num-ai').addEventListener('click', () => openDecisionAIPicker('number'));
+}
+
+function rollDecisionNumber(targetValue) {
+  const rawMin = parseInt(db.decisionState.numberMin);
+  const rawMax = parseInt(db.decisionState.numberMax);
+  const min = Math.min(rawMin, rawMax);
+  const max = Math.max(rawMin, rawMax);
+  const range = max - min + 1;
+  if (range < 1) return showToast('范围不对');
+  const target = (typeof targetValue === 'number' && targetValue >= min && targetValue <= max)
+    ? targetValue : (min + Math.floor(Math.random() * range));
+  const track = document.getElementById('dec-num-track');
+  const cellH = 46;
+  const spinCount = 22 + Math.floor(Math.random() * 12);
+  const seq = [];
+  for (let i = 0; i < spinCount; i++) seq.push(min + Math.floor(Math.random() * range));
+  seq.push(target);
+  track.innerHTML = seq.map(v => `<div class="dec-num-cell">${v}</div>`).join('');
+  track.style.transition = 'none';
+  track.style.transform = 'translateY(0)';
+  void track.offsetWidth;
+  const targetY = -(seq.length - 2) * cellH;
+  requestAnimationFrame(() => {
+    track.style.transition = 'transform 2.4s cubic-bezier(.15,.85,.25,1)';
+    track.style.transform = `translateY(${targetY}px)`;
+  });
+  setTimeout(() => {
+    document.getElementById('dec-num-result').textContent = '抽到：' + target;
+    decLastAction = { tool: '随机数', result: String(target) };
+  }, 2500);
+}
+
+/* ---------------- 骰子 ---------------- */
+function setupDecisionDice() {
+  renderDie(document.getElementById('dec-die-me'), 1);
+  renderDie(document.getElementById('dec-die-ta'), 1);
+  document.getElementById('dec-dice-roll').addEventListener('click', () => rollDecisionDice());
+  document.getElementById('dec-dice-ai').addEventListener('click', () => openDecisionAIPicker('dice'));
+}
+
+function renderDie(el, value) {
+  if (!el) return;
+  const layouts = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
+  const pips = layouts[value] || [];
+  el.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const p = document.createElement('div');
+    if (pips.includes(i)) p.className = 'dec-pip';
+    el.appendChild(p);
+  }
+}
+
+function rollDecisionDice(aiValue) {
+  const dieMe = document.getElementById('dec-die-me');
+  const dieTa = document.getElementById('dec-die-ta');
+  dieMe.classList.add('rolling'); dieTa.classList.add('rolling');
+  let c = 0;
+  const iv = setInterval(() => {
+    renderDie(dieMe, 1 + Math.floor(Math.random() * 6));
+    renderDie(dieTa, 1 + Math.floor(Math.random() * 6));
+    if (++c > 12) {
+      clearInterval(iv);
+      dieMe.classList.remove('rolling'); dieTa.classList.remove('rolling');
+      const mine = 1 + Math.floor(Math.random() * 6);
+      const theirs = (typeof aiValue === 'number' && aiValue >= 1 && aiValue <= 6)
+        ? aiValue : (1 + Math.floor(Math.random() * 6));
+      renderDie(dieMe, mine); renderDie(dieTa, theirs);
+      document.getElementById('dec-dice-me-score').textContent = mine;
+      document.getElementById('dec-dice-ta-score').textContent = theirs;
+      const r = document.getElementById('dec-dice-result');
+      if (mine > theirs) r.textContent = `你赢了！${mine} > ${theirs} —— 听你的`;
+      else if (mine < theirs) r.textContent = `TA赢了。${mine} < ${theirs} —— 听TA的`;
+      else r.textContent = `平局，${mine} = ${theirs}，再来一次？`;
+      decLastAction = { tool: '摇骰子', result: `${mine} vs ${theirs}` };
+    }
+  }, 80);
+}
+
+/* ---------------- 硬币 ---------------- */
+function setupDecisionCoin() {
+  document.getElementById('dec-coin-flip').addEventListener('click', () => flipDecisionCoin());
+  document.getElementById('dec-coin-ai').addEventListener('click', () => openDecisionAIPicker('coin'));
+}
+
+function flipDecisionCoin(targetFace) {
+  if (decCoinFlipping) return;
+  decCoinFlipping = true;
+  const coin = document.getElementById('dec-coin');
+  const face = (targetFace === '正' || targetFace === '反')
+    ? targetFace : (Math.random() < 0.5 ? '正' : '反');
+  const spins = 4 + Math.floor(Math.random() * 3);
+  const extra = face === '正' ? 0 : 180;
+  const total = spins * 360 + extra;
+  coin.style.transition = 'none';
+  coin.style.transform = 'rotateY(0deg)';
+  void coin.offsetWidth;
+  coin.style.transition = 'transform 1.6s cubic-bezier(.2,.8,.2,1)';
+  coin.style.transform = `rotateY(${total}deg)`;
+  setTimeout(() => {
+    decCoinFlipping = false;
+    document.getElementById('dec-coin-result').textContent = `结果：${face}面`;
+    document.getElementById('dec-coin-history').textContent = `上一次：${face}面`;
+    decLastAction = { tool: '抛硬币', result: face };
+  }, 1700);
+}
+
+/* ---------------- 抽卡 ---------------- */
+function setupDecisionCards() {
+  renderDecisionCardInputs();
+  renderDecisionCards();
+  document.getElementById('dec-card-reset').addEventListener('click', renderDecisionCards);
+  document.getElementById('dec-card-ai').addEventListener('click', () => openDecisionAIPicker('card'));
+}
+
+function renderDecisionCardInputs() {
+  const box = document.getElementById('dec-card-inputs');
+  if (!box) return;
+  box.innerHTML = '';
+  db.decisionState.cardTexts.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'dec-opt-row';
+    row.innerHTML = `<span style="width:24px;color:#9ca3af;font-size:13px;">${i + 1}</span><input type="text" class="dec-opt-input" value="${escapeHtml(t)}" data-idx="${i}">`;
+    box.appendChild(row);
+  });
+  box.querySelectorAll('.dec-opt-input').forEach(inp => {
+    inp.addEventListener('input', () => {
+      db.decisionState.cardTexts[parseInt(inp.dataset.idx)] = inp.value;
+      decDebouncedSave(); renderDecisionCards();
+    });
+  });
+}
+
+function renderDecisionCards() {
+  const stage = document.getElementById('dec-cards-stage');
+  if (!stage) return;
+  stage.innerHTML = '';
+  decCardsRevealed = false;
+  db.decisionState.cardTexts.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'dec-card';
+    card.dataset.idx = i;
+    card.innerHTML = `<div class="dec-card-inner"><div class="dec-card-face dec-card-front">?</div><div class="dec-card-face dec-card-back">${escapeHtml(t)}</div></div>`;
+    card.addEventListener('click', () => onDecisionCardClick(card));
+    stage.appendChild(card);
+  });
+  document.getElementById('dec-card-result').textContent = '选一张翻开';
+}
+
+function onDecisionCardClick(card) {
+  if (decCardsRevealed) return;
+  decCardsRevealed = true;
+  document.querySelectorAll('#dec-cards-stage .dec-card').forEach(c => {
+    c.classList.add('flipped');
+    if (c === card) c.style.transform = 'translateY(-8px)';
+  });
+  const idx = parseInt(card.dataset.idx);
+  const result = db.decisionState.cardTexts[idx];
+  document.getElementById('dec-card-result').textContent = '抽到：' + result;
+  decLastAction = { tool: '抽卡', result };
+}
+
+/* ---------------- AI 决策 ---------------- */
+function setupDecisionAIPicker() {
+  const modal = document.getElementById('dec-ai-picker');
+  if (!modal) return;
+  document.getElementById('dec-ai-cancel').addEventListener('click', () => modal.classList.remove('visible'));
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('visible'); });
+}
+
+function openDecisionAIPicker(tool) {
+  const list = document.getElementById('dec-ai-list');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!db.characters || db.characters.length === 0) {
+    list.innerHTML = '<li style="text-align:center;padding:24px;color:#9ca3af;font-size:13px;">通讯录里还没有好友</li>';
+  } else {
+    db.characters.forEach(c => {
+      const li = document.createElement('li');
+      li.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid #f3f4f6;cursor:pointer;';
+      li.innerHTML = `<img src="${c.avatar}" style="width:42px;height:42px;border-radius:50%;object-fit:cover;background:#e5e7eb;"><span style="font-size:15px;color:#1f2937;font-weight:500;">${escapeHtml(c.remarkName)}</span>`;
+      li.addEventListener('click', () => {
+        decAiCharId = c.id;
+        document.getElementById('dec-ai-picker').classList.remove('visible');
+        executeDecisionAI(tool, c);
+      });
+      list.appendChild(li);
+    });
+  }
+  document.getElementById('dec-ai-picker').classList.add('visible');
+}
+
+async function executeDecisionAI(tool, char) {
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) return showToast('请先在设置中配置 API');
+
+  let options = [];
+  let hint = '';
+  if (tool === 'wheel') {
+    options = db.decisionState.wheelOptions.slice();
+    hint = '转盘选项';
+  } else if (tool === 'number') {
+    const a = Math.min(db.decisionState.numberMin, db.decisionState.numberMax);
+    const b = Math.max(db.decisionState.numberMin, db.decisionState.numberMax);
+    options = Array.from({ length: b - a + 1 }, (_, i) => String(a + i));
+    hint = `随机数范围 ${a} 到 ${b}`;
+  } else if (tool === 'dice') {
+    options = ['1', '2', '3', '4', '5', '6'];
+    hint = '骰子点数（1 到 6）';
+  } else if (tool === 'coin') {
+    options = ['正', '反'];
+    hint = '硬币的正面或反面';
+  } else if (tool === 'card') {
+    options = db.decisionState.cardTexts.slice();
+    hint = '三张卡片的文字';
+  }
+
+  showToast(`正在让 ${char.remarkName} 帮你决定…`);
+
+  const sysPrompt = `你正在扮演「${char.realName}」，人设：${char.persona || '一个友好、有自己性格的人'}。用户在用「小决定」App，需要你帮忙做一个决定。
+${hint}：
+${options.map((o, i) => `${i + 1}. ${o}`).join('\n')}
+
+请从上面选一个。只输出你选的编号（比如 2），不要输出任何其他文字、不要带引号、不要格式标记。`;
+
+  try {
+    const reply = await callAI({ systemPrompt: sysPrompt, messages: [{ role: 'user', content: '请做出你的选择' }], stream: false });
+    if (!reply) return;
+    const m = String(reply).match(/\d+/);
+    let idx = m ? parseInt(m[0]) - 1 : 0;
+    if (idx < 0 || idx >= options.length) idx = 0;
+
+    if (tool === 'wheel') spinDecisionWheel(idx);
+    else if (tool === 'number') rollDecisionNumber(parseInt(options[idx]));
+    else if (tool === 'dice') rollDecisionDice(idx + 1);
+    else if (tool === 'coin') flipDecisionCoin(options[idx]);
+    else if (tool === 'card') { renderDecisionCards(); setTimeout(() => { const c = document.querySelector(`#dec-cards-stage .dec-card[data-idx="${idx}"]`); if (c) onDecisionCardClick(c); }, 300); }
+  } catch (e) {
+    showToast('AI 选择失败：' + e.message);
+  }
+}
+
+async function triggerDecisionAIReply() {
+  if (!decAiCharId || !decLastAction) return;
+  const char = db.characters.find(c => c.id === decAiCharId);
+  if (!char) return;
+  const { url, key, model } = db.apiSettings || {};
+  if (!url || !key || !model) return;
+  const { tool, result } = decLastAction;
+  const sysContent = `[system: 我刚才用「小决定」App做了一个选择。工具：${tool}。最终结果：${result}。你可以就这个结果自然地说一句，像真的在一起商量一样——认同、吐槽、反问、起哄都行，贴合你的人设。]`;
+  char.history.push({ id: `msg_dec_${Date.now()}`, role: 'user', content: sysContent, parts: [{ type: 'text', text: sysContent }], timestamp: Date.now() });
+  const prompt = `你正在扮演${char.realName}。人设：${char.persona || '一个友好、有自己性格的人'}。用户刚用「小决定」App做了一个选择。工具：${tool}。结果：${result}。请以角色的身份回一句15字以内的简短回应，只输出这一句，不要任何格式标记。`;
+  try {
+    const reply = await callAI({ systemPrompt: prompt, messages: [{ role: 'user', content: '请回应' }], stream: false });
+    if (reply) {
+      const clean = reply.trim().replace(/^["'“”]+|["'“”]+$/g, '');
+      const aiContent = `[${char.realName}的消息：${clean}]`;
+      char.history.push({ id: `msg_dec_ai_${Date.now()}`, role: 'assistant', content: aiContent, parts: [{ type: 'text', text: aiContent }], timestamp: Date.now() });
+      char.unread = true;
+      char.unreadCount = (char.unreadCount || 0) + 1;
+    }
+  } catch (e) { console.warn('小决定 AI 回复失败:', e); }
+  await saveData();
+  renderChatList();
+}
+/* ========== 功能结束：小决定 ========== */
 /* ========== 功能开始：每日记 ========== */
 const acctDefaultData = {
   books: [{ id: 'default', name: '日常账本', budget: 0 }],
@@ -11956,13 +12812,8 @@ function setupAccountingApp() {
   
 const b1 = document.getElementById('acct-back-btn-1');
 if (b1) b1.addEventListener('click', () => {
-  const svcScreen = document.getElementById('service-list-screen');
-  if (svcScreen && svcScreen.classList.contains('active')) {
-    renderServiceList();
-    switchScreen('service-list-screen');
-  } else {
-    switchScreen('contacts-screen');
-  }
+  renderServiceList();
+  switchScreen('service-list-screen');
 });
   const b2 = document.getElementById('acct-back-btn-2');
   if (b2) b2.addEventListener('click', () => {
