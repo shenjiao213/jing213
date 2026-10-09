@@ -2555,10 +2555,12 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="item-arrow">›</div>
       </li>
     </ul>
-    <div class="settings-actions-area">
-      <button type="button" class="btn btn-primary" id="settings-backup-btn">备份数据</button>
-      <label for="import-data-input" class="btn btn-neutral btn-label-center">导入数据</label>
-    </div>
+    
+<div class="settings-actions-area">
+  <button type="button" class="btn btn-primary" id="settings-backup-btn">备份数据</button>
+  <label for="import-data-input" class="btn btn-neutral btn-label-center">导入数据</label>
+  <button type="button" class="btn btn-danger" id="settings-fix-data-btn" style="margin-top: 10px;">修复旧数据 / 重置美化</button>
+</div>
   </main>
 </div>
 
@@ -5071,6 +5073,22 @@ window.saveData = async (data) => {
 };
 
 window.loadData = async () => {
+  const CURRENT_DATA_VERSION = 2;
+  if (db.dataVersion === undefined) db.dataVersion = 1;
+  
+  if (db.dataVersion < CURRENT_DATA_VERSION) {
+      db.customCssSettings = {
+        heart: '',
+        bubble: { global: '', perChar: {} },
+        list: '',
+        online: { global: '', perChar: {} },
+        offline: { global: '', perChar: {} }
+      };
+      db.tplRepo = { heart: [], bubble: [], list: [], online: [], offline: [] };
+      db.dataVersion = CURRENT_DATA_VERSION;
+      setTimeout(() => { if (window.saveData) window.saveData(); }, 1000);
+  }
+
   const oldData = localStorage.getItem('gemini-chat-app-db');
   if (oldData) {
     try { await dataStorage.saveAll(JSON.parse(oldData)); }
@@ -9976,6 +9994,25 @@ function setupTutorialApp() {
     if (header) header.parentElement.classList.toggle('open');
   });
   const settingsBackupBtn = document.getElementById('settings-backup-btn');
+const settingsFixDataBtn = document.getElementById('settings-fix-data-btn');
+if (settingsFixDataBtn) {
+  settingsFixDataBtn.addEventListener('click', async () => {
+    if (confirm('确定要修复数据吗？此操作会重置您所有的自定义美化设置（气泡、列表、线上、线下等）为最新默认样式，同时清除已保存的CSS模板。\n\n请放心，这绝不会影响您的聊天记录、角色和世界书数据。')) {
+      db.customCssSettings = {
+        heart: '',
+        bubble: { global: '', perChar: {} },
+        list: '',
+        online: { global: '', perChar: {} },
+        offline: { global: '', perChar: {} }
+      };
+      db.tplRepo = { heart: [], bubble: [], list: [], online: [], offline: [] };
+      db.dataVersion = 2;
+      await saveData();
+      showToast('数据已修复，正在刷新页面以应用新样式...');
+      setTimeout(() => window.location.reload(), 1500);
+    }
+  });
+}
   if (settingsBackupBtn) {
     settingsBackupBtn.addEventListener('click', async () => {
       if (loadingBtn) return;
