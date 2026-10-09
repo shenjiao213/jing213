@@ -9119,7 +9119,13 @@ const DEFAULT_BUBBLE_CSS = `/* 微信绿聊天气泡（默认） */
 .message-bubble.sent::after { content: ''; position: absolute; right: -6px; top: 12px; border-style: solid; border-width: 5px 0 5px 6px; border-color: transparent transparent transparent #95ec69; }
 /* 对方接收气泡 */
 .message-bubble.received { background-color: #ffffff; color: #000; border-radius: 8px; border-bottom-left-radius: 2px; }
-.message-bubble.received::after { content: ''; position: absolute; left: -6px; top: 12px; border-style: solid; border-width: 5px 6px 5px 0; border-color: transparent #ffffff transparent transparent; }`;
+.message-bubble.received::after { content: ''; position: absolute; left: -6px; top: 12px; border-style: solid; border-width: 5px 6px 5px 0; border-color: transparent #ffffff transparent transparent; }
+/* 语音条 */
+.voice-bubble { border-radius: 8px; backdrop-filter: blur(5px); }
+.message-wrapper.received .voice-bubble { background-color: #ffffff; color: #000; }
+.message-wrapper.received .voice-bubble::after { border-color: transparent #ffffff transparent transparent; }
+.message-wrapper.sent .voice-bubble { background-color: #95ec69; color: #000; }
+.message-wrapper.sent .voice-bubble::after { border-color: transparent transparent transparent #95ec69; }`;
 
 const DEFAULT_LIST_CSS = `/* 聊天列表整体容器 */
 #chat-list-screen .content { background-color: #ededed; }
@@ -9158,7 +9164,11 @@ const DEFAULT_ONLINE_CSS = `/* 线上聊天室默认样式（微信绿） */
 .message-bubble.received { background-color: #ffffff; color: #000; border-radius: 8px; border-bottom-left-radius: 2px; }
 .message-bubble.received::after { content: ''; position: absolute; left: -6px; top: 12px; border-style: solid; border-width: 5px 6px 5px 0; border-color: transparent #ffffff transparent transparent; }
 /* 3. 语音 / 图片 / 照片视频 */
-.voice-bubble { background-color: rgba(255, 255, 255, 0.5); border-radius: 8px; backdrop-filter: blur(5px); }
+.voice-bubble { border-radius: 8px; backdrop-filter: blur(5px); }
+.message-wrapper.received .voice-bubble { background-color: #ffffff; color: #000; }
+.message-wrapper.received .voice-bubble::after { border-color: transparent #ffffff transparent transparent; }
+.message-wrapper.sent .voice-bubble { background-color: #95ec69; color: #000; }
+.message-wrapper.sent .voice-bubble::after { border-color: transparent transparent transparent #95ec69; }
 .image-bubble { border-radius: 8px; background-color: rgba(255, 255, 255, 0.5); backdrop-filter: blur(5px); }
 .pv-card { border-radius: 12px; background-color: #f0f0f0; }
 /* 4. 转账卡片 */
