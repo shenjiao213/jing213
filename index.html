@@ -364,7 +364,7 @@ body {
   white-space: nowrap; width: 70px; text-align: center;
   overflow: hidden; text-overflow: ellipsis;
 }
-.message-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; }
+.message-avatar { width: 36px; height: 36px; border-radius: var(--avatar-radius, 6px); object-fit: cover; }
 .message-time { font-size: 9px; color: #aaa; margin-top: 3px; }
 /* 功能结束：聊天室 */
 
@@ -406,6 +406,74 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 /* 功能结束：消息气泡 */
+/* 功能开始：消息引用 */
+.message-quote {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-left: 3px solid #b0b0b0;
+  padding: 5px 8px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: #888;
+  border-radius: 4px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.message-bubble.sent .message-quote {
+  background-color: rgba(0, 0, 0, 0.07);
+  border-left-color: #7a9e5b;
+  color: #556b3a;
+}
+.message-bubble.received .message-quote {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-left-color: #b0b0b0;
+  color: #888;
+}
+.message-quote-content {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+#reply-quote-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #f7f7f7;
+  border-top: 1px solid #e5e5e5;
+  flex-shrink: 0;
+}
+#reply-quote-bar .reply-quote-inner {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  border-left: 3px solid #07c160;
+}
+#reply-quote-bar .reply-quote-sender {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+}
+#reply-quote-bar .reply-quote-text {
+  font-size: 13px;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#reply-quote-bar .reply-quote-close {
+  background: none;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+}
+/* 功能结束：消息引用 */
 
 /* 功能开始：图片/语音/照片视频气泡 */
 .image-bubble {
@@ -427,11 +495,11 @@ body {
   margin: 0 8px; cursor: pointer;
   transition: all 0.2s ease;
   min-width: 90px; max-width: 200px;
-  background-color: var(--bubble-received-bg, rgba(255,255,255,0.5));
-  color: var(--bubble-received-text, #000000);
+  background-color: #ffffff;
+  color: #000000;
 }
-.message-wrapper.sent .voice-bubble { border-bottom-right-radius: 5px; flex-direction: row-reverse; }
-.message-wrapper.received .voice-bubble { border-bottom-left-radius: 5px; }
+.message-wrapper.sent .voice-bubble { background-color: #95ec69; color: #000000; border-bottom-right-radius: 5px; flex-direction: row-reverse; }
+.message-wrapper.received .voice-bubble { background-color: #ffffff; color: #000000; border-bottom-left-radius: 5px; }
 .voice-bubble .play-icon { width: 18px; height: 18px; flex-shrink: 0; }
 .voice-bubble .duration { font-size: 13px; margin: 0 8px; white-space: nowrap; }
 .message-wrapper.sent .play-icon { transform: scaleX(-1); }
@@ -1832,6 +1900,34 @@ input:checked + .slider:before { transform: translateX(22px); }
 .css-preview-box .offline-bubble { width: 100%; padding: 15px; box-sizing: border-box; }
 .css-preview-box .chat-item { width: 100%; background: #fff; border-radius: 8px; display: flex; align-items: center; padding: 10px; }
 /* 功能结束：CSS美化编辑器与预览区 */
+
+/* 功能开始：模板工具条 */
+.tpl-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; flex-shrink: 0;
+}
+.tpl-toolbar .tpl-select {
+  flex: 1; min-width: 0;
+  padding: 8px 10px; border: 1px solid #e0e0e0;
+  border-radius: 8px; background: #fff;
+  font-size: 13px; color: #333; outline: none;
+  font-family: inherit;
+}
+.tpl-toolbar .tpl-save-btn {
+  padding: 8px 14px; border: none; border-radius: 8px;
+  background: #333; color: #fff;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  white-space: nowrap; font-family: inherit;
+}
+.tpl-toolbar .tpl-del-btn {
+  padding: 8px 14px; border: none; border-radius: 8px;
+  background: #f0f0f0; color: #666;
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  white-space: nowrap; font-family: inherit;
+}
+.tpl-toolbar .tpl-save-btn:active { background: #111; }
+.tpl-toolbar .tpl-del-btn:active { background: #ffd0d0; }
+/* 功能结束：模板工具条 */
 </style>
 </head>
 <body>
@@ -1947,6 +2043,13 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="typing-indicator" id="typing-indicator"></div>
   </main>
   <div class="chat-input-wrapper">
+<div id="reply-quote-bar">
+  <div class="reply-quote-inner">
+    <div class="reply-quote-sender" id="reply-quote-sender"></div>
+    <div class="reply-quote-text" id="reply-quote-text"></div>
+  </div>
+  <button class="reply-quote-close" id="reply-quote-close">×</button>
+</div>
     <div class="wechat-input-bar" id="message-input-default" style="gap: 6px; padding: 8px 10px; padding-bottom: calc(8px + var(--safe-bottom));">
       <button class="wechat-icon-btn" id="get-reply-btn" style="flex-shrink: 0; padding: 0;">
         <svg viewBox="0 0 24 24" style="width: 26px; height: 26px;">
@@ -2128,7 +2231,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 </main>
 </div>
 
-<!-- CSS美化菜单 -->
+<!-- ★ 新增：CSS美化二级菜单（原来缺失这个屏幕） -->
 <div id="css-beautify-screen" class="screen">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-settings-screen">‹</button>
@@ -2168,26 +2271,29 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="title-container"><h1 class="title">心声美化</h1></div>
     <div class="placeholder"></div>
   </header>
-  
-<main class="content" style="padding: 0; display: flex; flex-direction: column;">
-  <div class="css-editor-wrapper">
-    <div class="editor-header">
-      <label>自定义CSS</label>
-      <label for="heart-css-file-upload" class="btn-small-upload">导入文档</label>
-      <input type="file" id="heart-css-file-upload" accept=".txt,.css" style="display:none;">
+  <main class="content" style="padding: 0; display: flex; flex-direction: column;">
+    <div class="css-editor-wrapper">
+      <div class="tpl-toolbar">
+        <select class="tpl-select" id="heart-tpl-select"><option value="">选择已保存模板…</option></select>
+        <button type="button" class="tpl-save-btn" id="heart-tpl-save">保存为模板</button>
+        <button type="button" class="tpl-del-btn" id="heart-tpl-del">删除</button>
+      </div>
+      <div class="editor-header">
+        <label>自定义CSS</label>
+        <label for="heart-css-file-upload" class="btn-small-upload">导入文档</label>
+        <input type="file" id="heart-css-file-upload" accept=".txt,.css" style="display:none;">
+      </div>
+      <textarea id="heart-css-input" placeholder="在此输入心声的CSS代码..."></textarea>
+      <div class="action-row">
+        <button class="btn btn-neutral" id="heart-css-reset">恢复默认</button>
+        <button class="btn btn-primary" id="heart-css-save">保存</button>
+      </div>
+      <div id="heart-css-preview" class="css-preview-box">
+        <div class="preview-tip">实时预览</div>
+      </div>
     </div>
-    <textarea id="heart-css-input" placeholder="在此输入心声的CSS代码..."></textarea>
-    <div class="action-row">
-      <button class="btn btn-neutral" id="heart-css-reset">恢复默认</button>
-      <button class="btn btn-primary" id="heart-css-save">保存</button>
-    </div>
-    <div id="heart-css-preview" class="css-preview-box">
-      <div class="preview-tip">实时预览</div>
-    </div>
-  </div>
-</main>
+  </main>
 </div>
-
 <!-- 气泡美化 -->
 <div id="beautify-bubble-screen" class="screen">
   <header class="app-header">
@@ -2195,34 +2301,37 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="title-container"><h1 class="title">气泡美化</h1></div>
     <div class="placeholder"></div>
   </header>
-  
-<main class="content" style="padding: 0; display: flex; flex-direction: column;">
-  <div class="css-editor-wrapper">
-    <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
-      <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
-      <select id="bubble-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
-        <option value="global">全局</option>
-        <option value="char">应用于某个人</option>
-      </select>
-      <select id="bubble-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+  <main class="content" style="padding: 0; display: flex; flex-direction: column;">
+    <div class="css-editor-wrapper">
+      <div class="tpl-toolbar">
+        <select class="tpl-select" id="bubble-tpl-select"><option value="">选择已保存模板…</option></select>
+        <button type="button" class="tpl-save-btn" id="bubble-tpl-save">保存为模板</button>
+        <button type="button" class="tpl-del-btn" id="bubble-tpl-del">删除</button>
+      </div>
+      <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
+        <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
+        <select id="bubble-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
+          <option value="global">全局</option>
+          <option value="char">应用于某个人</option>
+        </select>
+        <select id="bubble-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+      </div>
+      <div class="editor-header">
+        <label>自定义CSS</label>
+        <label for="bubble-css-file-upload" class="btn-small-upload">导入文档</label>
+        <input type="file" id="bubble-css-file-upload" accept=".txt,.css" style="display:none;">
+      </div>
+      <textarea id="bubble-css-input" placeholder="在此输入气泡的CSS代码..."></textarea>
+      <div class="action-row">
+        <button class="btn btn-neutral" id="bubble-css-reset">恢复默认</button>
+        <button class="btn btn-primary" id="bubble-css-save">保存</button>
+      </div>
+      <div id="bubble-css-preview" class="css-preview-box">
+        <div class="preview-tip">实时预览</div>
+      </div>
     </div>
-    <div class="editor-header">
-      <label>自定义CSS</label>
-      <label for="bubble-css-file-upload" class="btn-small-upload">导入文档</label>
-      <input type="file" id="bubble-css-file-upload" accept=".txt,.css" style="display:none;">
-    </div>
-    <textarea id="bubble-css-input" placeholder="在此输入气泡的CSS代码..."></textarea>
-    <div class="action-row">
-      <button class="btn btn-neutral" id="bubble-css-reset">恢复默认</button>
-      <button class="btn btn-primary" id="bubble-css-save">保存</button>
-    </div>
-    <div id="bubble-css-preview" class="css-preview-box">
-      <div class="preview-tip">实时预览</div>
-    </div>
-  </div>
-</main>
+  </main>
 </div>
-
 <!-- 列表美化 -->
 <div id="beautify-list-screen" class="screen">
   <header class="app-header">
@@ -2230,26 +2339,29 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="title-container"><h1 class="title">列表美化</h1></div>
     <div class="placeholder"></div>
   </header>
-  
-<main class="content" style="padding: 0; display: flex; flex-direction: column;">
-  <div class="css-editor-wrapper">
-    <div class="editor-header">
-      <label>自定义CSS</label>
-      <label for="list-css-file-upload" class="btn-small-upload">导入文档</label>
-      <input type="file" id="list-css-file-upload" accept=".txt,.css" style="display:none;">
+  <main class="content" style="padding: 0; display: flex; flex-direction: column;">
+    <div class="css-editor-wrapper">
+      <div class="tpl-toolbar">
+        <select class="tpl-select" id="list-tpl-select"><option value="">选择已保存模板…</option></select>
+        <button type="button" class="tpl-save-btn" id="list-tpl-save">保存为模板</button>
+        <button type="button" class="tpl-del-btn" id="list-tpl-del">删除</button>
+      </div>
+      <div class="editor-header">
+        <label>自定义CSS</label>
+        <label for="list-css-file-upload" class="btn-small-upload">导入文档</label>
+        <input type="file" id="list-css-file-upload" accept=".txt,.css" style="display:none;">
+      </div>
+      <textarea id="list-css-input" placeholder="在此输入列表的CSS代码..."></textarea>
+      <div class="action-row">
+        <button class="btn btn-neutral" id="list-css-reset">恢复默认</button>
+        <button class="btn btn-primary" id="list-css-save">保存</button>
+      </div>
+      <div id="list-css-preview" class="css-preview-box">
+        <div class="preview-tip">实时预览</div>
+      </div>
     </div>
-    <textarea id="list-css-input" placeholder="在此输入列表的CSS代码..."></textarea>
-    <div class="action-row">
-      <button class="btn btn-neutral" id="list-css-reset">恢复默认</button>
-      <button class="btn btn-primary" id="list-css-save">保存</button>
-    </div>
-    <div id="list-css-preview" class="css-preview-box">
-      <div class="preview-tip">实时预览</div>
-    </div>
-  </div>
-</main>
+  </main>
 </div>
-
 <!-- 线上美化 -->
 <div id="beautify-online-screen" class="screen">
   <header class="app-header">
@@ -2257,34 +2369,37 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="title-container"><h1 class="title">线上美化</h1></div>
     <div class="placeholder"></div>
   </header>
-  
-<main class="content" style="padding: 0; display: flex; flex-direction: column;">
-  <div class="css-editor-wrapper">
-    <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
-      <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
-      <select id="online-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
-        <option value="global">全局</option>
-        <option value="char">应用于某个人</option>
-      </select>
-      <select id="online-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+  <main class="content" style="padding: 0; display: flex; flex-direction: column;">
+    <div class="css-editor-wrapper">
+      <div class="tpl-toolbar">
+        <select class="tpl-select" id="online-tpl-select"><option value="">选择已保存模板…</option></select>
+        <button type="button" class="tpl-save-btn" id="online-tpl-save">保存为模板</button>
+        <button type="button" class="tpl-del-btn" id="online-tpl-del">删除</button>
+      </div>
+      <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
+        <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
+        <select id="online-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
+          <option value="global">全局</option>
+          <option value="char">应用于某个人</option>
+        </select>
+        <select id="online-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+      </div>
+      <div class="editor-header">
+        <label>自定义CSS</label>
+        <label for="online-css-file-upload" class="btn-small-upload">导入文档</label>
+        <input type="file" id="online-css-file-upload" accept=".txt,.css" style="display:none;">
+      </div>
+      <textarea id="online-css-input" placeholder="在此输入线上元素的CSS代码..."></textarea>
+      <div class="action-row">
+        <button class="btn btn-neutral" id="online-css-reset">恢复默认</button>
+        <button class="btn btn-primary" id="online-css-save">保存</button>
+      </div>
+      <div id="online-css-preview" class="css-preview-box">
+        <div class="preview-tip">实时预览</div>
+      </div>
     </div>
-    <div class="editor-header">
-      <label>自定义CSS</label>
-      <label for="online-css-file-upload" class="btn-small-upload">导入文档</label>
-      <input type="file" id="online-css-file-upload" accept=".txt,.css" style="display:none;">
-    </div>
-    <textarea id="online-css-input" placeholder="在此输入线上元素的CSS代码..."></textarea>
-    <div class="action-row">
-      <button class="btn btn-neutral" id="online-css-reset">恢复默认</button>
-      <button class="btn btn-primary" id="online-css-save">保存</button>
-    </div>
-    <div id="online-css-preview" class="css-preview-box">
-      <div class="preview-tip">实时预览</div>
-    </div>
-  </div>
-</main>
+  </main>
 </div>
-
 <!-- 线下美化 -->
 <div id="beautify-offline-screen" class="screen">
   <header class="app-header">
@@ -2292,34 +2407,37 @@ input:checked + .slider:before { transform: translateX(22px); }
     <div class="title-container"><h1 class="title">线下美化</h1></div>
     <div class="placeholder"></div>
   </header>
-  
-<main class="content" style="padding: 0; display: flex; flex-direction: column;">
-  <div class="css-editor-wrapper">
-    <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
-      <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
-      <select id="offline-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
-        <option value="global">全局</option>
-        <option value="char">应用于某个人</option>
-      </select>
-      <select id="offline-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+  <main class="content" style="padding: 0; display: flex; flex-direction: column;">
+    <div class="css-editor-wrapper">
+      <div class="tpl-toolbar">
+        <select class="tpl-select" id="offline-tpl-select"><option value="">选择已保存模板…</option></select>
+        <button type="button" class="tpl-save-btn" id="offline-tpl-save">保存为模板</button>
+        <button type="button" class="tpl-del-btn" id="offline-tpl-del">删除</button>
+      </div>
+      <div class="apply-scope-selector" style="display:flex; gap:10px; margin-bottom:5px;">
+        <label style="font-weight:600; color:#333; white-space:nowrap; margin:0;">应用范围：</label>
+        <select id="offline-apply-scope" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;">
+          <option value="global">全局</option>
+          <option value="char">应用于某个人</option>
+        </select>
+        <select id="offline-char-select" class="char-selector" style="flex:1; padding:5px; border-radius:6px; border:1px solid #ccc;"></select>
+      </div>
+      <div class="editor-header">
+        <label>自定义CSS</label>
+        <label for="offline-css-file-upload" class="btn-small-upload">导入文档</label>
+        <input type="file" id="offline-css-file-upload" accept=".txt,.css" style="display:none;">
+      </div>
+      <textarea id="offline-css-input" placeholder="在此输入线下剧情的CSS代码..."></textarea>
+      <div class="action-row">
+        <button class="btn btn-neutral" id="offline-css-reset">恢复默认</button>
+        <button class="btn btn-primary" id="offline-css-save">保存</button>
+      </div>
+      <div id="offline-css-preview" class="css-preview-box">
+        <div class="preview-tip">实时预览</div>
+      </div>
     </div>
-    <div class="editor-header">
-      <label>自定义CSS</label>
-      <label for="offline-css-file-upload" class="btn-small-upload">导入文档</label>
-      <input type="file" id="offline-css-file-upload" accept=".txt,.css" style="display:none;">
-    </div>
-    <textarea id="offline-css-input" placeholder="在此输入线下剧情的CSS代码..."></textarea>
-    <div class="action-row">
-      <button class="btn btn-neutral" id="offline-css-reset">恢复默认</button>
-      <button class="btn btn-primary" id="offline-css-save">保存</button>
-    </div>
-    <div id="offline-css-preview" class="css-preview-box">
-      <div class="preview-tip">实时预览</div>
-    </div>
-  </div>
-</main>
-</div>
-  
+  </main>
+</div>  
 
 <div id="placeholder2-screen" class="screen">
   <header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">占位</h1></div><div class="placeholder"></div></header>
@@ -4115,6 +4233,7 @@ let isInMultiSelectMode = false;
 let editingMessageId = null;
 let currentPage = 1;
 let currentTransferMessageId = null;
+let currentQuote = null; // { senderName, text }
 let currentEditingWorldBookId = null;
 let currentStickerActionTarget = null;
 let currentGroupAction = { type: null, recipients: [] };
@@ -6222,6 +6341,9 @@ function handleMessageLongPress(messageWrapper, x, y) {
   const isInvisibleMessage = /\[[\s\S]*?(?:接收|退回)[\s\S]*?的转账\]|\[[\s\S]*?更新状态为：[\s\S]*?\]|\[[\s\S]*?已接收礼物\]|\[system:[\s\S]*?\]|\[[\s\S]*?邀请[\s\S]*?加入了群聊\]|\[[\s\S]*?修改群名为：[\s\S]*?\]|\[system-display:[\s\S]*?\]/i.test(message.content);
   
 let menuItems = [];
+if (!isInvisibleMessage && message.role !== 'system') {
+  menuItems.push({ label: '引用', action: () => setQuote(message) });
+}
 if (!isImageRecognitionMsg && !isVoiceMessage && !isStickerMessage && !isPhotoVideoMessage && !isTransferMessage && !isGiftMessage && !isInvisibleMessage) {
   menuItems.push({ label: '编辑', action: () => startMessageEdit(messageId) });
 }
@@ -6349,16 +6471,76 @@ async function deleteSelectedMessages() {
   exitMultiSelectMode();
   showToast(`已删除 ${deletedCount} 条消息`);
 }
+/* ========== 功能开始：消息引用 ========== */
+function extractQuotePreview(message) {
+  let text = message.content || '';
+  const rules = [
+    [/\[.*?的消息：([\s\S]+?)\]/, t => t],
+    [/\[.*?的语音：([\s\S]+?)\]/, t => '[语音] ' + t],
+    [/\[.*?发来的照片\/视频：([\s\S]+?)\]/, t => '[照片/视频] ' + t],
+    [/\[.*?的表情包：([\s\S]+?)\]/, t => '[表情] ' + t],
+    [/\[.*?发送的表情包：([\s\S]+?)\]/, t => '[表情] ' + t],
+    [/\[.*?送来的礼物：([\s\S]+?)\]/, t => '[礼物] ' + t],
+    [/\[.*?给你转账：([\s\S]+?)\]/, t => '[转账] ' + t],
+    [/\[.*?的转账：([\s\S]+?)\]/, t => '[转账] ' + t]
+  ];
+  for (const [re, fn] of rules) {
+    const m = text.match(re);
+    if (m) return fn(m[1].trim());
+  }
+  return text;
+}
+
+function setQuote(message) {
+  const chat = getCurrentChat();
+  if (!chat || !message) return;
+  let senderName = '';
+  const isSent = message.role === 'user';
+  if (isSent) {
+    senderName = currentChatType === 'private' ? chat.myName : chat.me.nickname;
+  } else {
+    if (currentChatType === 'private') senderName = chat.remarkName || chat.realName;
+    else {
+      const sender = chat.members.find(m => m.id === message.senderId);
+      senderName = sender ? (sender.groupNickname || sender.realName) : '成员';
+    }
+  }
+  let preview = extractQuotePreview(message);
+  if (preview.length > 60) preview = preview.slice(0, 60) + '…';
+  currentQuote = { senderName, text: preview };
+  const bar = document.getElementById('reply-quote-bar');
+  const sEl = document.getElementById('reply-quote-sender');
+  const tEl = document.getElementById('reply-quote-text');
+  if (sEl) sEl.textContent = senderName;
+  if (tEl) tEl.textContent = preview;
+  if (bar) bar.style.display = 'flex';
+  if (messageInput) messageInput.focus();
+}
+
+function clearQuote() {
+  currentQuote = null;
+  const bar = document.getElementById('reply-quote-bar');
+  if (bar) bar.style.display = 'none';
+  const sEl = document.getElementById('reply-quote-sender');
+  const tEl = document.getElementById('reply-quote-text');
+  if (sEl) sEl.textContent = '';
+  if (tEl) tEl.textContent = '';
+}
+/* ========== 功能结束：消息引用 ========== */
+
 function openChatRoom(chatId, type) {
+
     if (!chatId || !type) return;
     const chat = (type === 'private') ? db.characters.find(c => c.id === chatId) : db.groups.find(g => g.id === chatId);
     if (!chat) return;
     currentChatId = chatId;
     currentChatType = type;
     if (!chat.history || !Array.isArray(chat.history)) chat.history = [];
-    exitMultiSelectMode();
-    cancelMessageEdit();
-    if (chat.unread || chat.unreadCount) {
+    
+exitMultiSelectMode();
+cancelMessageEdit();
+clearQuote();
+if (chat.unread || chat.unreadCount) {
         chat.unread = false;
         chat.unreadCount = 0;
         saveData().then(() => renderChatList());
@@ -6521,13 +6703,25 @@ function createMessageBubbleElement(message) {
   const groupTransferMatch = content.match(groupTransferRegex);
   const privateGiftMatch = content.match(privateGiftRegex);
   const groupGiftMatch = content.match(groupGiftRegex);
-  const imageRecogMatch = content.match(imageRecogRegex);
-  const textMatch = content.match(textRegex);
-
   
-if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
-    bubbleElement = document.createElement('div');
-    bubbleElement.className = 'image-bubble';
+const imageRecogMatch = content.match(imageRecogRegex);
+const textMatch = content.match(textRegex);
+const quoteRegex = /\[(.+?)引用「([\s\S]*?)」：「([\s\S]*?)」\]/;
+const quoteMatch = content.match(quoteRegex);
+if (quoteMatch) {
+  bubbleElement = document.createElement('div');
+  bubbleElement.className = `message-bubble ${isSent ? 'sent' : 'received'}`;
+  const quoteEl = document.createElement('div');
+  quoteEl.className = 'message-quote';
+  quoteEl.textContent = quoteMatch[2];
+  const contentEl = document.createElement('div');
+  contentEl.className = 'message-quote-content';
+  contentEl.textContent = quoteMatch[3];
+  bubbleElement.appendChild(quoteEl);
+  bubbleElement.appendChild(contentEl);
+} else if ((isSent && sentStickerMatch && stickerData) || (!isSent && receivedStickerMatch)) {
+  bubbleElement = document.createElement('div');
+  bubbleElement.className = 'image-bubble';
     let stickerSrc = '';
     let stickerNameForFallback = '';
     if (isSent) {
@@ -6776,8 +6970,10 @@ async function sendMessage() {
     chat.name = renameMatch[2];
     chatRoomTitle.textContent = chat.name;
     messageContent = `[${chat.me.nickname}修改群名为：${chat.name}]`;
-  } else if (systemRegex.test(text) || inviteRegex.test(text)) {
+} else if (systemRegex.test(text) || inviteRegex.test(text)) {
     messageContent = text;
+  } else if (currentQuote) {
+    messageContent = `[${myName}引用「${currentQuote.text}」：「${text}」]`;
   } else {
     messageContent = `[${myName}的消息：${text}]`;
   }
@@ -6785,6 +6981,7 @@ async function sendMessage() {
   messageInput.value = '';
   sendMessageBtn.style.display = 'none';
   wechatMoreBtn.style.display = 'flex';
+  clearQuote();
 }
 async function sendImageForRecognition(base64Data) {
   if (!base64Data || isGenerating) return;
@@ -6977,7 +7174,8 @@ prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `· [${character.myName}发来的照片/视频：xxx]  → 我分享了描述为 xxx 的照片或视频\n`;
   prompt += `· [${character.myName}给你转账：xxx元；备注：xxx]  → 我给你转钱了\n`;
   prompt += `· [${character.myName}发送了位置：xxx] / [${character.myName}共享了实时位置：xxx]  → 我发了位置。带距离或附近地点时，要结合远近和场景自然回应（聊距离、路况、附近店都行）\n`;
-  prompt += `· [system: xxx]  → 系统指令，给我设定场景或上下文。别在对话里直接提它，心里知道、后续自然运用即可\n\n`;
+  prompt += `· [system: xxx]  → 系统指令，给我设定场景或上下文。别在对话里直接提它，心里知道、后续自然运用即可\n`;
+prompt += `· [${character.myName}引用「原消息」：「新消息」]  → 我引用了某条消息再发新话。你要结合被引用的内容和我说的话，一起理解和回应，自然一点，别生硬复述引用内容\n\n`;
   prompt += `════ 你的动作能力 ════\n\n`;
   prompt += `【收礼物】收到我的礼物，必须先发一条隐藏指令表示已收到：\n`;
   prompt += `   [${character.realName}已接收礼物]\n`;
@@ -7028,6 +7226,8 @@ prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包�
   prompt += `· 收转账指令  [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]（隐藏不显示）\n`;
   prompt += `· 状态指令    [${character.realName}更新状态为：{新状态}]（隐藏不显示）\n`;
   prompt += `· 发位置      [${character.realName}发送了位置：{位置名称}。{可选距离}]\n`;
+prompt += `· 引用回复    [${character.realName}引用「我原话或某条消息」：「你的回复」]\n`;
+prompt += `   适当使用，不用每次都引用。引用后要自然地接着说。\n`;
 /* 功能开始：心声 */
 prompt += `· 心声        <heart>{30~50字的内心独白}</heart>（每次回复的最后，必须有且只有一次）\n\n`;
 /* 功能结束：心声 */
@@ -7095,13 +7295,15 @@ prompt += `\n════ 我的消息格式 ════\n`;
   prompt += `· [${group.me.nickname} 向 {某成员真名} 转账：...]  → 我给某人转账了\n`;
   prompt += `· [${group.me.nickname} 向 {某成员真名} 送来了礼物：...]  → 我给某人送礼了\n`;
   prompt += `· [${group.me.nickname}的表情包：...] 等特殊消息 → 群成员可以就此评论\n`;
+prompt += `· [${group.me.nickname}引用「原消息」：「新消息」]  → 我引用了群里某条消息再发话，被引用的成员可以针对此回应\n`;
   prompt += `· [system: ...]、[...邀请...加入了群聊]、[...修改群名为...] → 系统事件，群成员要有所反应（欢迎新人、讨论新群名等）\n\n`;
   prompt += `════ 你的输出格式 ════\n`;
   prompt += `你生成的每一条消息都必须严格遵循以下格式，一条占一行。请用成员的【真名】填进去：\n\n`;
   prompt += `· 普通消息    [{成员真名}的消息：{内容}]\n`;
   prompt += `· 表情包      [{成员真名}发送的表情包：{路径}]（不用带 https://i.postimg.cc/）\n`;
   prompt += `· 语音        [{成员真名}的语音：{语音文字}]\n`;
-  prompt += `· 照片/视频   [{成员真名}发来的照片/视频：{内容描述}]\n\n`;
+  prompt += `· 照片/视频   [{成员真名}发来的照片/视频：{内容描述}]\n`;
+prompt += `· 引用回复    [{成员真名}引用「原话」：「新回复」]（可选，偶尔用）\n\n`;
   prompt += `【注意】群聊里，AI 角色不能接收/退回转账，也不能接收礼物，更不能更新状态。对我发的转账或礼物，用普通消息回应就好。\n\n`;
   prompt += `════ 群聊氛围 ════\n`;
   const numMembers = group.members.length;
@@ -8513,6 +8715,40 @@ function setupApiSettingsApp() {
 }
 /* ========== 功能结束：API 设置 ========== */
 /* ========== 功能开始：美化设置 ========== */
+/* 给 CSS 的每条选择器加上作用域前缀（供"应用于某个人"使用） */
+function addScopePrefix(css, prefix) {
+  if (!css || !css.trim()) return '';
+  const probe = document.createElement('style');
+  probe.textContent = css;
+  document.head.appendChild(probe);
+  let result = '';
+  try {
+    const sheet = probe.sheet;
+    if (!sheet) { document.head.removeChild(probe); return css; }
+    const rules = sheet.cssRules;
+    const walk = (ruleList) => {
+      for (let i = 0; i < ruleList.length; i++) {
+        const rule = ruleList[i];
+        if (rule.type === 1) {
+          const sels = rule.selectorText.split(',').map(s => `${prefix} ${s.trim()}`).join(', ');
+          result += `${sels} { ${rule.style.cssText} }\n`;
+        } else if (rule.type === 4) {
+          result += `@media ${rule.conditionText} {\n`;
+          walk(rule.cssRules);
+          result += '}\n';
+        } else {
+          result += rule.cssText + '\n';
+        }
+      }
+    };
+    walk(rules);
+  } catch (e) {
+    result = css;
+  }
+  document.head.removeChild(probe);
+  return result;
+}
+
 /* 通用：给用户 CSS 里的常用属性加 !important，保证能覆盖一切系统样式 */
 function strengthenCss(css) {
   if (!css) return '';
@@ -8651,44 +8887,29 @@ const DEFAULT_OFFLINE_CSS = [
 function applyCustomCss() {
   if (!db.customCssSettings || !db.characters) return;
 
-  // 清理旧的注入
-  document.querySelectorAll('[id^="custom-user-css-"]').forEach(el => el.remove());
+  document.querySelectorAll('style[id^="custom-user-css-"]').forEach(el => el.remove());
 
   const inject = (id, css) => {
-    if (!css) return;
+    if (!css || !css.trim()) return;
     const style = document.createElement('style');
     style.id = `custom-user-css-${id}`;
-    style.innerHTML = strengthenCss(css);
+    style.textContent = strengthenCss(css);
     document.head.appendChild(style);
   };
 
-  // 全局（五个作用域全部全局注入，用户写什么选择器就影响什么）
   inject('heart', db.customCssSettings.heart);
   inject('list', db.customCssSettings.list);
   inject('bubble-global', db.customCssSettings.bubble.global);
   inject('online-global', db.customCssSettings.online.global);
   inject('offline-global', db.customCssSettings.offline.global);
 
-  // 按角色注入
   db.characters.forEach(char => {
     const cb = db.customCssSettings.bubble.perChar[char.id];
-    if (cb) {
-      inject(`bubble-${char.id}`,
-        cb.replace(/(\.message-bubble(?:\.sent|\.received)?)/g,
-          `#chat-room-screen.chat-active-${char.id} $1`));
-    }
+    if (cb) inject(`bubble-${char.id}`, addScopePrefix(cb, `#chat-room-screen.chat-active-${char.id}`));
     const co = db.customCssSettings.online.perChar[char.id];
-    if (co) {
-      inject(`online-${char.id}`,
-        co.replace(/(\.message-bubble|\.voice-bubble|\.image-bubble|\.transfer-card|\.gift-card|\.pv-card|\.static-location-card)/g,
-          `#chat-room-screen.chat-active-${char.id} $1`));
-    }
+    if (co) inject(`online-${char.id}`, addScopePrefix(co, `#chat-room-screen.chat-active-${char.id}`));
     const cf = db.customCssSettings.offline.perChar[char.id];
-    if (cf) {
-      inject(`offline-${char.id}`,
-        cf.replace(/(\.offline-bubble|\.offline-card-header|\.offline-turn-badge|\.offline-chat-area)/g,
-          `#offline-screen.offline-active-${char.id} $1`));
-    }
+    if (cf) inject(`offline-${char.id}`, addScopePrefix(cf, `#offline-screen.offline-active-${char.id}`));
   });
 }
 
@@ -8767,15 +8988,19 @@ function setupBeautifySettings() {
     });
   };
 
-  bindCssEditor('heart', DEFAULT_HEART_CSS, () => db.customCssSettings.heart, (v) => db.customCssSettings.heart = v);
-  bindCssEditor('list', DEFAULT_LIST_CSS, () => db.customCssSettings.list, (v) => db.customCssSettings.list = v);
-
+  
+bindCssEditor('heart', DEFAULT_HEART_CSS, () => db.customCssSettings.heart, (v) => db.customCssSettings.heart = v);
+bindCssEditor('list', DEFAULT_LIST_CSS, () => db.customCssSettings.list, (v) => db.customCssSettings.list = v);
+bindTplToolbar('heart');
+bindTplToolbar('list');
   const setupScope = (prefix, dataKey, defaultCss) => {
     const scope = document.getElementById(`${prefix}-apply-scope`);
     const charSel = document.getElementById(`${prefix}-char-select`);
     if (!scope || !charSel) return;
-    charSel.innerHTML = '<option value="">请选择角色</option>' + db.characters.map(c => `<option value="${c.id}">${c.remarkName}</option>`).join('');
-    scope.addEventListener('change', () => {
+    
+charSel.innerHTML = '<option value="">请选择角色</option>' + db.characters.map(c => `<option value="${c.id}">${c.remarkName}</option>`).join('');
+charSel.style.display = scope.value === 'char' ? '' : 'none';
+scope.addEventListener('change', () => {
       charSel.style.display = scope.value === 'char' ? '' : 'none';
       document.getElementById(`${prefix}-css-input`).value = scope.value === 'global' ? (db.customCssSettings[dataKey].global || '') : '';
     });
@@ -8791,11 +9016,93 @@ function setupBeautifySettings() {
     );
   };
 
-  setupScope('bubble', 'bubble', DEFAULT_BUBBLE_CSS);
-  setupScope('online', 'online', DEFAULT_ONLINE_CSS);
-  setupScope('offline', 'offline', DEFAULT_OFFLINE_CSS);
+  
+setupScope('bubble', 'bubble', DEFAULT_BUBBLE_CSS);
+setupScope('online', 'online', DEFAULT_ONLINE_CSS);
+setupScope('offline', 'offline', DEFAULT_OFFLINE_CSS);
+bindTplToolbar('bubble');
+bindTplToolbar('online');
+bindTplToolbar('offline');
 
-  // 导航
+/* ========== 模板保存系统 ========== */
+if (!db.cssTemplates) db.cssTemplates = [];
+
+function getTplsForScope(scope) {
+  return (db.cssTemplates || []).filter(t => t.scope === scope);
+}
+
+function refreshTplSelect(scope) {
+  const sel = document.getElementById(`${scope}-tpl-select`);
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">选择已保存模板…</option>';
+  getTplsForScope(scope).slice().sort((a,b) => b.createdAt - a.createdAt).forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.id;
+    const d = new Date(t.createdAt);
+    opt.textContent = `${t.name}  ${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    sel.appendChild(opt);
+  });
+  if (cur && sel.querySelector(`option[value="${cur}"]`)) sel.value = cur;
+}
+
+function bindTplToolbar(scope) {
+  const sel = document.getElementById(`${scope}-tpl-select`);
+  const saveBtn = document.getElementById(`${scope}-tpl-save`);
+  const delBtn = document.getElementById(`${scope}-tpl-del`);
+  const textarea = document.getElementById(`${scope}-css-input`);
+  if (!sel || !saveBtn || !delBtn || !textarea) return;
+
+  refreshTplSelect(scope);
+
+  saveBtn.onclick = async () => {
+    const css = textarea.value;
+    if (!css || !css.trim()) return showToast('当前没有可保存的 CSS');
+    const name = await showHgInput({
+      title: '保存为模板',
+      sub: '给这套 CSS 起个名字，随时能切回来',
+      placeholder: '如：灰白极简'
+    });
+    if (!name) return;
+    const clean = String(name).trim();
+    if (!clean) return;
+    db.cssTemplates.push({
+      id: 'tpl_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      scope,
+      name: clean,
+      css,
+      createdAt: Date.now()
+    });
+    await saveData();
+    refreshTplSelect(scope);
+    showToast(`模板「${clean}」已保存`);
+  };
+
+  delBtn.onclick = async () => {
+    const id = sel.value;
+    if (!id) return showToast('请先在下拉里选择要删除的模板');
+    const tpl = db.cssTemplates.find(t => t.id === id);
+    if (!tpl) return;
+    if (!confirm(`确定删除模板「${tpl.name}」吗？`)) return;
+    db.cssTemplates = db.cssTemplates.filter(t => t.id !== id);
+    await saveData();
+    refreshTplSelect(scope);
+    showToast('模板已删除');
+  };
+
+  sel.onchange = () => {
+    const id = sel.value;
+    if (!id) return;
+    const tpl = db.cssTemplates.find(t => t.id === id);
+    if (!tpl) return;
+    textarea.value = tpl.css;
+    textarea.dispatchEvent(new Event('input'));
+    showToast(`已载入模板「${tpl.name}」，点“保存”才真正生效`);
+  };
+}
+/* ========== 模板保存系统结束 ========== */
+
+// 导航
   document.getElementById('go-to-beautify-settings-btn').onclick = () => switchScreen('beautify-settings-screen');
   document.getElementById('go-to-css-beautify-btn').onclick = () => switchScreen('css-beautify-screen');
   document.getElementById('go-to-heart-beautify-btn').onclick = () => switchScreen('beautify-heart-screen');
