@@ -7665,6 +7665,13 @@ async function generateRoleCardBlob(entity, type) {
 /* 从图片文件解析角色名片（含世界书） */
 async function tryParseRoleCardFromFile(file) {
   try {
+    // ★ 先只读前 8 字节判断 PNG 魔数：不是 PNG 立刻返回，避免读整个大文件
+    if (!file || file.size < 8) return null;
+    const headBuf = await file.slice(0, 8).arrayBuffer();
+    const head = new Uint8Array(headBuf);
+    if (!isPngBuffer(head)) return null;
+
+    // 确认是 PNG 才读整个文件
     const ab = await file.arrayBuffer();
     const encoded = extractPngText(ab, ROLE_CARD_KEY);
     if (!encoded) return null;
@@ -8173,26 +8180,40 @@ function setupScanScreen() {
 
   const albumBtn = document.getElementById('scan-album-action-btn');
   const albumHeaderBtn = document.getElementById('scan-album-btn');
-  const triggerAlbum = () => {
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.onchange = async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      showToast('正在识别角色卡…');
+  
+const triggerAlbum = () => {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'image/*';
+  fileInput.onchange = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    // ★ 立即可见的"识别中"提示条（不依赖 toast，不阻塞）
+    const loading = document.createElement('div');
+    loading.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:#fff;padding:12px 24px;border-radius:10px;z-index:999999;font-size:14px;pointer-events:none;';
+    loading.textContent = '识别中…';
+    document.body.appendChild(loading);
+
+    try {
       const roleData = await tryParseRoleCardFromFile(file);
+      loading.remove();
       if (roleData) {
+        // ★ 角色卡：秒弹
         showRoleCardScanResult(roleData);
         return;
       }
-      setTimeout(() => {
-        if (Math.random() < 0.8) simulateScan();
-        else showToast('这不是本软件的角色卡，请换一张');
-      }, 400);
-    };
-    fileInput.click();
+      // ★ 不是角色卡：立即走 fallback，不再等 400ms
+      if (Math.random() < 0.8) simulateScan();
+      else showToast('这不是本软件的角色卡，请换一张');
+    } catch (err) {
+      loading.remove();
+      console.warn('[识别] 出错', err);
+      showToast('识别失败，请换一张');
+    }
   };
+  fileInput.click();
+};
   if (albumBtn) albumBtn.addEventListener('click', triggerAlbum);
   if (albumHeaderBtn) albumHeaderBtn.addEventListener('click', triggerAlbum);
 
