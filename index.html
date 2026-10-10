@@ -5588,6 +5588,16 @@ input:checked + .slider:before { transform: translateX(22px); }
      功能结束：群聊设置侧边栏
      ========================================================== -->
 
+<div id="webview-screen" class="screen">
+  <header class="app-header">
+    <button class="back-btn" id="webview-back-btn">‹</button>
+    <div class="title-container"><h1 class="title" id="webview-title">加载中...</h1></div>
+    <div class="placeholder"></div>
+  </header>
+  <main class="content" style="padding:0; display:flex; flex-direction:column;">
+    <iframe id="webview-iframe" allowfullscreen allow="fullscreen; autoplay; encrypted-media; picture-in-picture; clipboard-write" style="flex:1; border:none; width:100%; height:100%;"></iframe>
+  </main>
+</div>
 </div>
 <!-- .phone-screen 结束 -->
 <script>
@@ -6278,9 +6288,9 @@ if (!db.customCssSettings) {
   if (db.timestampEnabled === undefined) db.timestampEnabled = true;
 
   const JJWXC_AVATAR = 'https://imgbed.heliar.top/i/v0j0LZ9JnUpYd8Fl_Camera_XHS_1791160783952notes_pre_post_1040g3k031ioe3v3ngu505o2pjhpg8uc1abad9p0.jpg';
-  
 const DEFAULT_SERVICES = [
   { id: 'service_jjwxc', name: '晋江文学城', avatar: JJWXC_AVATAR, url: 'https://m.jjwxc.net/', group: 'J' },
+  { id: 'service_jukankan', name: '剧好看', avatar: 'https://imgbed.heliar.top/i/3VGuWLOscSEKkirU_%E8%96%9B%E5%AE%9A%E8%B0%94%E7%9A%84%E7%8C%AB%E5%B7%A5%E4%BD%9C%E5%AE%A4%20(178).png', url: 'https://www.sqsxy.com/mbsitp/2.html', group: 'J' },
   { id: 'service_calc', name: '计算器', avatar: 'https://imgbed.heliar.top/i/u_n0iyzmfsUScTKc_(39).png', url: '', group: 'J', isCalculator: true },
   { id: 'service_daily', name: '每日记', avatar: 'https://imgbed.heliar.top/i/sx7iCxb0fS46b3_3_(4).png', url: '', group: 'M', isAccounting: true },
   { id: 'service_decide', name: '小决定', avatar: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#1f2937"/><circle cx="50" cy="50" r="26" fill="none" stroke="#fff" stroke-width="3.4"/><path d="M50 50 L50 26" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><path d="M50 50 L71 62" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><path d="M50 50 L29 62" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/><circle cx="50" cy="50" r="4.5" fill="#fff"/></svg>'), url: '', group: 'X', isDecision: true }
@@ -6403,17 +6413,31 @@ window.showToast = (message) => {
   setTimeout(() => toastElement.classList.remove('show'), 3000);
 };
 
-window.switchScreen = (targetId) => {
+window.screenHistory = [];
+
+window.goBack = () => {
+  if (window.screenHistory.length > 0) {
+    const prevId = window.screenHistory.pop();
+    window.switchScreen(prevId, true);
+  } else {
+    window.switchScreen('home-screen', true);
+  }
+};
+
+window.switchScreen = (targetId, isBack = false) => {
   try {
     const targetScreen = document.getElementById(targetId);
     if (!targetScreen) return;
     if (targetScreen.classList.contains('active')) return;
-    const currentScreen = document.querySelector('.screen.active');
-    if (currentScreen && currentScreen.id === 'friend-info-edit-screen' && typeof window.currentSaveFieldsFn === 'function') {
-      setTimeout(() => { try { window.currentSaveFieldsFn(); } catch (e) { console.error("自动保存失败:", e); } }, 100);
-    }
-    screens.forEach(screen => screen.classList.remove('active'));
-    targetScreen.classList.add('active');
+const currentScreen = document.querySelector('.screen.active');
+if (!isBack && currentScreen) {
+  window.screenHistory.push(currentScreen.id);
+}
+if (currentScreen && currentScreen.id === 'friend-info-edit-screen' && typeof window.currentSaveFieldsFn === 'function') {
+  setTimeout(() => { try { window.currentSaveFieldsFn(); } catch (e) { console.error("自动保存失败:", e); } }, 100);
+}
+screens.forEach(screen => screen.classList.remove('active'));
+targetScreen.classList.add('active');
     const overlays = document.querySelectorAll('.modal-overlay, .action-sheet-overlay, .settings-sidebar');
     overlays.forEach(o => o.classList.remove('visible', 'open'));
   } catch (error) { console.error("切换界面失败:", error); }
@@ -6617,8 +6641,17 @@ document.body.addEventListener('click', (e) => {
       const panel = document.getElementById(`moment-actions-${momentId}`);
       if (panel) panel.style.display = 'none';
   }
-  const backBtn = e.target.closest('.back-btn');
-  if (backBtn) { e.preventDefault(); switchScreen(backBtn.getAttribute('data-target')); }
+  
+const backBtn = e.target.closest('.back-btn');
+if (backBtn) {
+  e.preventDefault();
+  if (window.screenHistory.length > 0) {
+    window.goBack();
+  } else {
+    const target = backBtn.getAttribute('data-target') || 'home-screen';
+    switchScreen(target, true);
+  }
+}
   const openOverlay = document.querySelector('.modal-overlay.visible, .action-sheet-overlay.visible');
   if (openOverlay && e.target === openOverlay) openOverlay.classList.remove('visible');
 });
@@ -7090,14 +7123,33 @@ item.onclick = () => {
   if (service.isCalculator) { calcResetAll(); switchScreen('calculator-screen'); }
   else if (service.isAccounting) { window.openAccountingApp(); }
   else if (service.isDecision) { openDecisionApp(); }
-  else if (service.url) { window.open(service.url, '_blank'); }
+  else if (service.url) { openWebview(service.url, service.name); }
   else showToast('该服务号暂未配置链接');
 };
       container.appendChild(item);
     });
   });
 }
-function setupServiceListScreen() {}
+function setupServiceListScreen() {
+  const backBtn = document.getElementById('webview-back-btn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      const iframe = document.getElementById('webview-iframe');
+      if (iframe) iframe.src = 'about:blank';
+      window.goBack();
+    });
+  }
+}
+
+function openWebview(url, title) {
+  const iframe = document.getElementById('webview-iframe');
+  const titleEl = document.getElementById('webview-title');
+  if (iframe && titleEl) {
+    iframe.src = url;
+    titleEl.textContent = title || '加载中...';
+    switchScreen('webview-screen');
+  }
+}
 
 /* ==========================================================
    功能结束：新的朋友 & 服务号列表
