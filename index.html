@@ -3689,16 +3689,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     </div>
     
 <div style="height: 10px; background: #f7f7f7;"></div>
-
-<!-- 新增：二维码入口 -->
-<div id="profile-go-to-qrcode" style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #f0f0f0;">
-  <span style="font-size: 16px; color: #333;">二维码名片</span>
-  <div style="display: flex; align-items: center; gap: 8px;">
-    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: #888;"><path d="M3,3H11V11H3V3M5,5V9H9V5H5M13,3H21V11H13V3M15,5V9H19V5H15M3,13H11V21H3V13M5,15V19H9V15H5M13,13H15V15H13V13M17,13H19V15H17V13M15,15H17V17H15V15M19,15H21V17H19V15M13,17H15V19H13V17M17,17H19V19H17V17M19,19H21V21H19V19M15,19H17V21H15V19Z"/></svg>
-    <span style="color: #ccc; font-size: 18px;">›</span>
-  </div>
-</div>
-
 <div id="profile-go-to-moments" style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
   <span style="font-size: 16px; color: #333;">朋友圈</span>
   <span style="color: #ccc; font-size: 18px;">›</span>
@@ -3768,10 +3758,21 @@ input:checked + .slider:before { transform: translateX(22px); }
       <div style="font-size: 16px; color: #333; flex-shrink: 0;">个性签名</div>
       <div id="edit-friend-signature-display" style="font-size: 16px; color: #888; max-width: 65%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">这个人很懒，什么都没有留下</div>
     </div>
-    <div style="background: #fff; padding: 15px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
-      <div id="common-groups-label" style="font-size: 16px; color: #333;">我和TA的共同群聊</div>
-      <div id="edit-friend-common-groups" style="font-size: 16px; color: #888;">0个</div>
-    </div>
+    
+<!-- 二维码名片独立一行 -->
+<div id="profile-go-to-qrcode" style="background: #fff; padding: 15px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
+  <span style="font-size: 16px; color: #333;">二维码名片</span>
+  <div style="display: flex; align-items: center; gap: 8px;">
+    <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; fill: #888;"><path d="M3,3H11V11H3V3M5,5V9H9V5H5M13,3H21V11H13V3M15,5V9H19V5H15M3,13H11V21H3V13M5,15V19H9V15H5M13,13H15V15H13V13M17,13H19V15H17V13M15,15H17V17H15V15M19,15H21V17H19V15M13,17H15V19H13V17M17,17H19V19H17V17M19,19H21V21H19V19M15,19H17V21H15V19Z"/></svg>
+    <span style="color: #ccc; font-size: 18px;">›</span>
+  </div>
+</div>
+
+<!-- 共同群聊独立一行 -->
+<div style="background: #fff; padding: 15px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
+  <div id="common-groups-label" style="font-size: 16px; color: #333;">我和TA的共同群聊</div>
+  <div id="edit-friend-common-groups" style="font-size: 16px; color: #888;">0个</div>
+</div>
     <div style="background: #fff; padding: 15px 20px; border-top: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center;">
       <div style="font-size: 16px; color: #333;">添加时间</div>
       <div id="edit-friend-add-time" style="font-size: 16px; color: #888;"></div>
@@ -6520,11 +6521,9 @@ function setupBottomTabBar() {
   document.querySelectorAll('.wechat-tab-bar .tab-item').forEach(item => item.classList.remove('active'));
   document.querySelectorAll('.wechat-tab-bar .tab-item[data-tab="discover"]').forEach(item => item.classList.add('active'));
 } else if (tab === 'me') {
-      renderMeScreen();
-      switchScreen('me-screen');
-    } else {
-      showToast('该功能暂未开放，敬请期待！');
-    }
+  renderMeScreen();
+  switchScreen('me-screen');
+}
   });
 }
 /* ==========================================================
@@ -13531,8 +13530,6 @@ document.querySelectorAll('#me-screen .me-list-item').forEach(item => {
       } else if (name === '个人资料') {
         renderMyProfileInfoScreen();
         switchScreen('my-profile-info-screen');
-      } else {
-        showToast('该功能暂未开放，敬请期待！');
       }
     });
 });
