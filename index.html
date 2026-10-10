@@ -5425,8 +5425,18 @@ input:checked + .slider:before { transform: translateX(22px); }
     </div>
     <div class="chat-info-section-gap"></div>
 
-    <div class="chat-info-item" id="chat-info-pat-btn">
-      <span>拍一拍</span>
+    
+<div class="chat-info-item">
+  <span>时间戳</span>
+  <label class="switch" style="margin: 0;">
+    <input type="checkbox" id="chat-info-timestamp-toggle">
+    <span class="slider round"></span>
+  </label>
+</div>
+<div class="chat-info-section-gap"></div>
+
+<div class="chat-info-item" id="chat-info-pat-btn">
+  <span>拍一拍</span>
       <div style="display:flex; align-items:center; gap:5px;">
         <span id="chat-info-pat-preview" style="font-size:13px; color:#888;"></span>
         <span class="chat-info-arrow">›</span>
@@ -5590,6 +5600,10 @@ function getRandomValue(str) {
     return arr[Math.floor(Math.random() * arr.length)];
   }
   return str;
+}
+/* 功能：把字符串安全转义，用于 new RegExp() 动态拼接 */
+function escapeRegExp(s) {
+  return String(s == null ? '' : s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 /* ==========================================================
    功能结束：多密钥随机
@@ -8353,27 +8367,28 @@ messageArea.addEventListener('click', (e) => {
     const msg = chat.history.find(m => m.id === wrapper.dataset.id);
     if (!msg) return;
 
-    const isFirstTap = lastAvatarTapEl !== avatarEl;
-    if (isFirstTap) {
-      // 第一次点击：启动计时，等待看是否会有第二次
-      if (avatarTapTimer) { clearTimeout(avatarTapTimer); avatarTapTimer = null; }
-      lastAvatarTapEl = avatarEl;
-      avatarTapTimer = setTimeout(() => {
-        avatarTapTimer = null;
-        lastAvatarTapEl = null;
-        // 单击 → 心声
-        const hasHeart = !!(msg.heart && msg.role !== 'user');
-        if (hasHeart) {
-          showHeartCard(msg.heart, chat);
-        }
-      }, 260);
-    } else {
-      // 第二次点击：取消心声计时，触发拍一拍
-      if (avatarTapTimer) { clearTimeout(avatarTapTimer); avatarTapTimer = null; }
-      lastAvatarTapEl = null;
-      triggerPatPat(avatarEl);
+    
+const isFirstTap = lastAvatarTapEl !== avatarEl;
+if (isFirstTap) {
+  // 第一次点击：启动计时，等 300ms 看有没有第二次
+  if (avatarTapTimer) { clearTimeout(avatarTapTimer); avatarTapTimer = null; }
+  lastAvatarTapEl = avatarEl;
+  avatarTapTimer = setTimeout(() => {
+    avatarTapTimer = null;
+    lastAvatarTapEl = null;
+    // 300ms 内没有第二次点击 → 单击 → 心声
+    const hasHeart = !!(msg.heart && msg.role !== 'user');
+    if (hasHeart) {
+      showHeartCard(msg.heart, chat);
     }
-    return;
+  }, 300);
+} else {
+  // 300ms 内来了第二次点击 → 取消心声，触发拍一拍
+  if (avatarTapTimer) { clearTimeout(avatarTapTimer); avatarTapTimer = null; }
+  lastAvatarTapEl = null;
+  triggerPatPat(avatarEl);
+}
+return;
   }
   /* 功能结束：心声与拍一拍统一处理 */
 
@@ -9108,6 +9123,37 @@ bubbleRow.innerHTML = `<div class="message-info${heartable ? ' info-has-heart' :
 }
 /* ==========================================================
    功能结束：消息渲染
+   ========================================================== */
+
+
+/* ==========================================================
+   功能开始：把单条消息实时追加到聊天区
+   ----------------------------------------------------------
+   以前到处调用 addMessageBubble 却没有定义它，导致发消息、
+   AI 回复、拍一拍、旁白全部静默失败。这里补上实现。
+   ========================================================== */
+async function addMessageBubble(message, chat, chatType) {
+  if (!message) return;
+  if (!chat) {
+    chat = (currentChatType === 'private')
+      ? db.characters.find(c => c.id === currentChatId)
+      : db.groups.find(g => g.id === currentChatId);
+  }
+  if (!chat) return;
+  // 只渲染当前正在看的这个聊天室，其他聊天室的消息靠 renderMessages 刷
+  if (chat.id !== currentChatId) return;
+  try {
+    const el = createMessageBubbleElement(message);
+    if (el) {
+      messageArea.appendChild(el);
+      messageArea.scrollTop = messageArea.scrollHeight;
+    }
+  } catch (e) {
+    console.warn('渲染消息气泡失败:', e);
+  }
+}
+/* ==========================================================
+   功能结束：把单条消息实时追加到聊天区
    ========================================================== */
 /* ==========================================================
    功能开始：发送各类消息
@@ -9855,7 +9901,7 @@ fullResponse = fullResponse.replace(/<check>[\s\S]*?<\/check>/gi, '').trim();
   const messages = getMixedContent(fullResponse);
       if (messages.length > 0) {
         for (const item of messages) {
-          const aiLocationRegex = new RegExp(`\\[${character.realName}发送了位置：([\\s\\S]+?)\\]`);
+          const aiLocationRegex = new RegExp(`\\[${escapeRegExp(character.realName)}发送了位置：([\\s\\S]+?)\\]`);
           const aiLocationMatch = item.content.match(aiLocationRegex);
           if (aiLocationMatch) {
             const locationParts = aiLocationMatch[1].split('。');
@@ -9891,7 +9937,7 @@ if (item.content.includes(`[${character.realName}解除了对用户的拉黑]`))
   continue;
 }
 
-const patRegex = new RegExp(`\\[${character.realName}更新拍一拍为：([\\s\\S]+?)\\]`);
+const patRegex = new RegExp(`\\[${escapeRegExp(character.realName)}更新拍一拍为：([\\s\\S]+?)\\]`);
 const patMatch = item.content.match(patRegex);
 if (patMatch) {
   character.patSuffix = patMatch[1].trim();
@@ -9901,7 +9947,7 @@ if (patMatch) {
 }
 
 /* 功能开始：AI 偷用户的表情包 */
-const stealStickerRegex = new RegExp(`\\[${character.realName}偷了用户的表情包：([\\s\\S]+?)\\]`);
+const stealStickerRegex = new RegExp(`\\[${escapeRegExp(character.realName)}偷了用户的表情包：([\\s\\S]+?)\\]`);
 const stealMatch = item.content.match(stealStickerRegex);
 if (stealMatch) {
   const stealName = stealMatch[1].trim();
@@ -9918,7 +9964,7 @@ if (stealMatch) {
 }
 /* 功能结束：AI 偷用户的表情包 */
 
-const receivedTransferRegex = new RegExp(`\\[${character.realName}的转账：.*?元；备注：.*?\\]`);
+const receivedTransferRegex = new RegExp(`\\[${escapeRegExp(character.realName)}的转账：.*?元；备注：.*?\\]`);
 const giftRegex = new RegExp(`\\[${character.realName}送来的礼物：.*?\\]`);
 
 const message = {
@@ -10880,18 +10926,35 @@ if (ciAvatarWrap) ciAvatarWrap.addEventListener('click', () => {
     showToast(char.isMuted ? '已开启消息免打扰' : '已关闭消息免打扰');
   });
 
-  const ciPinToggle = document.getElementById('chat-info-pin-toggle');
-  if (ciPinToggle) ciPinToggle.addEventListener('change', async (e) => {
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (!char) return;
-    char.isPinned = e.target.checked;
-    await saveData();
-    renderChatList();
-    showToast(char.isPinned ? '已置顶' : '已取消置顶');
-  });
+  
+const ciPinToggle = document.getElementById('chat-info-pin-toggle');
+if (ciPinToggle) ciPinToggle.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  char.isPinned = e.target.checked;
+  await saveData();
+  renderChatList();
+  showToast(char.isPinned ? '已置顶' : '已取消置顶');
+});
+
+/* 功能开始：时间戳开关（聊天信息页） */
+const ciTimestampToggle = document.getElementById('chat-info-timestamp-toggle');
+if (ciTimestampToggle) ciTimestampToggle.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  if (e.target.checked) {
+    char.timestampEnabled = true;
+  } else {
+    /* 关闭时：若全局也是关的就回退成 null（跟随全局），否则显式 false */
+    char.timestampEnabled = (db.timestampEnabled === false) ? null : false;
+  }
+  await saveData();
+  showToast(e.target.checked ? '时间戳已开启，AI 将读取当前时间' : '时间戳已关闭，AI 不会读取时间');
+});
+/* 功能结束：时间戳开关（聊天信息页） */
 
 
-  const ciBgBtn = document.getElementById('chat-info-bg-btn');
+const ciBgBtn = document.getElementById('chat-info-bg-btn');
   if (ciBgBtn) ciBgBtn.addEventListener('click', () => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -10963,6 +11026,13 @@ function renderChatInfoScreen() {
   document.getElementById('chat-info-avatar-name').textContent = char.remarkName || '';
   document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
+
+  /* 时间戳开关回填：char 显式 true/false 优先，否则跟随全局 */
+  const tsToggle = document.getElementById('chat-info-timestamp-toggle');
+  if (tsToggle) {
+    tsToggle.checked = (char.timestampEnabled === true)
+      || (char.timestampEnabled !== false && db.timestampEnabled !== false);
+  }
 
 const myPat = (db.myProfile && db.myProfile.patSuffix) || '未设置';
 const aiPat = char.patSuffix || '未设置';
@@ -12085,21 +12155,22 @@ function renderTutorialContent() {
    ========================================================== */
 function setupHomeScreen() {
   const getIcon = (id) => db.customIcons[id] || defaultIcons[id].url;
-  const homeScreenHTML = `
-    <div class="time-widget"><div class="time" id="time-display"></div><div class="date" id="date-display"></div></div>
-    <div class="app-grid">
-      <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="聊天" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
-      <a href="#" class="app-icon" data-target="placeholder-screen"><img src="${getIcon('night-mode-btn')}" alt="鸿雁" class="icon-img"><span class="app-name">鸿雁</span></a>
-      <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="世界书" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
-      <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('wallpaper-screen')}" alt="占位" class="icon-img"><span class="app-name">占位</span></a>
-      <a href="#" class="app-icon" data-target="beautify-menu-screen"><img src="${getIcon('customize-screen')}" alt="美化" class="icon-img"><span class="app-name">美化</span></a>
-      <a href="#" class="app-icon" data-target="settings-menu-screen"><img src="${getIcon('api-settings-screen')}" alt="设置" class="icon-img"><span class="app-name">设置</span></a>
-    </div>
-    <div class="dock">
-      <a href="#" class="app-icon" data-target="placeholder-screen"><img src="${getIcon('day-mode-btn')}" alt="占位" class="icon-img"></a>
-      <a href="#" class="app-icon" data-target="placeholder-screen"><img src="${getIcon('tutorial-screen')}" alt="占位" class="icon-img"></a>
-      <a href="#" class="app-icon" data-target="placeholder-screen"><img src="${getIcon('font-settings-screen')}" alt="占位" class="icon-img"></a>
-    </div>`;
+  
+const homeScreenHTML = `
+  <div class="time-widget"><div class="time" id="time-display"></div><div class="date" id="date-display"></div></div>
+  <div class="app-grid">
+    <a href="#" class="app-icon" data-target="chat-list-screen"><img src="${getIcon('chat-list-screen')}" alt="聊天" class="icon-img"><span class="app-name">${defaultIcons['chat-list-screen'].name}</span></a>
+    <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('night-mode-btn')}" alt="鸿雁" class="icon-img"><span class="app-name">鸿雁</span></a>
+    <a href="#" class="app-icon" data-target="world-book-screen"><img src="${getIcon('world-book-screen')}" alt="世界书" class="icon-img"><span class="app-name">${defaultIcons['world-book-screen'].name}</span></a>
+    <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('wallpaper-screen')}" alt="占位" class="icon-img"><span class="app-name">占位</span></a>
+    <a href="#" class="app-icon" data-target="beautify-menu-screen"><img src="${getIcon('customize-screen')}" alt="美化" class="icon-img"><span class="app-name">美化</span></a>
+    <a href="#" class="app-icon" data-target="settings-menu-screen"><img src="${getIcon('api-settings-screen')}" alt="设置" class="icon-img"><span class="app-name">设置</span></a>
+  </div>
+  <div class="dock">
+    <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('day-mode-btn')}" alt="占位" class="icon-img"></a>
+    <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('tutorial-screen')}" alt="占位" class="icon-img"></a>
+    <a href="#" class="app-icon" data-target="placeholder2-screen"><img src="${getIcon('font-settings-screen')}" alt="占位" class="icon-img"></a>
+  </div>`;
   homeScreen.innerHTML = homeScreenHTML;
   updateClock();
   applyWallpaper(db.wallpaper);
