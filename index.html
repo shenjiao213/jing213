@@ -4754,12 +4754,12 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="scan-line"></div>
       </div>
       <div class="scan-tip">将二维码放入框内，即可自动识别</div>
-      <div class="scan-tip" style="font-size: 12px; opacity: 0.6;">（虚拟演示：可点击下方按钮模拟扫描）</div>
+      <div class="scan-tip" style="font-size: 12px; opacity: 0.6;"></div>
     </div>
-    <div class="scan-bottom-actions">
-      <button class="scan-action-btn primary" id="scan-simulate-btn">模拟扫码</button>
-      <button class="scan-action-btn" id="scan-album-action-btn">从相册识别</button>
-    </div>
+    
+<div class="scan-bottom-actions">
+  <button class="scan-action-btn primary" id="scan-album-action-btn">从相册识别</button>
+</div>
   </main>
 </div>
 <!-- ==========================================================
@@ -6098,7 +6098,9 @@ function getCurrentChat() {
   return db.groups.find(g => g.id === currentChatId);
 }
 function getMyName(chat) {
-  return currentChatType === 'private' ? chat.myName : chat.me.nickname;
+  if (!chat) return '我';
+  if (currentChatType === 'private') return chat.myName || '我';
+  return (chat.me && chat.me.nickname) || '我';
 }
 async function pushUserMessage({ content, parts, extra = {}, senderId = 'user_me' }) {
   const chat = getCurrentChat();
@@ -6643,14 +6645,13 @@ document.body.addEventListener('click', (e) => {
   }
   
 const backBtn = e.target.closest('.back-btn');
-if (backBtn) {
-  e.preventDefault();
-  if (window.screenHistory.length > 0) {
-    window.goBack();
-  } else {
-    const target = backBtn.getAttribute('data-target') || 'home-screen';
+if (backBtn && backBtn.dataset.skipGlobalBack !== 'true') {
+  const target = backBtn.getAttribute('data-target');
+  if (target) {
+    e.preventDefault();
     switchScreen(target, true);
   }
+  // 无 data-target 的返回按钮，交给各自的专属 handler 处理
 }
   const openOverlay = document.querySelector('.modal-overlay.visible, .action-sheet-overlay.visible');
   if (openOverlay && e.target === openOverlay) openOverlay.classList.remove('visible');
@@ -6772,7 +6773,7 @@ function renderFriendProfile(char) {
   if (qrEntry) {
     qrEntry.onclick = () => {
       document.querySelectorAll('.modal-overlay.visible, .action-sheet-overlay.visible').forEach(el => el.classList.remove('visible'));
-      openQRCodeScreen({ type: 'char', id: char.id });
+      openQRCodeScreen({ type: 'char', id: char.id }, 'friend-profile-screen');
     };
   }
 }
@@ -7382,7 +7383,361 @@ function renderFakeBarcode(container, seed) {
 /* ==========================================================
    功能结束：虚拟二维码生成工具
    ========================================================== */
+/* ==========================================================
+   功能开始：角色名片 · PNG 元数据导入导出
+   ========================================================== */
+const ROLE_CARD_KEY = 'OctopusRoleCard';
+const PNG_SIG = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
 
+const _pngCrcTable = (() => {
+  const t = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function _pngCrc32(buf, start, end) {
+  let c = 0xFFFFFFFF;
+  for (let i = start; i < end; i++) c = _pngCrcTable[(c ^ buf[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+function isPngBuffer(bytes) {
+  if (!bytes || bytes.length < 8) return false;
+  for (let i = 0; i < 8; i++) if (bytes[i] !== PNG_SIG[i]) return false;
+  return true;
+}
+function injectPngText(arrayBuffer, keyword, text) {
+  const src = new Uint8Array(arrayBuffer);
+  if (!isPngBuffer(src)) throw new Error('不是合法的 PNG 文件');
+  const kwBytes = new TextEncoder().encode(keyword);
+  const textBytes = new TextEncoder().encode(text);
+  const dataLen = kwBytes.length + 1 + textBytes.length;
+  const chunkLen = 12 + dataLen;
+  const chunk = new Uint8Array(chunkLen);
+  let o = 0;
+  chunk[o++] = (dataLen >>> 24) & 0xFF;
+  chunk[o++] = (dataLen >>> 16) & 0xFF;
+  chunk[o++] = (dataLen >>> 8) & 0xFF;
+  chunk[o++] = dataLen & 0xFF;
+  chunk[o++] = 0x74; chunk[o++] = 0x45; chunk[o++] = 0x58; chunk[o++] = 0x74;
+  chunk.set(kwBytes, o); o += kwBytes.length;
+  chunk[o++] = 0;
+  chunk.set(textBytes, o); o += textBytes.length;
+  const crc = _pngCrc32(chunk, 4, 8 + dataLen);
+  chunk[o++] = (crc >>> 24) & 0xFF;
+  chunk[o++] = (crc >>> 16) & 0xFF;
+  chunk[o++] = (crc >>> 8) & 0xFF;
+  chunk[o++] = crc & 0xFF;
+  const insertPos = 8 + 25;
+  const result = new Uint8Array(src.length + chunkLen);
+  result.set(src.subarray(0, insertPos), 0);
+  result.set(chunk, insertPos);
+  result.set(src.subarray(insertPos), insertPos + chunkLen);
+  return result.buffer;
+}
+function extractPngText(arrayBuffer, keyword) {
+  const bytes = new Uint8Array(arrayBuffer);
+  if (!isPngBuffer(bytes)) return null;
+  let offset = 8;
+  const decoder = new TextDecoder('latin1');
+  while (offset + 12 <= bytes.length) {
+    const length = (bytes[offset] << 24) | (bytes[offset + 1] << 16) | (bytes[offset + 2] << 8) | bytes[offset + 3];
+    const type = String.fromCharCode(bytes[offset + 4], bytes[offset + 5], bytes[offset + 6], bytes[offset + 7]);
+    if (type === 'tEXt') {
+      const dataStart = offset + 8;
+      const dataEnd = dataStart + length;
+      let nullPos = -1;
+      for (let i = dataStart; i < dataEnd; i++) { if (bytes[i] === 0) { nullPos = i; break; } }
+      if (nullPos > -1) {
+        const kw = decoder.decode(bytes.subarray(dataStart, nullPos));
+        if (kw === keyword) return decoder.decode(bytes.subarray(nullPos + 1, dataEnd));
+      }
+    }
+    if (type === 'IEND') break;
+    offset += 12 + length;
+  }
+  return null;
+}
+function utf8ToBase64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+  }
+  return btoa(bin);
+}
+function base64ToUtf8(b64) {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+/* 打包角色数据（含绑定的局部世界书全文） */
+function buildRoleCardPayload(char) {
+  const worldBooks = [];
+  const seen = new Set();
+  (char.worldBookIds || []).forEach(wbId => {
+    const wb = db.worldBooks.find(x => x.id === wbId);
+    if (wb && !seen.has(wb.id)) {
+      seen.add(wb.id);
+      worldBooks.push({
+        name: wb.name || '未命名',
+        content: wb.content || '',
+        position: wb.position || 'before',
+        scope: wb.scope || 'local',
+        group: wb.group || '',
+        enabled: wb.enabled !== false
+      });
+    }
+  });
+  return {
+    v: 1,
+    type: 'role',
+    ts: Date.now(),
+    role: {
+      realName: char.realName || '',
+      remarkName: char.remarkName || '',
+      persona: char.persona || '',
+      avatar: char.avatar || '',
+      wxid: char.wxid || '',
+      signature: char.signature || '',
+      phone: char.phone || '',
+      group: char.group || '',
+      address: char.address || '',
+      region: char.region || '',
+      gender: char.gender || '',
+      status: char.status || '在线',
+      worldBooks: worldBooks
+    }
+  };
+}
+
+function buildMeCardPayload(p) {
+  return {
+    v: 1,
+    type: 'me',
+    ts: Date.now(),
+    profile: {
+      nickname: p.nickname || '我',
+      avatar: p.avatar || '',
+      wxid: db.myWxid || '',
+      signature: p.signature || '',
+      gender: p.gender || '',
+      region: p.region || '',
+      phone: p.phone || ''
+    }
+  };
+}
+
+function encodeRoleCard(payload) { return utf8ToBase64(JSON.stringify(payload)); }
+function decodeRoleCard(b64) { return JSON.parse(base64ToUtf8(b64)); }
+
+/* 在任意 canvas ctx 上画伪二维码 */
+function drawFakeQRCodeToCtx(ctx, seed, size, offsetX, offsetY) {
+  let hash = 0;
+  const str = String(seed || 'default');
+  for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash |= 0; }
+  const rand = () => { hash = (hash * 1103515245 + 12345) & 0x7fffffff; return hash / 0x7fffffff; };
+  const modules = 25;
+  const cell = size / modules;
+  const inCorner = (x, y) => (x < 8 && y < 8) || (x >= modules - 8 && y < 8) || (x < 8 && y >= modules - 8);
+  ctx.fillStyle = '#000';
+  for (let y = 0; y < modules; y++) {
+    for (let x = 0; x < modules; x++) {
+      if (inCorner(x, y)) continue;
+      if (rand() > 0.52) {
+        ctx.fillRect(offsetX + Math.floor(x * cell), offsetY + Math.floor(y * cell), Math.ceil(cell), Math.ceil(cell));
+      }
+    }
+  }
+  const drawCorner = (cx, cy) => {
+    ctx.fillStyle = '#000';
+    ctx.fillRect(offsetX + cx * cell, offsetY + cy * cell, cell * 7, cell * 7);
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(offsetX + (cx + 1) * cell, offsetY + (cy + 1) * cell, cell * 5, cell * 5);
+    ctx.fillStyle = '#000';
+    ctx.fillRect(offsetX + (cx + 2) * cell, offsetY + (cy + 2) * cell, cell * 3, cell * 3);
+  };
+  drawCorner(0, 0);
+  drawCorner(modules - 7, 0);
+  drawCorner(0, modules - 7);
+}
+
+function _roundRectPath(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+function _loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+}
+
+/* 生成"完整名片卡片"PNG（深灰底 + 白卡片 + 二维码 + 中间头像 + 名字 + 说明） */
+async function generateRoleCardBlob(entity, type) {
+  const W = 720, H = 900, dpr = 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  ctx.fillStyle = '#2c2c2c';
+  ctx.fillRect(0, 0, W, H);
+
+  const cardX = 40, cardY = 40, cardW = W - 80, cardH = H - 80;
+  ctx.fillStyle = '#ffffff';
+  _roundRectPath(ctx, cardX, cardY, cardW, cardH, 30);
+  ctx.fill();
+
+  const qrSize = 500;
+  const qrX = (W - qrSize) / 2;
+  const qrY = cardY + 60;
+
+  const seed = (type === 'role')
+    ? ('rolecard_' + (entity.id || '') + '_' + (entity.wxid || entity.realName || ''))
+    : ('me_' + (db.myWxid || entity.nickname || ''));
+  drawFakeQRCodeToCtx(ctx, seed, qrSize, qrX, qrY);
+
+  const avatarUrl = entity.avatar || (type === 'role'
+    ? 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg'
+    : 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg');
+  try {
+    const avatarImg = await _loadImage(avatarUrl);
+    const avSize = 100;
+    const avX = (W - avSize) / 2;
+    const avY = qrY + (qrSize - avSize) / 2;
+    ctx.fillStyle = '#ffffff';
+    _roundRectPath(ctx, avX - 8, avY - 8, avSize + 16, avSize + 16, 14);
+    ctx.fill();
+    ctx.save();
+    _roundRectPath(ctx, avX, avY, avSize, avSize, 10);
+    ctx.clip();
+    ctx.drawImage(avatarImg, avX, avY, avSize, avSize);
+    ctx.restore();
+  } catch (e) {
+    console.warn('[角色码] 头像跳过', e);
+  }
+
+  const name = (type === 'role')
+    ? (entity.remarkName || entity.realName || '未命名')
+    : (entity.nickname || '我');
+  ctx.fillStyle = '#333333';
+  ctx.font = '600 34px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const nameY = qrY + qrSize + 70;
+  ctx.fillText(name, W / 2, nameY);
+
+  ctx.fillStyle = '#999999';
+  ctx.font = '400 20px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
+  const tipText = (type === 'role')
+    ? '扫一扫上面的二维码，添加TA为好友'
+    : '扫一扫上面的二维码，加我为好友';
+  ctx.fillText(tipText, W / 2, nameY + 48);
+
+  const baseBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+  const baseBuf = await baseBlob.arrayBuffer();
+
+  const payload = (type === 'role') ? buildRoleCardPayload(entity) : buildMeCardPayload(entity);
+  const encoded = encodeRoleCard(payload);
+  const finalBuf = injectPngText(baseBuf, ROLE_CARD_KEY, encoded);
+  return new Blob([finalBuf], { type: 'image/png' });
+}
+
+/* 从图片文件解析角色名片（含世界书） */
+async function tryParseRoleCardFromFile(file) {
+  try {
+    const ab = await file.arrayBuffer();
+    const encoded = extractPngText(ab, ROLE_CARD_KEY);
+    if (!encoded) return null;
+    const payload = decodeRoleCard(encoded);
+    if (!payload || payload.type !== 'role' || !payload.role) return null;
+    return payload.role;
+  } catch (e) {
+    console.warn('[角色名片] 解析失败', e);
+    return null;
+  }
+}
+
+/* 用解析出的角色数据生成新角色，顺便把世界书落地到本地 */
+function buildCharFromRoleCard(roleData) {
+  const importedWbIds = [];
+  if (Array.isArray(roleData.worldBooks) && roleData.worldBooks.length > 0) {
+    if (!db.worldBooks) db.worldBooks = [];
+    roleData.worldBooks.forEach(wbData => {
+      if (!wbData || !wbData.content) return;
+      // 名称 + 内容都一致 → 视为同一本，直接复用
+      let existing = db.worldBooks.find(x =>
+        x.name === wbData.name && x.content === wbData.content
+      );
+      if (existing) {
+        importedWbIds.push(existing.id);
+      } else {
+        const newWb = {
+          id: 'wb_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+          name: wbData.name || '未命名',
+          content: wbData.content,
+          position: wbData.position || 'before',
+          scope: wbData.scope || 'local',
+          group: wbData.group || '',
+          enabled: wbData.enabled !== false
+        };
+        db.worldBooks.push(newWb);
+        importedWbIds.push(newWb.id);
+      }
+    });
+  }
+
+  return {
+    id: `char_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    realName: roleData.realName || '新朋友',
+    remarkName: roleData.remarkName || roleData.realName || '新朋友',
+    persona: roleData.persona || '',
+    avatar: roleData.avatar || 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg',
+    myName: '我',
+    myPersona: '',
+    myAvatar: (db.myProfile && db.myProfile.avatar) || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg',
+    theme: 'black_white',
+    maxMemory: 300,
+    chatBg: '',
+    history: [],
+    isPinned: false,
+    status: roleData.status || '在线',
+    worldBookIds: importedWbIds,
+    useCustomBubbleCss: false,
+    customBubbleCss: '',
+    unread: true,
+    unreadCount: 0,
+    wxid: roleData.wxid || ('wxid_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6)),
+    phone: roleData.phone || '',
+    group: roleData.group || '',
+    address: roleData.address || '',
+    region: roleData.region || '',
+    signature: roleData.signature || '',
+    addTime: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+  };
+}
+/* ==========================================================
+   功能结束：角色名片 · PNG 元数据导入导出
+   ========================================================== */
 
 /* ==========================================================
    功能开始：微信支付 · 服务页
@@ -7582,79 +7937,119 @@ function renderPayWalletAmountOnServicePage() {
 /* ==========================================================
    功能结束：钱包页
    ========================================================== */
-
-
 /* ==========================================================
    功能开始：二维码展示页（自己 / AI 角色通用）
    ========================================================== */
-let currentQRCodeTarget = null; // { type: 'me' | 'char', id }
+let currentQRCodeTarget = null;
+let _qrReturnScreen = 'my-profile-info-screen';
+let _qrCurrentBlob = null;
 
-function openQRCodeScreen(target) {
+async function openQRCodeScreen(target, fromScreenId) {
   if (!target) target = { type: 'me' };
   currentQRCodeTarget = target;
+  if (fromScreenId) _qrReturnScreen = fromScreenId;
+
   const title = document.getElementById('qr-code-title');
+  const holder = document.getElementById('qr-code-holder');
+  const card = document.querySelector('.qr-display-card');
   const nameEl = document.getElementById('qr-code-name');
   const subEl = document.getElementById('qr-code-sub');
   const avatarEl = document.getElementById('qr-code-avatar');
-  const holder = document.getElementById('qr-code-holder');
 
-  let name, avatar, wxid, seed;
+  let blob = null;
+  let name, avatar, seed;
 
   if (target.type === 'char') {
     const char = db.characters.find(c => c.id === target.id);
     if (!char) { showToast('找不到这个角色'); return; }
     name = char.remarkName || char.realName;
     avatar = char.avatar;
-    wxid = char.wxid || ('wxid_' + char.id.slice(-6));
-    seed = 'char_' + char.id;
+    seed = 'rolecard_' + (char.id || '') + '_' + (char.wxid || char.realName || '');
     if (title) title.textContent = '二维码名片';
-    if (subEl) subEl.textContent = '扫一扫上面的二维码，添加TA为好友';
+    try { blob = await generateRoleCardBlob(char, 'role'); }
+    catch (e) { console.warn('[角色码] 生成失败:', e); }
   } else {
     const p = db.myProfile || {};
     name = p.nickname || '我';
     avatar = p.avatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
-    wxid = db.myWxid || 'wxid_xxx';
     seed = 'me_' + (db.myWxid || name);
     if (title) title.textContent = '我的二维码';
-    if (subEl) subEl.textContent = '扫一扫上面的二维码，加我为好友';
+    try { blob = await generateRoleCardBlob(p, 'me'); }
+    catch (e) { console.warn('[我的码] 生成失败:', e); }
   }
 
   if (nameEl) nameEl.textContent = name;
   if (avatarEl) avatarEl.src = avatar;
-  if (holder) renderFakeQRCode(holder, seed, 220);
+
+  if (holder) {
+    holder.innerHTML = '';
+    if (blob) {
+      _qrCurrentBlob = blob;
+      const url = URL.createObjectURL(blob);
+      const img = document.createElement('img');
+      img.src = url;
+      img.style.width = '280px';
+      img.style.height = 'auto';
+      img.style.display = 'block';
+      img.style.borderRadius = '16px';
+      img.style.boxShadow = '0 20px 50px rgba(0,0,0,0.35)';
+      holder.appendChild(img);
+      if (nameEl && nameEl.parentElement) nameEl.parentElement.style.display = 'none';
+      if (subEl) subEl.style.display = 'none';
+      if (avatarEl) avatarEl.style.display = 'none';
+      if (card) { card.style.background = 'transparent'; card.style.padding = '0'; card.style.boxShadow = 'none'; }
+    } else {
+      _qrCurrentBlob = null;
+      renderFakeQRCode(holder, seed, 220);
+      if (nameEl && nameEl.parentElement) nameEl.parentElement.style.display = 'flex';
+      if (subEl) subEl.style.display = 'block';
+      if (avatarEl) avatarEl.style.display = 'block';
+      if (card) { card.style.background = ''; card.style.padding = ''; card.style.boxShadow = ''; }
+    }
+  }
 
   switchScreen('qr-code-screen');
 }
 
 function setupQRCodeScreen() {
   const backBtn = document.getElementById('qr-code-back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => {
-    // 从好友资料或我的资料页过来的，回到对应页面
-    if (currentQRCodeTarget && currentQRCodeTarget.type === 'char') {
-      const char = db.characters.find(c => c.id === currentQRCodeTarget.id);
-      if (char) {
-        renderFriendProfile(char);
-        switchScreen('friend-profile-screen');
-        return;
+  if (backBtn) {
+    backBtn.dataset.skipGlobalBack = 'true';
+    backBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (currentQRCodeTarget && currentQRCodeTarget.type === 'char') {
+        const char = db.characters.find(c => c.id === currentQRCodeTarget.id);
+        if (char) {
+          renderFriendProfile(char);
+          switchScreen('friend-profile-screen');
+          return;
+        }
       }
-    }
-    switchScreen('my-profile-info-screen');
-  });
+      switchScreen(_qrReturnScreen || 'my-profile-info-screen');
+    });
+  }
 
   const saveBtn = document.getElementById('qr-code-save-btn');
   if (saveBtn) {
     saveBtn.addEventListener('click', async () => {
-      const holder = document.getElementById('qr-code-holder');
-      const canvas = holder && holder.querySelector('canvas');
-      if (!canvas) return showToast('二维码尚未生成');
       try {
-        const link = document.createElement('a');
-        link.download = `二维码_${(currentQRCodeTarget && currentQRCodeTarget.type) || 'me'}_${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png');
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        showToast('已保存到下载目录');
+        let blob = _qrCurrentBlob;
+        if (!blob) {
+          const holder = document.getElementById('qr-code-holder');
+          const canvas = holder && holder.querySelector('canvas');
+          if (!canvas) { showToast('二维码尚未生成'); return; }
+          blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `二维码名片_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('已保存为 PNG');
       } catch (e) {
         showToast('保存失败：' + e.message);
       }
@@ -7664,14 +8059,40 @@ function setupQRCodeScreen() {
   const shareBtn = document.getElementById('qr-code-share-btn');
   if (shareBtn) {
     shareBtn.addEventListener('click', async () => {
-      if (!currentQRCodeTarget || currentQRCodeTarget.type !== 'char') {
-        showToast('仅角色二维码可分享给好友');
-        return;
+      try {
+        let blob = _qrCurrentBlob;
+        if (!blob) {
+          const holder = document.getElementById('qr-code-holder');
+          const canvas = holder && holder.querySelector('canvas');
+          if (!canvas) return showToast('二维码尚未生成');
+          blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        }
+        const fileName = `二维码名片_${Date.now()}.png`;
+        const file = new File([blob], fileName, { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: '二维码名片',
+              text: '扫一扫上面的二维码，加为好友'
+            });
+            return;
+          } catch (err) {
+            if (err && err.name === 'AbortError') return;
+          }
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        showToast('已保存图片，可手动发到微信');
+      } catch (e) {
+        showToast('分享失败：' + e.message);
       }
-      const char = db.characters.find(c => c.id === currentQRCodeTarget.id);
-      if (!char) return;
-      // 分享：在聊天里发消息（带二维码提示）
-      showToast('长按二维码可保存图片，再发给好友～');
     });
   }
 }
@@ -7746,13 +8167,9 @@ function showScanResultModal() {
 
   modal.classList.add('visible');
 }
-
 function setupScanScreen() {
   const backBtn = document.getElementById('scan-back-btn');
   if (backBtn) backBtn.addEventListener('click', () => switchScreen('contacts-screen'));
-
-  const simulateBtn = document.getElementById('scan-simulate-btn');
-  if (simulateBtn) simulateBtn.addEventListener('click', simulateScan);
 
   const albumBtn = document.getElementById('scan-album-action-btn');
   const albumHeaderBtn = document.getElementById('scan-album-btn');
@@ -7760,47 +8177,78 @@ function setupScanScreen() {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/*';
-    fileInput.onchange = (e) => {
+    fileInput.onchange = async (e) => {
       const file = e.target.files && e.target.files[0];
       if (!file) return;
-      showToast('正在识别图片中的二维码…');
+      showToast('正在识别角色卡…');
+      const roleData = await tryParseRoleCardFromFile(file);
+      if (roleData) {
+        showRoleCardScanResult(roleData);
+        return;
+      }
       setTimeout(() => {
-        // 模拟识别结果：80% 概率扫到一个角色，20% 提示未识别
-        if (Math.random() < 0.8) {
-          simulateScan();
-        } else {
-          showToast('未识别到二维码，请换一张图片');
-        }
-      }, 800);
+        if (Math.random() < 0.8) simulateScan();
+        else showToast('这不是本软件的角色卡，请换一张');
+      }, 400);
     };
     fileInput.click();
   };
   if (albumBtn) albumBtn.addEventListener('click', triggerAlbum);
   if (albumHeaderBtn) albumHeaderBtn.addEventListener('click', triggerAlbum);
 
-  // 扫描结果弹窗
   const modal = document.getElementById('scan-result-modal');
   const cancelBtn = document.getElementById('scan-result-cancel');
   const addBtn = document.getElementById('scan-result-add');
   if (cancelBtn) cancelBtn.addEventListener('click', () => {
     modal.classList.remove('visible');
     scanResultData = null;
+    window.__scannedRoleData = null;
+    window.__scannedExistingId = null;
   });
   if (modal) {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) {
         modal.classList.remove('visible');
         scanResultData = null;
+        window.__scannedRoleData = null;
+        window.__scannedExistingId = null;
       }
     });
   }
+
   if (addBtn) {
     addBtn.addEventListener('click', async () => {
+      /* ---- 角色名片导入 ---- */
+      if (window.__scannedRoleData) {
+        const roleData = window.__scannedRoleData;
+        const existingId = window.__scannedExistingId;
+        window.__scannedRoleData = null;
+        window.__scannedExistingId = null;
+        modal.classList.remove('visible');
+
+        if (addBtn.dataset.mode === 'chat' && existingId) {
+          openChatRoom(existingId, 'private');
+          return;
+        }
+        if (!db.characters) db.characters = [];
+        const newChar = buildCharFromRoleCard(roleData);
+        db.characters.push(newChar);
+        await saveData();
+        renderContactsList();
+        renderChatList();
+        const wbCount = (newChar.worldBookIds || []).length;
+        showToast(wbCount > 0
+          ? `已添加「${newChar.remarkName}」，并导入 ${wbCount} 本世界书`
+          : `已添加「${newChar.remarkName}」到通讯录`);
+        switchScreen('contacts-screen');
+        return;
+      }
+
+      /* ---- 模拟扫描结果的导入（保留原逻辑） ---- */
       if (!scanResultData) return;
       const mode = addBtn.dataset.mode;
 
       if (mode === 'chat') {
-        // 已有好友：直接进聊天
         modal.classList.remove('visible');
         if (scanResultData.type === 'me') {
           switchScreen('me-screen');
@@ -7811,7 +8259,6 @@ function setupScanScreen() {
         return;
       }
 
-      // 加好友：把陌生人加入通讯录
       if (!db.characters) db.characters = [];
       const newChar = {
         id: scanResultData.charId,
@@ -7844,10 +8291,44 @@ function setupScanScreen() {
       modal.classList.remove('visible');
       showToast(`已添加「${newChar.remarkName}」到通讯录`);
       scanResultData = null;
-      // 加完跳到通讯录
       switchScreen('contacts-screen');
     });
   }
+}
+
+/* 展示"扫到角色卡"的弹窗 */
+function showRoleCardScanResult(roleData) {
+  const modal = document.getElementById('scan-result-modal');
+  const avatarEl = document.getElementById('scan-result-avatar');
+  const nameEl = document.getElementById('scan-result-name');
+  const wxidEl = document.getElementById('scan-result-wxid');
+  const addBtn = document.getElementById('scan-result-add');
+  if (!modal || !addBtn) return;
+
+  let existing = null;
+  if (roleData.wxid) existing = db.characters.find(c => c.wxid === roleData.wxid);
+  if (!existing && roleData.remarkName) {
+    existing = db.characters.find(c =>
+      c.remarkName === roleData.remarkName && c.realName === roleData.realName);
+  }
+
+  if (avatarEl) avatarEl.src = roleData.avatar || 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg';
+  if (nameEl) nameEl.textContent = roleData.remarkName || roleData.realName || '未命名';
+  const wbCount = Array.isArray(roleData.worldBooks) ? roleData.worldBooks.length : 0;
+  if (wxidEl) wxidEl.textContent = '微信号: ' + (roleData.wxid || '未设置') + (wbCount > 0 ? `  · 含${wbCount}本世界书` : '');
+
+  if (existing) {
+    addBtn.textContent = '发消息';
+    addBtn.dataset.mode = 'chat';
+  } else {
+    addBtn.textContent = '加为好友';
+    addBtn.dataset.mode = 'add';
+  }
+
+  window.__scannedRoleData = roleData;
+  window.__scannedExistingId = existing ? existing.id : null;
+  scanResultData = null;
+  modal.classList.add('visible');
 }
 /* ==========================================================
    功能结束：扫一扫页
@@ -10022,7 +10503,7 @@ if (stealMatch) {
 /* 功能结束：AI 偷用户的表情包 */
 
 const receivedTransferRegex = new RegExp(`\\[${escapeRegExp(character.realName)}的转账：.*?元；备注：.*?\\]`);
-const giftRegex = new RegExp(`\\[${character.realName}送来的礼物：.*?\\]`);
+const giftRegex = new RegExp(`\\[${escapeRegExp(character.realName)}送来的礼物：.*?\\]`);
 
 const message = {
   id: `msg_${Date.now()}_${Math.random()}`,
@@ -10275,6 +10756,7 @@ async function setupStickerSystem() {
 }
 
 function renderStickerGrid() {
+  if (!Array.isArray(db.myStickers)) db.myStickers = [];
   stickerGridContainer.innerHTML = '';
   const addItem = document.createElement('div');
   addItem.className = 'sticker-item';
@@ -13770,10 +14252,11 @@ function setupMyProfileInfoScreen() {
     });
   }
 
-  /* 功能开始：我的二维码入口 */
-  const qrRow = document.getElementById('profile-info-qrcode-row');
-  if (qrRow) qrRow.addEventListener('click', () => openQRCodeScreen({ type: 'me' }));
-  /* 功能结束：我的二维码入口 */
+  
+/* 功能开始：我的二维码入口 */
+const qrRow = document.getElementById('profile-info-qrcode-row');
+if (qrRow) qrRow.addEventListener('click', () => openQRCodeScreen({ type: 'me' }, 'my-profile-info-screen'));
+/* 功能结束：我的二维码入口 */
 
   const roleRow = document.getElementById('profile-info-role-row');
   if (roleRow) roleRow.addEventListener('click', () => openMyProfileEditModal());
@@ -14926,11 +15409,22 @@ const acctDefaultData = {
     { id: 'alipay', name: '支付宝', balance: 0, icon: 'alipay' }
   ],
   transactions: [],
-  
-categories: {
-  expense: [],
-  income: []
-}
+  categories: {
+    expense: [
+      { id: 'cat_food',  name: '餐饮', icon: 'food',          color: '#ff5e5e' },
+      { id: 'cat_trans', name: '交通', icon: 'transport',     color: '#ffa940' },
+      { id: 'cat_shop',  name: '购物', icon: 'shopping',      color: '#fa5151' },
+      { id: 'cat_daily', name: '日用', icon: 'daily',         color: '#52c41a' },
+      { id: 'cat_ent',   name: '娱乐', icon: 'entertainment', color: '#722ed1' },
+      { id: 'cat_oth_e', name: '其他', icon: 'other',         color: '#999999' }
+    ],
+    income: [
+      { id: 'cat_salary', name: '工资', icon: 'salary',     color: '#4cd964' },
+      { id: 'cat_bonus',  name: '奖金', icon: 'bonus',      color: '#52c41a' },
+      { id: 'cat_invest', name: '理财', icon: 'investment', color: '#1890ff' },
+      { id: 'cat_oth_i',  name: '其他', icon: 'other',      color: '#999999' }
+    ]
+  }
 };
 
 function initAcctData() {
@@ -14941,10 +15435,15 @@ function initAcctData() {
     if (!db.accountingData.accounts) db.accountingData.accounts = acctDefaultData.accounts;
     if (!db.accountingData.transactions) db.accountingData.transactions = [];
     if (!db.accountingData.categories) db.accountingData.categories = acctDefaultData.categories;
+    if (!db.accountingData.categories.expense || db.accountingData.categories.expense.length === 0) {
+      db.accountingData.categories.expense = JSON.parse(JSON.stringify(acctDefaultData.categories.expense));
+    }
+    if (!db.accountingData.categories.income || db.accountingData.categories.income.length === 0) {
+      db.accountingData.categories.income = JSON.parse(JSON.stringify(acctDefaultData.categories.income));
+    }
     if (!db.accountingData.currentBookId) db.accountingData.currentBookId = 'default';
   }
 }
-
 const acctIconSvg = {
   food: '<svg viewBox="0 0 24 24"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-8-15.03-8-15.03 0h15.03zM1.02 17h15v2h-15z"/></svg>',
   transport: '<svg viewBox="0 0 24 24"><path d="M4 16c0 .88.39 1.67 1 2.22V20c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h8v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1.78c.61-.55 1-1.34 1-2.22V6c0-3.5-3.58-4-8-4s-8 .5-8 4v10zm3.5 1c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm9 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6H6V6h12v5z"/></svg>',
