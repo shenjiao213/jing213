@@ -8195,22 +8195,22 @@ const triggerAlbum = () => {
     loading.textContent = '识别中…';
     document.body.appendChild(loading);
 
-    try {
-      const roleData = await tryParseRoleCardFromFile(file);
-      loading.remove();
-      if (roleData) {
-        // ★ 角色卡：秒弹
-        showRoleCardScanResult(roleData);
-        return;
-      }
-      // ★ 不是角色卡：立即走 fallback，不再等 400ms
-      if (Math.random() < 0.8) simulateScan();
-      else showToast('这不是本软件的角色卡，请换一张');
-    } catch (err) {
-      loading.remove();
-      console.warn('[识别] 出错', err);
-      showToast('识别失败，请换一张');
-    }
+    
+try {
+  const roleData = await tryParseRoleCardFromFile(file);
+  loading.remove();
+  if (roleData) {
+    // ★ 角色卡：秒弹
+    showRoleCardScanResult(roleData);
+    return;
+  }
+  // ★ 不是角色卡：直接告诉用户，不再塞虚拟人物
+  showToast('这不是本软件的角色卡，请换一张');
+} catch (err) {
+  loading.remove();
+  console.warn('[识别] 出错', err);
+  showToast('识别失败，请换一张');
+}
   };
   fileInput.click();
 };
