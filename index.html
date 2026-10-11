@@ -2740,6 +2740,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 .sticker-lib-item img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:8px;background:#f0f0f2}
 .sticker-lib-item-name{font-size:12px;color:#555b65;overflow-wrap:anywhere;margin:5px 0}
 .sticker-lib-item button{font-size:12px;padding:5px 8px;border-radius:8px}
+.sticker-lib-item-actions{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.sticker-lib-item-actions .sticker-lib-btn{min-width:0;padding:5px 8px;font-size:12px}
+
 
 /* 表情包管理严格按参考图：白色圆角分组卡片、紧凑灰白布局 */
 #sticker-library-screen .content{background:#f5f5f7!important;padding:18px 16px 30px!important;overflow-y:auto}
@@ -3633,6 +3636,30 @@ input:checked + .slider:before { transform: translateX(22px); }
 .wallet-menu-item:last-child { border-bottom: none; }
 .wallet-menu-item:active { background: #fafafa; }
 .wallet-menu-item .arrow { color: #ccc; font-size: 18px; }
+
+/* ---------- 微信钱包仿真子页面：仅作用于钱包模块 ---------- */
+.wallet-ledger-action{margin-left:auto;border:0;background:transparent;color:#222;font:inherit;cursor:pointer}
+.wallet-subpage{min-height:100%;background:#fff;color:#191919;padding-bottom:24px}
+.wallet-subhead{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#ededed;font-size:17px;font-weight:600}
+.wallet-subhead button{border:0;background:transparent;font:inherit;font-size:15px;color:#222;padding:8px 0;min-width:36px}
+.wallet-row{display:flex;align-items:center;gap:14px;padding:20px 18px;border-bottom:1px solid #f0f0f0;min-height:78px;cursor:pointer}
+.wallet-row-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#e9b900;font-size:20px;flex-shrink:0}
+.wallet-row-copy{flex:1;min-width:0}.wallet-row-title{font-size:16px}.wallet-row-sub{font-size:12px;color:#999;margin-top:6px}.wallet-row-value{font-size:16px;white-space:nowrap}.wallet-chevron{font-size:24px;color:#bbb;margin-left:4px}
+.wallet-fund-page{min-height:100%;background:#ffb900;color:#fff;padding:18px 12px 28px}
+.wallet-fund-top{text-align:center;padding:20px 0 26px}.wallet-fund-top .gem{font-size:34px;background:#fff;color:#ffb900;width:54px;height:54px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px}.wallet-fund-card{background:#fff;color:#222;border-radius:12px;padding:28px 18px;text-align:center}.wallet-fund-card .fund-label{font-size:14px}.wallet-fund-card .fund-value{font-size:38px;font-weight:650;margin:12px 0}.wallet-fund-muted{color:#999;font-size:13px}.wallet-fund-stats{display:flex;margin:24px 0 18px}.wallet-fund-stats>div{flex:1}.wallet-fund-stats>div+div{border-left:1px solid #eee}.wallet-fund-actions{display:flex;gap:12px;margin-top:24px}.wallet-fund-actions button{flex:1;border:0;border-radius:8px;padding:13px 8px;font:inherit;font-weight:600;background:#f2f2f2;color:#222}.wallet-fund-actions button.primary{background:#ffb900;color:#fff}.wallet-tool-btn{border:0;border-radius:9px;padding:12px 16px;background:#07c160;color:white;font:inherit;cursor:pointer}.wallet-tool-btn.secondary{background:#f1f1f1;color:#222}.wallet-form-line{padding:16px 18px;border-bottom:1px solid #f1f1f1}.wallet-form-line input,.wallet-form-line select,.wallet-form-line textarea{width:100%;box-sizing:border-box;border:1px solid #ddd;border-radius:8px;padding:12px;font:inherit;background:#fff;color:#222}.wallet-ledger-item{padding:15px 18px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:12px}.wallet-ledger-item .ledger-main{flex:1;min-width:0}.wallet-ledger-item .ledger-title{font-size:15px}.wallet-ledger-item .ledger-date{font-size:12px;color:#999;margin-top:7px}.wallet-ledger-item .ledger-amount{font-weight:600;white-space:nowrap}.wallet-delete{border:0;background:#fff0f0;color:#d66;padding:6px 10px;border-radius:15px;font:inherit}
+.wallet-virtual-mark{display:flex;justify-content:center;align-items:center;gap:6px;padding:18px 12px 22px;color:#a0a5ad;font-size:11px;letter-spacing:.2px;background:#fff}
+.wallet-virtual-mark .mark-dot{width:5px;height:5px;border-radius:50%;background:#c8cdd3;display:inline-block}
+.wallet-bank-card{position:relative;margin:14px 14px;background:linear-gradient(120deg,#147bb7,#36a4d0);color:#fff;border-radius:15px;padding:22px 20px;min-height:144px;box-sizing:border-box;box-shadow:0 5px 16px rgba(24,117,170,.12);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.wallet-bank-card:nth-child(2n){background:linear-gradient(120deg,#078c7a,#11b99b);box-shadow:0 5px 16px rgba(8,150,128,.1)}
+.wallet-bank-card:nth-child(3n){background:linear-gradient(120deg,#d94d5b,#f07882);box-shadow:0 5px 16px rgba(210,70,90,.1)}
+.wallet-bank-number{margin-top:25px;letter-spacing:2px;font-size:14px;opacity:.88}
+.wallet-bank-balance{margin-top:17px;font-size:13px;opacity:.95}
+.wallet-context-backdrop{position:fixed;inset:0;background:rgba(25,30,38,.24);z-index:9998;display:flex;align-items:flex-end;justify-content:center;padding:0 12px calc(18px + env(safe-area-inset-bottom));box-sizing:border-box}
+.wallet-context-menu{width:min(460px,100%);background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.16);animation:walletMenuIn .16s ease-out}
+.wallet-context-title{padding:18px 16px 12px;text-align:center;color:#999;font-size:12px;border-bottom:1px solid #f2f2f2}
+.wallet-context-action{display:block;width:100%;border:0;background:#fff;padding:17px 16px;font:inherit;font-size:16px;color:#222;border-bottom:1px solid #f4f4f4}
+.wallet-context-action.danger{color:#e45b64}.wallet-context-action:last-child{border-bottom:0}
+@keyframes walletMenuIn{from{transform:translateY(12px);opacity:.7}to{transform:translateY(0);opacity:1}}
 
 /* ---------- 二维码展示页 ---------- */
 #qr-code-screen {
@@ -5109,32 +5136,6 @@ input:checked + .slider:before { transform: translateX(22px); }
       </div>
     </div>
 
-    <!-- 金融理财 -->
-    <div class="pay-grid-card">
-      <div class="pay-grid-title">金融理财</div>
-      <div class="pay-grid-items">
-        <div class="pay-grid-item" data-pay-placeholder="信用卡还款">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4a90e2" stroke-width="1.8"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div>
-          <span>信用卡还款</span>
-        </div>
-        <div class="pay-grid-item" data-pay-placeholder="理财通">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4a90e2" stroke-width="1.8"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16" stroke-linecap="round"/></svg></div>
-          <span>理财通</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- 生活服务 -->
-    <div class="pay-grid-card">
-      <div class="pay-grid-title">生活服务</div>
-      <div class="pay-grid-items">
-        <div class="pay-grid-item" data-pay-placeholder="手机充值">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4a90e2" stroke-width="1.8"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M12 18h.01" stroke-linecap="round"/></svg></div>
-          <span>手机充值</span>
-        </div>
-      </div>
-    </div>
-
     <!-- 交通出行 -->
     <div class="pay-grid-card">
       <div class="pay-grid-title">交通出行</div>
@@ -5146,10 +5147,6 @@ input:checked + .slider:before { transform: translateX(22px); }
         <div class="pay-grid-item" data-pay-placeholder="火车票机票">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.8"><rect x="5" y="3" width="14" height="14" rx="3"/><circle cx="9" cy="13" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="13" r="1" fill="currentColor" stroke="none"/><path d="M8 20l1.5-3M16 20l-1.5-3" stroke-linecap="round"/></svg></div>
           <span>火车票机票</span>
-        </div>
-        <div class="pay-grid-item" data-pay-placeholder="滴滴出行">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FF9D3D" stroke-width="1.8"><path d="M5 13h14a2 2 0 0 1 2 2v2h-2M3 15v2h2M5 13l1-4h12l1 4" stroke-linecap="round"/></svg></div>
-          <span>滴滴出行</span>
         </div>
         <div class="pay-grid-item" data-pay-placeholder="酒店民宿">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="#07c160" stroke-width="1.8"><path d="M3 20V8l9-5 9 5v12" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 20v-6h8v6" stroke-linecap="round"/></svg></div>
@@ -5214,34 +5211,12 @@ input:checked + .slider:before { transform: translateX(22px); }
      功能开始：钱包页
      ========================================================== -->
 <div id="wallet-screen" class="screen">
-  <header class="app-header" style="background: #ededed; border-bottom: 1px solid #dcdcdc; backdrop-filter: none; -webkit-backdrop-filter: none;">
-    <button class="back-btn" id="wallet-back-btn" style="color: #000;">‹</button>
-    <div class="title-container"><h1 class="title" style="color:#000; font-weight: 600; font-size: 17px;">钱包</h1></div>
-    <div class="placeholder"></div>
+  <header class="app-header" style="background:#ededed;border-bottom:1px solid #dcdcdc;backdrop-filter:none;-webkit-backdrop-filter:none;">
+    <button class="back-btn" id="wallet-back-btn" style="color:#000;">‹</button>
+    <div class="title-container"><h1 class="title" id="wallet-header-title" style="color:#000;font-weight:600;font-size:17px;">钱包</h1></div>
+    <button class="wallet-ledger-action" id="wallet-header-action">账单</button>
   </header>
-  <main class="content" style="padding: 0; overflow-y: auto; background: #f5f5f5;">
-    <div class="wallet-balance-card">
-      <button class="edit-btn" id="wallet-edit-balance-btn">修改余额</button>
-      <div class="label">零钱</div>
-      <div class="value" id="wallet-balance-display">¥0.00</div>
-    </div>
-    <div class="wallet-tip">此处为虚拟钱包，余额可以随意自定义，与真实支付无关。</div>
-    <div class="wallet-menu">
-      <div class="wallet-menu-item" data-pay-placeholder="零钱通">
-        <span>零钱通</span><span class="arrow">›</span>
-      </div>
-      <div class="wallet-menu-item" data-pay-placeholder="银行卡">
-        <span>银行卡</span><span class="arrow">›</span>
-      </div>
-      <div class="wallet-menu-item" data-pay-placeholder="支付分">
-        <span>支付分</span><span class="arrow">›</span>
-      </div>
-      <div class="wallet-menu-item" data-pay-placeholder="账单">
-        <span>账单</span><span class="arrow">›</span>
-      </div>
-    </div>
-    <div style="height: 20px;"></div>
-  </main>
+  <main class="content" id="wallet-main-content" style="padding:0;overflow-y:auto;background:#fff;"></main>
 </div>
 <!-- ==========================================================
      功能结束：钱包页
@@ -8493,43 +8468,100 @@ function renderWalletBalance() {
 
 function setupWalletScreen() {
   const backBtn = document.getElementById('wallet-back-btn');
-  if (backBtn) backBtn.addEventListener('click', () => {
-    renderPayWalletAmountOnServicePage();
-    switchScreen('wechat-pay-service-screen');
-  });
-
-  const editBtn = document.getElementById('wallet-edit-balance-btn');
-  if (editBtn) {
-    editBtn.addEventListener('click', async () => {
-      const val = await showHgInput({
-        title: '修改零钱余额',
-        sub: '虚拟钱包，随意设定一个数字即可',
-        placeholder: '例如：666.66',
-        value: getWalletBalance().toFixed(2)
-      });
-      if (val === null) return;
-      const num = parseFloat(val);
-      if (isNaN(num) || num < 0) return showToast('请输入有效金额');
-      
-setWalletBalance(num);
-if (!db.accountingData) initAcctData();
-db.accountingData.accounts = [{ id: 'wechat_wallet', name: '微信零钱', balance: num, icon: 'wechat' }];
-await saveData();
-renderWalletBalance();
-renderAcctAccounts();
-showToast('余额已修改并同步至每日记');
+  const titleEl = document.getElementById('wallet-header-title');
+  const actionEl = document.getElementById('wallet-header-action');
+  const main = document.getElementById('wallet-main-content');
+  let walletPage = 'overview';
+  const money = n => `¥${(Number(n)||0).toFixed(2)}`;
+  const ensureWalletExtras = () => {
+    if (!Array.isArray(db.walletLedger)) db.walletLedger = [];
+    if (!Array.isArray(db.walletBankCards)) db.walletBankCards = [];
+    if (!Array.isArray(db.kinshipCards)) db.kinshipCards = [];
+    if (typeof db.walletFundBalance !== 'number') db.walletFundBalance = 0;
+    if (typeof db.walletFundYield !== 'number') db.walletFundYield = 0.00844;
+  };
+  ensureWalletExtras();
+  const record = (title, amount, note='') => {
+    db.walletLedger.unshift({id:'wl_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),title,amount:Number(amount)||0,note,date:new Date().toLocaleString('zh-CN',{hour12:false})});
+  };
+  const persist = async () => { await saveData(); renderWalletBalance(); };
+  const setHeader = (title, action='') => { titleEl.textContent=title; actionEl.textContent=action; actionEl.style.visibility=action?'visible':'hidden'; actionEl.onclick=action?(()=>go('ledger')):null; };
+  const go = page => { walletPage=page; render(); };
+  const editAmount = async (title, initial, callback) => {
+    const val=await showHgInput({title,sub:'这是虚拟钱包数据，可随时修改',placeholder:'输入金额',value:String(Number(initial||0).toFixed(2))});
+    if(val===null)return; const n=Number(val); if(!Number.isFinite(n)||n<0)return showToast('请输入有效金额'); await callback(n);
+  };
+  function renderOverview(){
+    setHeader('钱包','账单');
+    main.innerHTML=`<div style="background:#fff;min-height:100%;">
+      <div class="wallet-row" data-wallet-action="cash"><div class="wallet-row-icon">¥</div><div class="wallet-row-copy"><div class="wallet-row-title">零钱</div></div><div class="wallet-row-value">${money(getWalletBalance())}</div><span class="wallet-chevron">›</span></div>
+      <div class="wallet-row" data-wallet-action="fund"><div class="wallet-row-icon">◇</div><div class="wallet-row-copy"><div class="wallet-row-title">零钱通</div><div class="wallet-row-sub">收益率 ${(db.walletFundYield*100).toFixed(4)}%</div></div><div class="wallet-row-value">${money(db.walletFundBalance)}</div><span class="wallet-chevron">›</span></div>
+      <div class="wallet-row" data-wallet-action="bank"><div class="wallet-row-icon" style="color:#1296db">▤</div><div class="wallet-row-copy"><div class="wallet-row-title">银行卡</div><div class="wallet-row-sub">${db.walletBankCards.length} 张银行卡</div></div><span class="wallet-chevron">›</span></div>
+      <div class="wallet-row" data-wallet-action="kinship"><div class="wallet-row-icon" style="color:#e6a23c">♡</div><div class="wallet-row-copy"><div class="wallet-row-title">亲属卡</div><div class="wallet-row-sub">给好友赠送或接收亲属卡</div></div><span class="wallet-chevron">›</span></div>
+      <div class="wallet-virtual-mark"><span class="mark-dot"></span><span>虚拟钱包 · 仅供角色扮演</span></div>
+    </div>`;
+    main.querySelectorAll('[data-wallet-action]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.walletAction)));
+  }
+  function renderCash(){
+    setHeader('零钱','明细');
+    main.innerHTML=`<div style="background:#fff;min-height:100%;text-align:center;padding:80px 18px 30px;box-sizing:border-box;"><div style="width:58px;height:58px;border-radius:50%;background:#ffca00;color:#fff;display:grid;place-items:center;font-size:30px;margin:0 auto 28px;">¥</div><div style="font-size:16px;">我的零钱</div><div style="font-size:42px;font-weight:650;margin:16px 0 24px;">${money(getWalletBalance())}</div><div style="color:#e6a23c;margin-bottom:70px;">零钱余额可随时编辑</div><button class="wallet-tool-btn" id="cash-edit" style="width:min(280px,90%);">修改零钱余额</button><div class="wallet-virtual-mark" style="padding-top:26px;"><span class="mark-dot"></span><span>虚拟余额</span></div></div>`;
+    main.querySelector('#cash-edit').onclick=()=>editAmount('修改零钱余额',getWalletBalance(),async n=>{const old=getWalletBalance();setWalletBalance(n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:n,icon:'wechat'}];record('修改零钱余额',n-old,'手动调整');await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();showToast('零钱余额已更新');});
+  }
+  function renderFund(){
+    setHeader('零钱通','');
+    main.innerHTML=`<div class="wallet-fund-page"><div class="wallet-fund-top"><div class="gem">◇</div><div style="font-size:20px;font-weight:600;">零钱通</div><div style="margin-top:16px;font-size:14px;">资金安全保障中 ›</div></div><div class="wallet-fund-card"><div class="fund-label">账户余额</div><div class="fund-value">${money(db.walletFundBalance)}</div><div style="color:#526b8b;font-size:14px;">7日年化收益率 ${(db.walletFundYield*100).toFixed(4)}%</div><div class="wallet-fund-stats"><div><div class="wallet-fund-muted">累计收益</div><div style="font-size:22px;margin-top:8px;">${money(db.walletFundEarnings||0)}</div></div><div><div class="wallet-fund-muted">昨日收益</div><div style="font-size:22px;margin-top:8px;">${money(db.walletFundYesterday||0)}</div></div></div><div class="wallet-fund-actions"><button id="fund-out" ${db.walletFundBalance<=0?'disabled':''}>转出</button><button class="primary" id="fund-in">转入</button></div><button id="fund-yield" style="border:0;background:transparent;color:#999;margin-top:22px;">修改模拟年化收益率 ›</button></div><div style="margin-top:20px;font-size:15px;">更多产品</div><div style="background:#fff;color:#222;border-radius:10px;padding:18px;margin-top:12px;"><b>收益说明</b><p style="color:#999;font-size:12px;line-height:1.7;">按模拟年化收益率计算每日收益，收益只影响虚拟零钱通余额，不涉及真实资金。</p></div></div>`;
+    main.querySelector('#fund-in').onclick=()=>editAmount('转入零钱通',0,async n=>{if(n<=0)return showToast('请输入大于 0 的金额');if(n>getWalletBalance())return showToast('零钱余额不足');setWalletBalance(getWalletBalance()-n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];db.walletFundBalance+=n;record('转入零钱通',-n);await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();});
+    main.querySelector('#fund-out').onclick=()=>editAmount('从零钱通转出',0,async n=>{if(n<=0)return showToast('请输入大于 0 的金额');if(n>db.walletFundBalance)return showToast('零钱通余额不足');db.walletFundBalance-=n;setWalletBalance(getWalletBalance()+n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];record('零钱通转出',n);await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();});
+    main.querySelector('#fund-yield').onclick=async()=>{const val=await showHgInput({title:'模拟年化收益率（%）',sub:'例如 0.844 表示年化 0.844%',placeholder:'0.844',value:String((db.walletFundYield*100).toFixed(4))});if(val===null)return;const n=Number(val);if(!Number.isFinite(n)||n<0||n>100)return showToast('请输入 0 到 100 之间的数值');db.walletFundYield=n/100;await persist();render();};
+  }
+  function renderBank(){
+    setHeader('银行卡','添加');
+    main.innerHTML=`<div style="min-height:100%;background:#f3f4f6;padding:8px 0 24px;">${db.walletBankCards.length?db.walletBankCards.map(c=>`<div class="wallet-bank-card" data-bank-card="${c.id}" aria-label="长按管理银行卡"><div style="font-size:17px;font-weight:600;">${escapeHtml(c.bank)}</div><div class="wallet-bank-number">${escapeHtml(c.number||'**** **** **** ****')}</div><div class="wallet-bank-balance">模拟可用余额　${money(c.balance)}</div></div>`).join(''):'<div style="text-align:center;padding:90px 20px;color:#999;">还没有银行卡<br><span style="display:inline-block;margin-top:8px;font-size:12px;">点击右上角添加</span></div>'}<div class="wallet-virtual-mark"><span class="mark-dot"></span><span>虚拟银行卡 · 长按卡片管理</span></div></div>`;
+    actionEl.onclick=async()=>{const bank=await showHgInput({title:'银行卡名称',placeholder:'例如：中国建设银行'});if(bank===null||!bank.trim())return;const number=await showHgInput({title:'卡号（可填写虚拟卡号）',placeholder:'例如：**** 1234'});if(number===null)return;const bal=await showHgInput({title:'银行卡余额',placeholder:'0.00',value:'0.00'});if(bal===null)return;const n=Number(bal);if(!Number.isFinite(n)||n<0)return showToast('余额无效');db.walletBankCards.push({id:'bank_'+Date.now(),bank:bank.trim(),number:number.trim(),balance:n});await persist();render();};
+    const showBankMenu = (cardId) => {
+      const c=db.walletBankCards.find(x=>String(x.id)===String(cardId)); if(!c)return;
+      const overlay=document.createElement('div'); overlay.className='wallet-context-backdrop';
+      overlay.innerHTML=`<div class="wallet-context-menu" role="menu"><div class="wallet-context-title">${escapeHtml(c.bank)} · ${escapeHtml(c.number||'虚拟银行卡')}</div><button class="wallet-context-action" data-menu-edit>修改余额</button><button class="wallet-context-action danger" data-menu-delete>删除银行卡</button><button class="wallet-context-action" data-menu-cancel style="color:#777;margin-top:8px;">取消</button></div>`;
+      document.body.appendChild(overlay);
+      const close=()=>overlay.remove(); overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
+      overlay.querySelector('[data-menu-cancel]').onclick=close;
+      overlay.querySelector('[data-menu-edit]').onclick=()=>{close();editAmount('修改银行卡余额',c.balance,async n=>{c.balance=n;await persist();render();});};
+      overlay.querySelector('[data-menu-delete]').onclick=async()=>{close();if(!confirm('确定删除这张虚拟银行卡？'))return;db.walletBankCards=db.walletBankCards.filter(x=>String(x.id)!==String(cardId));await persist();render();};
+    };
+    main.querySelectorAll('[data-bank-card]').forEach(el=>{
+      let timer=null, longPressed=false, startX=0, startY=0;
+      const cancel=()=>{if(timer){clearTimeout(timer);timer=null;}};
+      el.addEventListener('contextmenu',e=>{e.preventDefault();longPressed=true;showBankMenu(el.dataset.bankCard);});
+      el.addEventListener('touchstart',e=>{const t=e.touches[0];startX=t.clientX;startY=t.clientY;longPressed=false;timer=setTimeout(()=>{longPressed=true;showBankMenu(el.dataset.bankCard);},480);},{passive:true});
+      el.addEventListener('touchmove',e=>{const t=e.touches[0];if(Math.abs(t.clientX-startX)>10||Math.abs(t.clientY-startY)>10)cancel();},{passive:true});
+      el.addEventListener('touchend',cancel);el.addEventListener('touchcancel',cancel);
+      el.addEventListener('click',()=>{if(longPressed){longPressed=false;return;} });
+      el.addEventListener('mousedown',()=>{longPressed=false;timer=setTimeout(()=>{longPressed=true;showBankMenu(el.dataset.bankCard);},500);});
+      el.addEventListener('mouseup',cancel);el.addEventListener('mouseleave',cancel);
     });
   }
-
-  document.querySelectorAll('#wallet-screen [data-pay-placeholder]').forEach(el => {
-    el.addEventListener('click', () => {
-      showToast(`${el.dataset.payPlaceholder} 功能暂未开放（演示占位）`);
-    });
-  });
-
-  renderWalletBalance();
+  function renderKinship(){
+    setHeader('亲属卡','发送');
+    const chars=Array.isArray(db.characters)?db.characters:[];
+    main.innerHTML=`<div style="background:#f5f5f5;min-height:100%;padding:14px;box-sizing:border-box;"><div style="padding:8px 4px 14px;font-size:14px;color:#777;">亲属卡</div>${db.kinshipCards.length?db.kinshipCards.map(k=>`<div style="background:#fff;border-radius:10px;padding:16px;margin-bottom:10px;"><div style="font-weight:600;">${escapeHtml(k.name)} · ${k.direction==='sent'?'我赠送的':'对方赠送的'}</div><div style="color:#888;font-size:12px;margin-top:8px;">每月额度 ${money(k.limit)} · ${k.status||'已开通'}</div><button class="wallet-delete" data-kinship-delete="${k.id}" style="margin-top:10px;">删除</button></div>`).join(''):'<div style="text-align:center;color:#999;padding:28px 0;">暂时没有亲属卡</div>'}<div style="background:#fff;border-radius:14px;padding:4px 16px;box-shadow:0 2px 12px rgba(20,30,50,.025);"><div style="padding:13px 0;color:#999;font-size:12px;border-bottom:1px solid #f2f2f2;">选择联系人</div>${chars.length?chars.map(c=>`<div class="wallet-row" style="padding:12px 0;min-height:62px;background:#fff;gap:12px;" data-kinship-char="${c.id}"><img src="${escapeHtml(c.avatar||'')}" onerror="this.style.display='none'" style="width:42px;height:42px;border-radius:8px;object-fit:cover;background:#f1f2f4;flex-shrink:0;"><div class="wallet-row-copy"><div class="wallet-row-title">${escapeHtml(c.remarkName||c.name||c.realName||'角色')}</div></div><span class="wallet-chevron">›</span></div>`).join(''):'<div style="color:#999;font-size:13px;padding:26px 0;text-align:center;">通讯录里暂无联系人</div>'}</div><div class="wallet-virtual-mark"><span class="mark-dot"></span><span>亲属卡为虚拟角色扮演功能</span></div></div>`;
+    actionEl.onclick=async()=>{const name=await showHgInput({title:'对方赠送亲属卡',placeholder:'输入通讯录角色名称'});if(name===null||!name.trim())return;const limit=await showHgInput({title:'每月额度',placeholder:'例如：2000',value:'2000'});if(limit===null)return;const n=Number(limit);if(!Number.isFinite(n)||n<0)return showToast('额度无效');db.kinshipCards.unshift({id:'kin_'+Date.now(),name:name.trim(),direction:'received',limit:n,status:'已接收'});await persist();render();showToast('已记录虚拟亲属卡');};
+    main.querySelectorAll('[data-kinship-char]').forEach(el=>el.onclick=async()=>{const c=chars.find(x=>String(x.id)===el.dataset.kinshipChar);if(!c)return;const limit=await showHgInput({title:`赠送亲属卡给 ${c.remarkName||c.name||c.realName||'角色'}`,sub:'设置每月虚拟额度',placeholder:'例如：2000',value:'2000'});if(limit===null)return;const n=Number(limit);if(!Number.isFinite(n)||n<0)return showToast('额度无效');db.kinshipCards.unshift({id:'kin_'+Date.now(),name:c.remarkName||c.name||c.realName||'角色',direction:'sent',limit:n,status:'待对方回应'});window.__pendingFocus=`你收到了一张来自用户赠送的虚拟亲属卡邀请，每月额度为 ¥${n.toFixed(2)}。请严格按照你的人设自然回应，可以接受、拒绝、追问或表达情绪，不要跳出角色。人设优先级最高，其次世界书、记忆和其他设定。`;await persist();render();showToast('已生成亲属卡邀请；角色反应会在对应聊天中触发');});
+    main.querySelectorAll('[data-kinship-delete]').forEach(b=>b.onclick=async()=>{db.kinshipCards=db.kinshipCards.filter(k=>k.id!==b.dataset.kinshipDelete);await persist();render();});
+  }
+  function renderLedger(){
+    setHeader('零钱明细','编辑');
+    main.innerHTML=`<div style="padding:12px 18px;color:#a0a5ad;font-size:12px;background:#fff;display:flex;align-items:center;gap:6px;"><span style="width:5px;height:5px;border-radius:50%;background:#c8cdd3;display:inline-block;"></span>虚拟账单 · 当前零钱 ${money(getWalletBalance())}</div>${db.walletLedger.length?db.walletLedger.map(l=>`<div class="wallet-ledger-item"><div class="wallet-row-icon" style="background:#fff8d9;">¥</div><div class="ledger-main"><div class="ledger-title">${escapeHtml(l.title)}</div><div class="ledger-date">${escapeHtml(l.date||'')}</div>${l.note?`<div class="wallet-row-sub">${escapeHtml(l.note)}</div>`:''}</div><div class="ledger-amount" style="color:${l.amount>0?'#e5b800':'#222'}">${l.amount>0?'+':''}${money(l.amount)}</div><button class="wallet-delete" data-ledger-delete="${l.id}">删除</button></div>`).join(''):'<div style="text-align:center;color:#999;padding:90px 20px;">暂无零钱明细</div>'}`;
+    actionEl.onclick=async()=>{const title=await showHgInput({title:'添加账单名称',placeholder:'例如：餐饮、购物、转账'});if(title===null||!title.trim())return;const amount=await showHgInput({title:'账单金额（支出填负数）',placeholder:'例如：-25.00'});if(amount===null)return;const n=Number(amount);if(!Number.isFinite(n))return showToast('金额格式不正确');record(title.trim(),n);await persist();render();};
+    main.querySelectorAll('[data-ledger-delete]').forEach(b=>b.onclick=async()=>{db.walletLedger=db.walletLedger.filter(l=>l.id!==b.dataset.ledgerDelete);await persist();render();});
+  }
+  function render(){ensureWalletExtras(); if(walletPage==='overview')renderOverview();else if(walletPage==='cash')renderCash();else if(walletPage==='fund')renderFund();else if(walletPage==='bank')renderBank();else if(walletPage==='kinship')renderKinship();else if(walletPage==='ledger')renderLedger();}
+  backBtn.onclick=()=>{if(walletPage!=='overview'){go('overview');return;}renderPayWalletAmountOnServicePage();switchScreen('wechat-pay-service-screen');};
+  actionEl.onclick=()=>go('ledger');
+  // Apply interest once per date, based on the configured simulated annual yield.
+  const today=new Date().toISOString().slice(0,10);
+  if(db.walletFundLastDate!==today){const last=db.walletFundLastDate?new Date(db.walletFundLastDate+'T00:00:00'):null;const now=new Date(today+'T00:00:00');const days=last?Math.max(1,Math.min(30,Math.floor((now-last)/86400000))):1;const earned=Math.round((Number(db.walletFundBalance)||0)*db.walletFundYield*days/365*100)/100;if(earned>0){db.walletFundBalance+=earned;db.walletFundEarnings=(Number(db.walletFundEarnings)||0)+earned;db.walletFundYesterday=earned;}db.walletFundLastDate=today;saveData();}
+  renderWalletBalance();render();
 }
-
 function renderPayWalletAmountOnServicePage() {
   const banner = document.getElementById('pay-wallet-amount');
   if (banner) banner.textContent = `¥${getWalletBalance().toFixed(2)}`;
@@ -11592,7 +11624,24 @@ function renderStickerLibrary() {
   if(titleEl)titleEl.textContent=current?`批量添加到：${current.name}`:'批量添加 URL';
   if(hintEl)hintEl.textContent=current?'每行一个图片 URL，也可写成「表情名 | URL」。导入后会保存到当前分组。':'请先创建并选择一个分组。';
   itemsEl.innerHTML='';
-  if(current)(current.stickers||[]).forEach(sticker=>{const card=document.createElement('div');card.className='sticker-lib-item';const img=document.createElement('img');img.src=sticker.data;img.alt=sticker.name;img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src=buildStickerFallback(sticker.name);};const name=document.createElement('div');name.className='sticker-lib-item-name';name.textContent=sticker.name;const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='移除';del.addEventListener('click',async()=>{current.stickers=current.stickers.filter(s=>s.id!==sticker.id);await saveData();renderStickerLibrary();});card.append(img,name,del);itemsEl.appendChild(card);});
+  if(current)(current.stickers||[]).forEach(sticker=>{
+    const card=document.createElement('div');card.className='sticker-lib-item';
+    const img=document.createElement('img');img.src=sticker.data;img.alt=sticker.name||'未命名表情';img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src=buildStickerFallback(sticker.name||'表情');};
+    const name=document.createElement('div');name.className='sticker-lib-item-name';name.textContent=sticker.name||'未命名表情';name.title='AI 会使用这个名称识别表情';
+    const actions=document.createElement('div');actions.className='sticker-lib-item-actions';
+    const edit=document.createElement('button');edit.type='button';edit.className='sticker-lib-btn secondary';edit.textContent='改名';edit.setAttribute('aria-label',`修改表情名称：${sticker.name||'未命名表情'}`);
+    edit.addEventListener('click',async()=>{
+      const next=window.prompt('给这个表情包起一个 AI 能识别的名字：',sticker.name||'');
+      if(next===null)return;
+      const trimmed=next.trim();
+      if(!trimmed){showToast('表情名称不能为空');return;}
+      sticker.name=trimmed.slice(0,80);
+      await saveData();renderStickerLibrary();showToast('表情名称已保存，AI 将按新名称识别');
+    });
+    const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='移除';
+    del.addEventListener('click',async()=>{current.stickers=current.stickers.filter(s=>s.id!==sticker.id);await saveData();renderStickerLibrary();});
+    actions.append(edit,del);card.append(img,name,actions);itemsEl.appendChild(card);
+  });
 }
 
 function setupStickerLibraryManager() {
