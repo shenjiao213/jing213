@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1791,6 +1791,9 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 .offline-bubble-text {
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
 }
 .offline-input-bar {
   display: flex;
@@ -1826,6 +1829,42 @@ input:checked + .slider:before { transform: translateX(22px); }
 .offline-icon-btn.send-btn { background: #333; border-color: #333; }
 .offline-icon-btn.send-btn svg { fill: #fff; }
 .offline-icon-btn.send-btn:active { background: #555; }
+/* 线下剧情修复与设置：韩系灰白 */
+#offline-screen .offline-chat-area { min-width:0; overflow-x:hidden; overflow-wrap:anywhere; word-break:normal; }
+#offline-screen .offline-bubble-container, #offline-screen .offline-bubble, #offline-screen .offline-bubble-text { min-width:0; max-width:100%; box-sizing:border-box; overflow-wrap:anywhere; word-break:break-word; }
+#offline-screen .offline-bubble-text { white-space:pre-wrap; line-height:1.95; }
+#offline-screen .offline-bubble-text .offline-thought { font-style:italic; color:#777d86; }
+#offline-screen .offline-bubble-text .offline-dialogue { padding-bottom:0; margin-bottom:0; border-bottom:0; text-decoration-line:underline; text-decoration-style:dashed; text-decoration-color:#aeb1b8; text-decoration-thickness:1px; text-underline-offset:4px; text-decoration-skip-ink:none; }
+#offline-screen .offline-bubble-text .offline-dialogue:last-child { border-bottom:0; margin-bottom:0; padding-bottom:0; }
+#offline-screen .offline-settings-overlay { position:absolute; inset:0; z-index:100; background:rgba(34,36,42,.28); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); display:flex; align-items:flex-end; justify-content:center; }
+#offline-screen .offline-settings-panel { width:100%; max-height:88%; display:flex; flex-direction:column; background:#f8f8fa; border:1px solid rgba(255,255,255,.9); border-radius:22px 22px 0 0; box-shadow:0 -12px 40px rgba(35,38,45,.13); color:#383a40; overflow:hidden; }
+#offline-screen .offline-settings-heading { display:flex; justify-content:space-between; align-items:flex-start; padding:20px 20px 14px; background:linear-gradient(135deg,#fff,#f0f0f3); border-bottom:1px solid #e9e9ed; }
+#offline-screen .offline-settings-eyebrow { font-size:10px; letter-spacing:2px; color:#a1a2aa; }
+#offline-screen .offline-settings-heading h2 { font-size:20px; margin:5px 0 4px; font-weight:600; }
+#offline-screen .offline-settings-heading p,.offline-settings-note { color:#92939b; font-size:12px; line-height:1.6; margin:0; }
+#offline-screen .offline-settings-close { border:0; width:32px; height:32px; border-radius:50%; background:#e9e9ed; color:#666; font-size:24px; line-height:1; }
+#offline-screen .offline-settings-body { overflow-y:auto; padding:16px 20px 20px; }
+#offline-screen .offline-setting-label { display:block; font-size:13px; color:#555861; font-weight:600; margin:16px 0 8px; }
+#offline-screen .offline-settings-body textarea,#offline-screen .offline-settings-body input[type=number],#offline-screen .offline-settings-body select { width:100%; box-sizing:border-box; border:1px solid #e2e2e7; border-radius:11px; background:#fff; color:#454750; padding:11px 12px; font:inherit; font-size:13px; outline:none; }
+#offline-screen .offline-settings-body textarea { resize:vertical; line-height:1.65; }
+#offline-screen .offline-bg-row { display:flex; align-items:center; gap:10px; }
+#offline-screen .offline-bg-preview { flex:1; min-width:0; height:54px; display:flex; align-items:center; padding:0 12px; border:1px solid #e3e3e8; border-radius:12px; background:#eeeef1 center/cover no-repeat; color:#747680; font-size:12px; }
+#offline-screen .offline-upload-btn,#offline-screen .offline-text-btn { border:1px solid #dedee4; border-radius:10px; padding:10px 12px; background:#fff; color:#666873; font-size:12px; }
+#offline-screen .offline-text-btn { margin-top:8px; padding:6px 0; border:0; background:transparent; }
+#offline-screen .offline-choice-row { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+#offline-screen .offline-choice-row label { position:relative; }
+#offline-screen .offline-choice-row input { position:absolute; opacity:0; }
+#offline-screen .offline-choice-row span { display:block; text-align:center; padding:11px 4px; border-radius:10px; background:#fff; border:1px solid #e2e2e7; color:#777983; font-size:13px; }
+#offline-screen .offline-choice-row input:checked + span { background:#e4e5e9; border-color:#bfc1c9; color:#353740; box-shadow:inset 0 0 0 1px #c9cad1; }
+#offline-screen .offline-perspective-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+#offline-screen .offline-perspective-grid label { color:#777983; font-size:12px; }
+#offline-screen .offline-perspective-grid select { margin-top:7px; }
+#offline-screen .offline-settings-note { margin-top:14px; }
+#offline-screen .offline-settings-footer { display:flex; gap:10px; padding:12px 20px calc(12px + var(--safe-bottom)); border-top:1px solid #e8e8ed; background:rgba(255,255,255,.92); }
+#offline-screen .offline-settings-footer button { flex:1; border:0; border-radius:12px; padding:13px; font-size:14px; }
+#offline-screen #offline-settings-cancel { background:#ededf0; color:#686a73; }
+#offline-screen #offline-settings-save { background:#343741; color:#fff; box-shadow:0 5px 12px rgba(40,42,50,.12); }
+@media (min-width:600px) { #offline-screen .offline-settings-overlay { align-items:center; padding:20px; } #offline-screen .offline-settings-panel { max-width:520px; max-height:88%; border-radius:22px; } }
 /* ==========================================================
    功能结束：线下模式样式
    ========================================================== */
@@ -2668,6 +2707,82 @@ input:checked + .slider:before { transform: translateX(22px); }
   #chat-list-screen .wechat-header,
   #contacts-screen .wechat-header { padding-top: calc(12px + var(--safe-top, 0px)) !important; }
 }
+
+/* 表情包分组页：紧凑韩系灰白样式 */
+#sticker-library-screen .app-header{display:flex;align-items:center}
+.sticker-lib-plus{border:0;background:transparent;color:#343942;font-size:30px;line-height:1;width:40px;height:40px;cursor:pointer}
+#sticker-lib-create-panel[hidden]{display:none!important}
+#sticker-lib-create-panel .sticker-lib-input,#sticker-lib-create-panel .sticker-lib-textarea{margin:5px 0 10px}
+.sticker-lib-group{padding:10px 11px;border-radius:12px;margin-top:7px;background:#fff}
+.sticker-lib-group.active{background:#f3f5f8;border-color:#cbd2dc}
+.sticker-lib-group .sticker-lib-btn{padding:7px 9px;font-size:12px;white-space:nowrap}
+.sticker-lib-group .sticker-lib-muted{margin-top:3px}
+.sticker-lib-groups-card{padding:14px}
+#sticker-library-screen .content{padding-top:12px}
+/* 表情包库：沿用应用灰白韩系视觉 */
+#sticker-library-screen .content{background:#f5f5f7;overflow-y:auto;padding:18px 16px 32px;box-sizing:border-box}
+.sticker-lib-card{background:#fff;border:1px solid #ececf0;border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 5px 18px rgba(35,42,54,.035)}
+.sticker-lib-title{font-size:16px;font-weight:600;color:#252a33;margin-bottom:8px}
+.sticker-lib-muted{font-size:12px;color:#9296a0;line-height:1.6}
+.sticker-lib-input,.sticker-lib-textarea{width:100%;box-sizing:border-box;border:1px solid #e3e4e8;border-radius:12px;background:#fafafa;padding:12px;color:#30343c;font:inherit;outline:none}
+.sticker-lib-input:focus,.sticker-lib-textarea:focus{border-color:#aeb8c8;background:#fff}
+.sticker-lib-textarea{min-height:118px;resize:vertical;line-height:1.65}
+.sticker-lib-btn{border:0;border-radius:12px;padding:10px 14px;background:#202b3b;color:#fff;font:inherit;cursor:pointer}
+.sticker-lib-btn.secondary{background:#f0f1f4;color:#444b57}
+.sticker-lib-btn.danger{background:#fff1f1;color:#b84c55}
+.sticker-lib-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sticker-lib-group{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid #ececf0;border-radius:13px;margin-top:8px;background:#fcfcfd}
+.sticker-lib-group.active{border-color:#9daec4;background:#f1f5fa}
+.sticker-lib-group-main{min-width:0;flex:1}
+.sticker-lib-group-name{font-size:14px;color:#30343c;font-weight:600;overflow-wrap:anywhere}
+.sticker-lib-items{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.sticker-lib-item{min-width:0;border:1px solid #eeeeF2;border-radius:12px;padding:8px;background:#fafafa;text-align:center}
+.sticker-lib-item img{width:100%;aspect-ratio:1;object-fit:contain;border-radius:8px;background:#f0f0f2}
+.sticker-lib-item-name{font-size:12px;color:#555b65;overflow-wrap:anywhere;margin:5px 0}
+.sticker-lib-item button{font-size:12px;padding:5px 8px;border-radius:8px}
+
+/* 表情包管理严格按参考图：白色圆角分组卡片、紧凑灰白布局 */
+#sticker-library-screen .content{background:#f5f5f7!important;padding:18px 16px 30px!important;overflow-y:auto}
+#sticker-library-screen .app-header{background:#f5f5f7;border-bottom:0;min-height:64px}
+#sticker-lib-create-panel{border-radius:22px;padding:18px!important;margin-bottom:16px}
+.sticker-lib-groups-card{padding:0!important;background:transparent!important;border:0!important;box-shadow:none!important;margin:0 0 18px!important}
+#sticker-lib-groups{display:flex;flex-direction:column;gap:14px}
+.sticker-lib-group{display:flex;align-items:center;gap:13px;min-height:86px;box-sizing:border-box;padding:15px 17px!important;border:1px solid #f0f0f2!important;border-radius:20px!important;background:#fff!important;margin:0!important;box-shadow:0 5px 16px rgba(45,50,60,.035)}
+.sticker-lib-group.active{border-color:#e8e9ed!important;background:#fff!important}
+.sticker-lib-group::before{content:'☺';display:flex;align-items:center;justify-content:center;flex:0 0 54px;width:54px;height:54px;border-radius:13px;background:#f0f1f3;color:#9a9da4;font-size:27px}
+.sticker-lib-group[data-group-kind="cute"]::before{content:'♡';color:#d9a5b0;background:#f7eff1}
+.sticker-lib-group[data-group-kind="funny"]::before{content:'☻';color:#62656b;background:#f0f0f1}
+.sticker-lib-group[data-group-kind="daily"]::before{content:'🐱';font-size:25px;background:#eef2f6}
+.sticker-lib-group[data-group-kind="animal"]::before{content:'🐼';font-size:25px}
+.sticker-lib-group-main{flex:1;min-width:0}
+.sticker-lib-group-name{font-size:16px!important;font-weight:600!important;color:#282c33!important;margin-bottom:4px}
+.sticker-lib-group .sticker-lib-muted{font-size:13px!important;color:#999da5!important;margin:0!important}
+.sticker-lib-group .sticker-lib-btn{font-size:12px;padding:6px 8px;border-radius:9px}
+.sticker-lib-group .sticker-lib-btn.secondary{display:none}
+.sticker-lib-group .sticker-lib-btn.danger{display:none}
+.sticker-lib-group.manage-mode .sticker-lib-btn.danger{display:inline-flex}
+.sticker-lib-group .sticker-lib-rename{display:none}
+.sticker-lib-group.manage-mode .sticker-lib-rename{display:inline-flex}
+.sticker-lib-group .sticker-lib-rename{background:#f0f1f4;color:#454b55;padding:7px 9px;font-size:12px;border:0;border-radius:9px;white-space:nowrap}
+.sticker-lib-inline-name{width:100%;min-width:0;box-sizing:border-box;border:1px solid #dfe2e8;border-radius:9px;padding:7px 9px;font:inherit;color:#30343c;background:#fff}
+.sticker-lib-group-main{cursor:pointer}
+.sticker-lib-ai-label{font-size:12px;color:#969aa2;white-space:nowrap}
+.sticker-lib-switch{position:relative;width:48px;height:27px;border:0;border-radius:20px;background:#d9dade;padding:0;flex:0 0 48px;cursor:pointer}
+.sticker-lib-switch::after{content:'';position:absolute;top:3px;left:3px;width:21px;height:21px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:left .18s}
+.sticker-lib-switch.on{background:#263140}
+.sticker-lib-switch.on::after{left:24px}
+.sticker-lib-chevron{font-size:29px;line-height:1;color:#c4c6cb;margin-left:0}
+.sticker-lib-actions-card{padding:0!important;border-radius:20px!important;overflow:hidden;margin-top:22px!important}
+.sticker-lib-action-row{width:100%;display:flex;align-items:center;gap:13px;padding:18px 17px;border:0;background:#fff;text-align:left;color:#30343b;font:inherit;cursor:pointer;min-height:78px}
+.sticker-lib-action-row.secondary-row{border-top:1px solid #f0f0f2;min-height:61px;color:#8c9098}
+.sticker-lib-action-icon{width:54px;height:54px;border-radius:13px;background:#f1f2f5;color:#858b96;display:flex;align-items:center;justify-content:center;font-size:30px;flex:0 0 54px}
+.sticker-lib-action-icon.small-icon{width:28px;height:28px;flex-basis:28px;background:transparent;font-size:22px}
+.sticker-lib-action-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.sticker-lib-action-copy strong{font-size:16px;font-weight:600}
+.sticker-lib-action-copy small{font-size:12px;color:#a0a3aa;line-height:1.5}
+#sticker-lib-editor-card[hidden]{display:none!important}
+#sticker-lib-editor-card{margin-top:14px}
+
 </style>
 <style id="group-settings-one-size-refinement">
 
@@ -2716,6 +2831,79 @@ input:checked + .slider:before { transform: translateX(22px); }
  #group-settings-sidebar .group-chat-info-gap { margin:0 -14px; }
 }
 
+</style>
+
+<style id="small-decision-accounting-polish">
+/* 仅优化：小决定抽卡、抛硬币、每日记日历 */
+#decision-view-card .dec-cards-stage { gap: 14px; padding: 28px 8px 22px; perspective: 1000px; }
+#decision-view-card .dec-card { width: min(27vw, 104px); height: min(42vw, 154px); max-height: 154px; animation: decCardDeal .42s both; animation-delay: var(--card-delay, 0ms); }
+#decision-view-card .dec-card-inner { filter: drop-shadow(0 8px 12px rgba(31,41,55,.10)); }
+#decision-view-card .dec-card-front { position: relative; overflow: hidden; border: 1px solid #dce3ef; border-radius: 15px; color: #fff; background: radial-gradient(circle at 20% 15%,rgba(255,255,255,.95),transparent 32%), linear-gradient(145deg,#24334a 0%,#435b79 52%,#b7c5d7 100%); box-shadow: inset 0 0 0 4px rgba(255,255,255,.22), inset 0 0 0 6px rgba(255,255,255,.12), 0 7px 16px rgba(35,50,73,.16); }
+#decision-view-card .dec-card-front::before { content:''; position:absolute; inset:8px; border:1px solid rgba(255,255,255,.52); border-radius:10px; }
+#decision-view-card .dec-card-question { font-size:36px; font-weight:700; text-shadow:0 2px 8px rgba(0,0,0,.18); }
+#decision-view-card .dec-card-mark { position:absolute; bottom:12px; right:14px; font-size:13px; color:rgba(255,255,255,.85); }
+#decision-view-card .dec-card-back { border-radius:15px; padding:12px 8px; font-size:14px; background:linear-gradient(145deg,#fffdf8,#f4eee3); box-shadow:inset 0 0 0 1px #e8dcc8, inset 0 0 0 5px rgba(255,255,255,.7); }
+#decision-view-card .dec-card:active { transform: translateY(-3px) scale(.98); }
+@keyframes decCardDeal { from { opacity:0; transform:translateY(12px) rotate(-2deg) scale(.94); } to { opacity:1; transform:translateY(0) rotate(0) scale(1); } }
+#decision-view-coin .dec-coin-stage { padding:38px 0 28px; }
+#decision-view-coin .dec-coin { width:136px; height:136px; filter: drop-shadow(0 13px 12px rgba(91,62,19,.2)); }
+#decision-view-coin .dec-coin-face { font-size:0; border:1px solid rgba(255,255,255,.72); }
+#decision-view-coin .dec-coin-face::before { inset:5px; border:1px solid rgba(255,255,255,.48); z-index:0; filter:none; }
+#decision-view-coin .dec-coin-front { background:radial-gradient(circle at 32% 24%,#fff4c7 0%,#f3d77d 24%,#d9a83d 58%,#a66d1d 82%,#f5d77d 100%); }
+#decision-view-coin .dec-coin-back { background:radial-gradient(circle at 32% 24%,#fff 0%,#e9edf3 25%,#aab6c7 60%,#65758b 84%,#dfe5ed 100%); }
+#decision-view-coin .dec-coin-front::after, #decision-view-coin .dec-coin-back::after { content:'✦'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:45px; font-weight:500; color:rgba(104,67,15,.82); text-shadow:0 1px 0 rgba(255,255,255,.65); }
+#decision-view-coin .dec-coin-back::after { content:'☾'; color:rgba(51,65,85,.85); font-size:48px; }
+#decision-view-coin .dec-coin-face { box-shadow:inset 0 0 0 3px rgba(255,255,255,.55), inset 0 0 0 7px rgba(111,76,22,.22), inset 0 0 0 10px rgba(255,255,255,.3), 0 8px 22px rgba(0,0,0,.15); }
+.acct-calendar-grid { gap:6px; padding:4px 14px 18px; }
+.acct-calendar-day { min-width:0; aspect-ratio: .82; border-radius:13px; background:linear-gradient(160deg,#fff,#fbfbfc); border:1px solid #f0f1f4; box-shadow:0 3px 9px rgba(31,41,55,.035); transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+.acct-calendar-day:not(.header):not(:empty):hover { border-color:#d9e2ef; box-shadow:0 5px 12px rgba(31,41,55,.07); }
+.acct-calendar-day.header { aspect-ratio:auto; min-height:28px; color:#9299a5; font-weight:600; border:0; }
+.acct-calendar-day .solar-date { font-size:14px; font-weight:700; }
+.acct-calendar-day .lunar-date { font-size:9px; color:#a0a5af; margin-top:1px; margin-bottom:3px; }
+.acct-calendar-day .day-stats { width:100%; gap:2px; font-size:8px; line-height:1.15; }
+.acct-calendar-day .expense-stat,.acct-calendar-day .income-stat { max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600; }
+.acct-calendar-day.today { background:linear-gradient(145deg,#263449,#435773); border-color:#263449; box-shadow:0 5px 12px rgba(38,52,73,.2); }
+.acct-calendar-day.today .solar-date { color:#fff; }
+.acct-calendar-day.today .lunar-date { color:rgba(255,255,255,.7); }
+.acct-calendar-day.today .expense-stat { color:#ffd5d5; opacity:1; }
+.acct-calendar-day.today .income-stat { color:#d5ffe0; opacity:1; }
+@media (max-width:360px) { #decision-view-card .dec-card { width:82px; height:124px; } #decision-view-card .dec-cards-stage { gap:9px; } .acct-calendar-grid { gap:3px; padding-left:9px; padding-right:9px; } .acct-calendar-day .solar-date { font-size:13px; } }
+@media (prefers-reduced-motion: reduce) { #decision-view-card .dec-card { animation:none; } }
+</style>
+<style id="targeted-ui-bugfix">
+/* ===== 精修：小决定卡牌、真实硬币质感、每日记纯阳历 ===== */
+#decision-view-card .dec-card { position:relative; isolation:isolate; width:min(27vw,104px); height:min(42vw,154px); max-height:154px; flex:0 0 auto; overflow:visible; }
+#decision-view-card .dec-card-inner { position:relative; width:100%; height:100%; transform:translateZ(0); transform-style:preserve-3d; -webkit-transform-style:preserve-3d; transition:transform .72s cubic-bezier(.2,.75,.25,1); will-change:transform; }
+#decision-view-card .dec-card.flipped .dec-card-inner { transform:rotateY(180deg); }
+#decision-view-card .dec-card-face { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:100%; height:100%; margin:0; border-radius:15px; padding:12px 8px; overflow:hidden; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+#decision-view-card .dec-card-front { overflow:hidden; color:#fff; background:radial-gradient(circle at 25% 16%,rgba(255,255,255,.9),transparent 28%),linear-gradient(145deg,#17283e 0%,#3f5e7d 52%,#1c3049 100%); border:1px solid #dbe5f1; box-shadow:inset 0 0 0 4px rgba(225,237,250,.35),inset 0 0 0 7px rgba(255,255,255,.14),0 9px 17px rgba(31,48,70,.2); }
+#decision-view-card .dec-card-front::before { content:''; position:absolute; inset:9px; border:1px solid rgba(255,255,255,.58); border-radius:10px; pointer-events:none; }
+#decision-view-card .dec-card-question { position:relative; z-index:1; font-size:39px; font-weight:800; color:#fff; text-shadow:0 2px 5px rgba(0,0,0,.25); }
+#decision-view-card .dec-card-mark { z-index:1; }
+#decision-view-card .dec-card-back { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transform:rotateY(180deg) translateZ(1px); -webkit-transform:rotateY(180deg) translateZ(1px); overflow-wrap:anywhere; word-break:break-word; text-align:center; color:#24344a; font-size:clamp(12px,3.5vw,15px); font-weight:700; line-height:1.45; background:radial-gradient(circle at 50% 0%,#fff 0%,transparent 70%),linear-gradient(145deg,#fffdf8,#eee5d5); border:1px solid #d7c6a6; box-shadow:inset 0 0 0 4px rgba(255,255,255,.82),inset 0 0 0 6px #e7d8be; }
+#decision-view-card .dec-card-back::before { content:'✦'; position:absolute; top:10px; color:#b18b4b; font-size:12px; }
+#decision-view-card .dec-card.flipped { z-index:2; }
+#decision-view-card .dec-card:not(.flipped) { transition:opacity .2s ease; }
+
+/* 硬币：金属边缘、压纹字样和清晰的正反面 */
+#decision-view-coin .dec-coin-stage { padding:38px 0 30px; perspective:1100px; }
+#decision-view-coin .dec-coin { width:150px; height:150px; border-radius:50%; filter:drop-shadow(0 15px 13px rgba(43,38,29,.24)); }
+#decision-view-coin .dec-coin-face { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:0; overflow:hidden; border:5px solid #c28d35; box-shadow:inset 0 0 0 2px #fff0b5,inset 0 0 0 5px rgba(126,78,14,.48),inset 0 0 0 8px rgba(255,239,172,.86),inset 0 0 0 11px rgba(139,89,20,.28),0 0 0 2px #f6df9c; }
+#decision-view-coin .dec-coin-face::before { content:''; position:absolute; inset:12px; border-radius:50%; border:1px solid rgba(255,246,202,.82); box-shadow:inset 0 0 0 1px rgba(135,86,17,.22); z-index:1; }
+#decision-view-coin .dec-coin-front { background:radial-gradient(ellipse at 32% 20%,#fff8cf 0%,#ffe68a 17%,#edbf49 48%,#c58a20 74%,#8f5a12 100%); }
+#decision-view-coin .dec-coin-back { background:radial-gradient(ellipse at 32% 20%,#fff8e7 0%,#e6e2d6 20%,#b8b3a5 52%,#817b6d 78%,#504b42 100%); border-color:#9e9889; }
+#decision-view-coin .dec-coin-front::after, #decision-view-coin .dec-coin-back::after { content:'正'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:serif; font-size:47px; font-weight:900; color:#85540d; text-shadow:1px 2px 0 rgba(255,244,186,.85),-1px -1px 0 rgba(112,68,9,.45); z-index:2; }
+#decision-view-coin .dec-coin-back::after { content:'反'; color:#514b3f; text-shadow:1px 2px 0 rgba(255,255,255,.75),-1px -1px 0 rgba(48,44,36,.35); }
+#decision-view-coin .dec-coin::after { content:''; position:absolute; inset:3px; border-radius:50%; border:1px solid rgba(255,255,255,.65); box-shadow:inset 0 0 0 2px rgba(106,72,22,.14); pointer-events:none; }
+
+/* 每日记：只显示公历，去掉农历副标题 */
+.acct-calendar-day { min-width:0; aspect-ratio:.82; border-radius:13px; background:linear-gradient(160deg,#fff,#f8f9fb); border:1px solid #edf0f4; box-shadow:0 4px 12px rgba(31,41,55,.045); }
+.acct-calendar-day .solar-date { font-size:15px; font-weight:700; color:#293241; }
+.acct-calendar-day .lunar-date { display:none !important; }
+.acct-calendar-day .day-stats { margin-top:4px; }
+.acct-calendar-day.today { background:linear-gradient(145deg,#203047,#3d5878); border-color:#203047; box-shadow:0 6px 14px rgba(32,48,71,.22); }
+.acct-calendar-day.today .solar-date { color:#fff; }
+@media (max-width:360px) { #decision-view-coin .dec-coin { width:132px; height:132px; } }
 </style>
 </head>
 <body>
@@ -2942,6 +3130,36 @@ input:checked + .slider:before { transform: translateX(22px); }
 <!-- ==========================================================
      功能开始：设置菜单
      ========================================================== -->
+<div id="sticker-library-screen" class="screen">
+  <header class="app-header">
+    <button class="back-btn" data-target="me-screen">‹</button>
+    <div class="title-container"><h1 class="title">表情包管理</h1></div>
+    <button type="button" id="sticker-lib-open-create" class="sticker-lib-plus" aria-label="新建分组">＋</button>
+  </header>
+  <main class="content">
+    <section id="sticker-lib-create-panel" class="sticker-lib-card" hidden>
+      <div class="sticker-lib-title">新建分组</div>
+      <input id="sticker-lib-new-group" class="sticker-lib-input" placeholder="分组名称，例如：日常、猫猫">
+      <textarea id="sticker-lib-create-urls" class="sticker-lib-textarea" placeholder="可选：同时粘贴表情 URL，每行一个；也可写「偷笑 | https://...」"></textarea>
+      <div class="sticker-lib-row"><button type="button" id="sticker-lib-create-group" class="sticker-lib-btn">创建并导入</button><button type="button" id="sticker-lib-cancel-create" class="sticker-lib-btn secondary">取消</button></div>
+    </section>
+    <section class="sticker-lib-groups-card">
+      <div id="sticker-lib-groups"></div>
+    </section>
+    <section class="sticker-lib-card sticker-lib-actions-card">
+      <button type="button" id="sticker-lib-show-import" class="sticker-lib-action-row"><span class="sticker-lib-action-icon">⇧</span><span class="sticker-lib-action-copy"><strong>批量导入</strong><small>粘贴多条链接 / 导入 DOCX / 粘贴文本</small></span><span class="sticker-lib-chevron">›</span></button>
+      <button type="button" id="sticker-lib-toggle-manage" class="sticker-lib-action-row secondary-row"><span class="sticker-lib-action-icon small-icon">⚙</span><span class="sticker-lib-action-copy"><strong>管理分组</strong></span><span class="sticker-lib-chevron">›</span></button>
+    </section>
+    <section class="sticker-lib-card" id="sticker-lib-editor-card" hidden>
+      <div class="sticker-lib-title" id="sticker-lib-editor-title">表情列表</div>
+      <div class="sticker-lib-muted" id="sticker-lib-editor-hint">选择一个分组后，可批量导入链接或文本。</div>
+      <textarea id="sticker-lib-bulk-urls" class="sticker-lib-textarea" placeholder="偷笑 | https://example.com/smile.png&#10;https://example.com/heart.webp"></textarea>
+      <div class="sticker-lib-row" style="margin-top:10px"><button type="button" id="sticker-lib-import-urls" class="sticker-lib-btn">批量导入</button><button type="button" id="sticker-lib-import-file-btn" class="sticker-lib-btn secondary">导入文本 / DOCX</button><input id="sticker-lib-import-file" type="file" accept=".txt,.docx,text/plain,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden><button type="button" id="sticker-lib-clear-urls" class="sticker-lib-btn secondary">清空</button><button type="button" id="sticker-lib-close-editor" class="sticker-lib-btn secondary">收起</button></div>
+      <div id="sticker-lib-items" class="sticker-lib-items"></div>
+    </section>
+  </main>
+</div>
+
 <div id="settings-menu-screen" class="screen">
   <header class="app-header">
     <button class="back-btn" data-target="home-screen">‹</button>
@@ -4721,7 +4939,7 @@ input:checked + .slider:before { transform: translateX(22px); }
   <header class="app-header">
     <button class="back-btn" id="offline-back-btn">‹</button>
     <div class="title-container"><h1 class="title" id="offline-title">线下剧情</h1></div>
-    <div class="placeholder"></div>
+    <button class="action-btn" id="offline-settings-open" aria-label="线下设置" title="线下设置" style="width:38px;height:38px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#555;font-size:22px;letter-spacing:2px;">···</button>
   </header>
   
   <main class="content offline-chat-area" id="offline-chat-area" style="padding:15px; display: flex; flex-direction: column;">
@@ -4736,6 +4954,41 @@ input:checked + .slider:before { transform: translateX(22px); }
     <button class="offline-icon-btn send-btn" id="offline-send-btn">
       <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
     </button>
+  </div>
+  <div id="offline-settings-modal" class="offline-settings-overlay" style="display:none;">
+    <section class="offline-settings-panel" role="dialog" aria-modal="true" aria-labelledby="offline-settings-title">
+      <header class="offline-settings-heading">
+        <div><div class="offline-settings-eyebrow">OFFLINE STORY</div><h2 id="offline-settings-title">线下设置</h2><p>自定义内容优先于基础提示词中的同类规则</p></div>
+        <button type="button" id="offline-settings-close" class="offline-settings-close" aria-label="关闭">×</button>
+      </header>
+      <div class="offline-settings-body">
+        <label class="offline-setting-label" for="offline-bg-file">聊天背景</label>
+        <div class="offline-bg-row"><div id="offline-bg-preview" class="offline-bg-preview">当前背景 · 灰白</div><label class="offline-upload-btn" for="offline-bg-file">选择图片</label><input id="offline-bg-file" type="file" accept="image/*" hidden></div>
+        <button type="button" id="offline-bg-clear" class="offline-text-btn">恢复默认背景</button>
+
+        <label class="offline-setting-label" for="offline-style-text">自定义文风</label>
+        <textarea id="offline-style-text" rows="3" placeholder="例如：韩系灰白氛围、克制细腻、少用华丽辞藻，动作与对话自然衔接。"></textarea>
+
+        <div class="offline-setting-label">篇幅</div>
+        <div class="offline-choice-row" id="offline-length-choice">
+          <label><input type="radio" name="offline-length" value="short"><span>短篇</span></label>
+          <label><input type="radio" name="offline-length" value="medium" checked><span>中篇</span></label>
+          <label><input type="radio" name="offline-length" value="long"><span>长篇</span></label>
+        </div>
+        <label class="offline-setting-label" for="offline-custom-words">自定义字数（可选）</label>
+        <input id="offline-custom-words" type="number" min="100" max="10000" step="100" placeholder="留空则使用上方篇幅">
+
+        <div class="offline-setting-label">角色叙事视角</div>
+        <div class="offline-perspective-grid">
+          <label>角色（TA）视角<select id="offline-char-perspective"><option value="first">第一人称</option><option value="second">第二人称</option><option value="third" selected>第三人称</option></select></label>
+          <label>用户（我）视角<select id="offline-user-perspective"><option value="first">第一人称</option><option value="second" selected>第二人称</option><option value="third">第三人称</option></select></label>
+        </div>
+        <label class="offline-setting-label" for="offline-banned-words">违禁词 / 禁止提及内容</label>
+        <textarea id="offline-banned-words" rows="3" placeholder="每行一个词或短语，也可以用逗号分隔。AI 将尽量避免输出这些内容。"></textarea>
+        <p class="offline-settings-note">说明：自定义规则会作为本角色线下剧情的高优先级补充；若与基础提示词冲突，以这里保存的设置为准。违禁词会写入提示词约束，但无法保证模型绝对不输出。</p>
+      </div>
+      <footer class="offline-settings-footer"><button type="button" id="offline-settings-cancel">取消</button><button type="button" id="offline-settings-save">保存设置</button></footer>
+    </section>
   </div>
   <div id="offline-multi-bar" style="display:none; position:absolute; bottom:0; left:0; width:100%; box-sizing:border-box; background:rgba(255,255,255,0.96); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-top:1px solid #eaeaea; padding:10px 16px; padding-bottom:calc(10px + var(--safe-bottom)); z-index:40; align-items:center; justify-content:space-between;">
     <span id="offline-select-count" style="font-size:14px; color:#333;">已选择 0 项</span>
@@ -5711,6 +5964,13 @@ input:checked + .slider:before { transform: translateX(22px); }
       <span>外语自动翻译</span>
       <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-auto-translate-toggle"><span class="slider round"></span></label>
     </div>
+    <div class="chat-info-item" id="chat-info-heart-prompt-btn" role="button" tabindex="0" style="min-height:72px;">
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+        <span>心声提示词</span>
+        <span id="chat-info-heart-prompt-preview" style="font-size:12px;color:#999;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">自定义心声生成规则，优先于默认提示词</span>
+      </div>
+      <span class="chat-info-arrow">›</span>
+    </div>
     
 
 <div class="chat-info-section-gap"></div>
@@ -6027,6 +6287,8 @@ window.db = {
   apiSettings: {},
   wallpaper: 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg',
   myStickers: [],
+  stickerGroups: [],
+  activeStickerGroupId: '',
   homeScreenMode: 'night',
   worldBooks: [],
   fontUrl: '',
@@ -6573,6 +6835,8 @@ window.loadData = async () => {
   const loaded = await dataStorage.loadAll();
   if (loaded) db = { ...db, ...loaded };
 if (!db.myStickers) db.myStickers = [];
+if (!Array.isArray(db.stickerGroups)) db.stickerGroups = [];
+if (!db.activeStickerGroupId) db.activeStickerGroupId = '';
 if (!db.moments) db.moments = [];
 if (!db.interactions) db.interactions = [];
 if (!db.cssTemplates) db.cssTemplates = [];
@@ -7037,6 +7301,7 @@ safely('API设置', setupApiSettingsApp);
 safely('美化设置', setupBeautifySettings);
 safely('壁纸设置', setupWallpaperApp);
   safely('表情系统', setupStickerSystem);
+  safely('表情包库管理', setupStickerLibraryManager);
   safely('语音系统', setupVoiceMessageSystem);
   safely('照片/视频', setupPhotoVideoSystem);
   safely('位置系统', setupLocationSystem);
@@ -9501,7 +9766,8 @@ async function translateMessageToChinese(messageId, autoMode = false) {
   const chat = getCurrentChat();
   const message = chat && chat.history.find(m => m.id === messageId);
   const wrapper = document.querySelector('.message-wrapper[data-id="' + CSS.escape(messageId) + '"]');
-  if (!message || !wrapper) { showToast('找不到这条消息'); return; }
+  // 自动翻译时，消息可能已被删除、未渲染（例如不可见系统消息）或页面刚切换；静默跳过，避免每次进入聊天都弹出无关提示。
+  if (!message || !wrapper) { if (!autoMode) showToast('找不到这条消息'); return; }
   const raw = extractFavoriteText(message.content || '').trim();
   if (!raw || raw === '[非文本消息]') { showToast('这条消息暂不支持翻译'); return; }
   const existing = wrapper.querySelector('.message-translation-bar');
@@ -10010,7 +10276,11 @@ if (quoteMatch) {
       const rawPath = receivedStickerMatch[1].trim();
       stickerNameForFallback = rawPath;
       if (message.stickerData) stickerSrc = message.stickerData;
-      else stickerSrc = resolveStickerUrl(rawPath);
+      else {
+        const activeStickerGroup = (db.stickerGroups || []).find(g => g.id === db.activeStickerGroupId);
+        const librarySticker = activeStickerGroup && Array.isArray(activeStickerGroup.stickers) ? activeStickerGroup.stickers.find(st => st.name === rawPath) : null;
+        stickerSrc = librarySticker ? librarySticker.data : resolveStickerUrl(rawPath);
+      }
     }
     const stickerImg = document.createElement('img');
     stickerImg.alt = '表情包';
@@ -10490,6 +10760,13 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
   prompt += `   它和你说出口的话可以完全不一样：嘴上在怼，心里在偷笑；想说却咽回去的那半句；对我这句话真实的反应；沉默背后那点小心思。\n`;
   prompt += `   要具体、有人味、有画面感，不要总结陈词，不要旁白腔。\n`;
   prompt += `   心声不显示成聊天气泡，只在我点你头像的时候才会看到。每次回复必须有一次，且只能有一次。\n\n`;
+  const customHeartPrompt = (character.heartPrompt || '').trim();
+  if (customHeartPrompt) {
+    prompt += `════ 用户自定义心声提示词（优先级高于默认心声规则）════\n`;
+    prompt += `以下内容是用户为“心声”单独指定的生成要求。只要涉及心声的长度、行数、体裁、语气、视角、格式或内容，均以用户要求为准，覆盖前文同类默认要求；不得用默认的“第一人称、30到50字”等限制抵消用户要求。例如用户要求三行小诗，就必须严格输出三行诗，不得多行、少行，也不要额外解释。\n`;
+    prompt += `${customHeartPrompt}\n`;
+    prompt += `【必要格式兼容】仍然必须且只能输出一次 <heart>...</heart> 包裹心声内容，标签外不要输出心声；标签内部严格遵循用户自定义的内容与排版要求。\n\n`;
+  }
 
   prompt += `════ 线上线下时间线连贯铁律 ════\n`;
   prompt += `历史记录中包含了你和用户的"线下剧情模式"发言（大段的小说体纯文本），以及现在的"线上聊天模式"发言。\n`;
@@ -10506,6 +10783,14 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
   prompt += `· 表情包      [${character.realName}发送的表情包：{名字或路径}]\n`;
   prompt += `   如果你偷过我的表情包，可以直接用它的名字（比如 [${character.realName}发送的表情包：偷笑]），系统会自动换成正确的图。\n`;
   prompt += `   不是收藏里的表情，就填一个图片路径（不用带 https://i.postimg.cc/），比如 "害羞vHLfrV3K/1.jpg"。\n`;
+  const aiStickerGroup = (db.stickerGroups || []).find(g => g.id === db.activeStickerGroupId);
+  if (aiStickerGroup && Array.isArray(aiStickerGroup.stickers) && aiStickerGroup.stickers.length) {
+    prompt += `\n════ 用户指定的 AI 表情包组（优先使用）════\n`;
+    prompt += `当前可使用分组：${aiStickerGroup.name}。当表情贴合语境时，可以发送其中一个；不要每条回复都发，也不要强行使用。\n`;
+    prompt += `只允许从以下表情名称中选择，名称必须完全一致：\n`;
+    aiStickerGroup.stickers.forEach(st => { prompt += `· ${st.name}\n`; });
+    prompt += `使用格式：[${character.realName}发送的表情包：表情名称]。选中的名称必须与列表完全一致，不要输出 URL，不要编造组外表情。\n\n`;
+  }
   prompt += `· 收礼物指令  [${character.realName}已接收礼物]（隐藏不显示）\n`;
   prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包：{名字}]（隐藏不显示）\n`;
   prompt += `· 收转账指令  [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]（隐藏不显示）\n`;
@@ -10580,6 +10865,12 @@ function generateGroupSystemPrompt(group) {
 
   let prompt = `【任务】你正在扮演「${group.name}」这个群聊里的所有 AI 角色。我（${group.me.nickname}）是群里唯一的人类。\n\n`;
   prompt += focusPrompt('群聊扮演', '只扮演群成员在群里发言。不要输出私聊格式，不要输出线下小说体，不要处理其他任何功能。你的每一条输出都必须是群里某个成员发出的一条群消息。');
+  const activeStickerGroupForGroupChat = (db.stickerGroups || []).find(g => g.id === db.activeStickerGroupId);
+  if (activeStickerGroupForGroupChat && Array.isArray(activeStickerGroupForGroupChat.stickers) && activeStickerGroupForGroupChat.stickers.length) {
+    prompt += `\n════ 用户指定的 AI 表情包组（优先使用）════\n`;
+    prompt += `当前可使用分组：${activeStickerGroupForGroupChat.name}。合适时可使用，不能每条都发。可用名称（必须完全一致）：${activeStickerGroupForGroupChat.stickers.map(st => st.name).join('、')}。\n`;
+    prompt += `群成员发送表情时，使用格式：[成员真名发送的表情包：表情名称]，只能选择上面列出的名称，不要输出 URL 或编造组外表情。\n\n`;
+  }
   prompt += buildMemoryBlock(group, '');
   prompt += buildTimeBlock(group);
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
@@ -10716,6 +11007,30 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
   prompt += `· 禁止输出 [xxx的消息：xxx]、<heart> 等线上聊天标记。\n`;
   prompt += `· 只输出纯文本小说叙事体。\n\n`;
   prompt += `请基于以上设定与历史，开始输出你的纯文本剧情回复。`;
+
+  // 用户在「线下设置」中填写的规则属于本角色专属覆盖规则，优先于上方基础提示词中相冲突的同类规则。
+  const offlineCfg = chat.offlineSettings || {};
+  const perspectiveNames = { first: '第一人称', second: '第二人称', third: '第三人称' };
+  const lengthNames = { short: '短篇（约 300–600 字）', medium: '中篇（约 700–1500 字）', long: '长篇（约 1600–2800 字）' };
+  const overrideRules = [];
+  if (offlineCfg.style && offlineCfg.style.trim()) overrideRules.push(`【自定义文风·优先执行】\n${offlineCfg.style.trim()}`);
+  if (offlineCfg.length || offlineCfg.customWords) {
+    const lengthText = offlineCfg.customWords ? `每次回复约 ${Math.max(100, Math.min(10000, Number(offlineCfg.customWords) || 700))} 字` : (lengthNames[offlineCfg.length] || lengthNames.medium);
+    overrideRules.push(`【自定义篇幅·优先执行】\n${lengthText}`);
+  }
+  if (offlineCfg.charPerspective || offlineCfg.userPerspective) {
+    overrideRules.push(`【自定义叙事视角·优先执行】\n角色（${chat.realName}）叙事视角：${perspectiveNames[offlineCfg.charPerspective] || '第三人称'}。用户叙事视角：${perspectiveNames[offlineCfg.userPerspective] || '第二人称'}。请分别遵守两种视角；不得替用户捏造未提供的动作、台词、心理或决定。`);
+  }
+  if (offlineCfg.bannedWords && offlineCfg.bannedWords.trim()) {
+    const words = offlineCfg.bannedWords.split(/[，,、\n\r]+/).map(w => w.trim()).filter(Boolean);
+    if (words.length) overrideRules.push(`【用户自定义禁用词/内容·优先执行】\n以下词语或内容不得在输出中出现，改用自然的其他表达，且不要解释禁用规则：${words.join('、')}`);
+  }
+  if (overrideRules.length) {
+    prompt += `\n\n════ 用户线下自定义规则（高优先级覆盖）════\n`;
+    prompt += `重要：以下规则由用户在当前线下设置中主动填写。若它们与本提示词前文的基础文风、篇幅、叙事视角或词语限制发生冲突，必须以以下用户自定义规则为准；其他未冲突的基础规则继续有效。\n`;
+    prompt += overrideRules.join('\n\n') + '\n';
+  }
+  prompt += `\n【输出排版】心理描写请用 *心理内容* 标记；角色说出口的对话尽量单独成段，动作/环境/心理描写与对话分段，便于界面进行区分。`;
   return prompt;
 }
 /* ==========================================================
@@ -11075,10 +11390,15 @@ const message = {
 /* 功能开始：AI 用自己收藏的表情包 */
 const aiStickerRegex = new RegExp(`\\[${escapeRegExp(character.realName)}发送的表情包：([\\s\\S]+?)\\]`);
 const aiStickerMatch = item.content.match(aiStickerRegex);
-if (aiStickerMatch && Array.isArray(character.stickerBag) && character.stickerBag.length > 0) {
+if (aiStickerMatch) {
   const sName = aiStickerMatch[1].trim();
-  const found = character.stickerBag.find(s => s.name === sName);
-  if (found) message.stickerData = found.data;
+  const activeGroup = (db.stickerGroups || []).find(g => g.id === db.activeStickerGroupId);
+  const groupSticker = activeGroup && Array.isArray(activeGroup.stickers) ? activeGroup.stickers.find(s => s.name === sName) : null;
+  if (groupSticker) message.stickerData = groupSticker.data;
+  else if (Array.isArray(character.stickerBag) && character.stickerBag.length > 0) {
+    const found = character.stickerBag.find(s => s.name === sName);
+    if (found) message.stickerData = found.data;
+  }
 }
 /* 功能结束：AI 用自己收藏的表情包 */
           if (chat.isBlacklisted) message.sendFailed = true;
@@ -11241,6 +11561,115 @@ function setupImageRecognition() {
 /* ==========================================================
    功能开始：表情系统
    ========================================================== */
+function renderStickerLibrary() {
+  if (!Array.isArray(db.stickerGroups)) db.stickerGroups = [];
+  if (!db.stickerGroups.length) db.stickerGroups.push({id:'sticker_group_default',name:'默认分组',stickers:[]});
+  const groupsEl=document.getElementById('sticker-lib-groups'), itemsEl=document.getElementById('sticker-lib-items');
+  const titleEl=document.getElementById('sticker-lib-editor-title'), hintEl=document.getElementById('sticker-lib-editor-hint');
+  if(!groupsEl||!itemsEl)return;
+  if(!window.currentStickerLibraryGroupId||!db.stickerGroups.some(g=>g.id===window.currentStickerLibraryGroupId))window.currentStickerLibraryGroupId=db.stickerGroups[0]?.id||'';
+  groupsEl.innerHTML='';
+  db.stickerGroups.forEach(group=>{
+    const row=document.createElement('div'); row.className='sticker-lib-group'+(group.id===window.currentStickerLibraryGroupId?' active':'');
+    const n=group.name.toLowerCase(); row.dataset.groupKind=/撒娇/.test(n)?'cute':/搞笑/.test(n)?'funny':/日常/.test(n)?'daily':/动物|猫猫/.test(n)?'animal':'default';
+    const main=document.createElement('div');main.className='sticker-lib-group-main';
+    const name=document.createElement('div');name.className='sticker-lib-group-name';name.textContent=group.name;
+    const meta=document.createElement('div');meta.className='sticker-lib-muted';meta.textContent=`${(group.stickers||[]).length} 个表情`;
+    main.append(name,meta); main.addEventListener('click',()=>{if(row.classList.contains('renaming'))return;window.currentStickerLibraryGroupId=group.id;document.getElementById('sticker-lib-editor-card').hidden=false;renderStickerLibrary();document.getElementById('sticker-lib-editor-card').scrollIntoView({behavior:'smooth',block:'start'});});
+    row.appendChild(main);
+    const rename=document.createElement('button');rename.type='button';rename.className='sticker-lib-rename';rename.textContent='编辑';rename.addEventListener('click',async e=>{e.stopPropagation();if(row.classList.contains('renaming'))return;row.classList.add('renaming');main.innerHTML='';const input=document.createElement('input');input.className='sticker-lib-inline-name';input.value=group.name;input.maxLength=60;input.setAttribute('aria-label','分组名称');const actions=document.createElement('div');actions.className='sticker-lib-row';actions.style.marginTop='6px';const save=document.createElement('button');save.type='button';save.className='sticker-lib-btn';save.textContent='保存';const cancel=document.createElement('button');cancel.type='button';cancel.className='sticker-lib-btn secondary';cancel.textContent='取消';actions.append(save,cancel);main.append(input,actions);input.focus();input.select();cancel.addEventListener('click',()=>renderStickerLibrary());save.addEventListener('click',async()=>{const next=input.value.trim();if(!next){showToast('分组名称不能为空');input.focus();return;}if((db.stickerGroups||[]).some(g=>g.id!==group.id&&(g.name||'').toLowerCase()===next.toLowerCase())){showToast('这个分组名称已存在');input.focus();return;}group.name=next;await saveData();renderStickerLibrary();showToast('分组名称已保存');});input.addEventListener('keydown',ev=>{if(ev.key==='Enter')save.click();if(ev.key==='Escape')cancel.click();});});row.appendChild(rename);
+    if(group.id!=='sticker_group_default'&&group.name!=='默认分组'){
+      const label=document.createElement('span');label.className='sticker-lib-ai-label';label.textContent='给 AI 用';
+      const ai=document.createElement('button');ai.type='button';ai.className='sticker-lib-switch'+(db.activeStickerGroupId===group.id?' on':'');ai.setAttribute('aria-label',db.activeStickerGroupId===group.id?'关闭 AI 使用':'给 AI 使用');ai.setAttribute('aria-pressed',db.activeStickerGroupId===group.id?'true':'false');
+      ai.addEventListener('click',async e=>{e.stopPropagation();db.activeStickerGroupId=db.activeStickerGroupId===group.id?'':group.id;await saveData();renderStickerLibrary();showToast(db.activeStickerGroupId?`AI 将使用「${group.name}」表情组`:'已关闭自定义表情组');});
+      row.append(label,ai);
+    }
+    const choose=document.createElement('button');choose.type='button';choose.className='sticker-lib-btn secondary';choose.textContent='管理';choose.addEventListener('click',()=>{window.currentStickerLibraryGroupId=group.id;document.getElementById('sticker-lib-editor-card').hidden=false;renderStickerLibrary();document.getElementById('sticker-lib-editor-card').scrollIntoView({behavior:'smooth',block:'start'});});row.appendChild(choose);
+    const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='删除';del.addEventListener('click',async e=>{e.stopPropagation();if(group.id==='sticker_group_default'||group.name==='默认分组'){showToast('默认分组不能删除');return;}if(!confirm(`确定删除「${group.name}」分组吗？`))return;db.stickerGroups=db.stickerGroups.filter(g=>g.id!==group.id);if(db.activeStickerGroupId===group.id)db.activeStickerGroupId='';if(window.currentStickerLibraryGroupId===group.id)window.currentStickerLibraryGroupId=db.stickerGroups[0]?.id||'';await saveData();renderStickerLibrary();});row.appendChild(del);
+    groupsEl.appendChild(row);
+  });
+  const current=db.stickerGroups.find(g=>g.id===window.currentStickerLibraryGroupId);
+  if(titleEl)titleEl.textContent=current?`批量添加到：${current.name}`:'批量添加 URL';
+  if(hintEl)hintEl.textContent=current?'每行一个图片 URL，也可写成「表情名 | URL」。导入后会保存到当前分组。':'请先创建并选择一个分组。';
+  itemsEl.innerHTML='';
+  if(current)(current.stickers||[]).forEach(sticker=>{const card=document.createElement('div');card.className='sticker-lib-item';const img=document.createElement('img');img.src=sticker.data;img.alt=sticker.name;img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src=buildStickerFallback(sticker.name);};const name=document.createElement('div');name.className='sticker-lib-item-name';name.textContent=sticker.name;const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='移除';del.addEventListener('click',async()=>{current.stickers=current.stickers.filter(s=>s.id!==sticker.id);await saveData();renderStickerLibrary();});card.append(img,name,del);itemsEl.appendChild(card);});
+}
+
+function setupStickerLibraryManager() {
+  const createBtn = document.getElementById('sticker-lib-create-group');
+  const nameInput = document.getElementById('sticker-lib-new-group');
+  const importBtn = document.getElementById('sticker-lib-import-urls');
+  const clearBtn = document.getElementById('sticker-lib-clear-urls');
+  const textarea = document.getElementById('sticker-lib-bulk-urls');
+  const createPanel = document.getElementById('sticker-lib-create-panel');
+  const createUrls = document.getElementById('sticker-lib-create-urls');
+  document.getElementById('sticker-lib-show-import')?.addEventListener('click',()=>{const editor=document.getElementById('sticker-lib-editor-card');editor.hidden=!editor.hidden;if(!editor.hidden){renderStickerLibrary();editor.scrollIntoView({behavior:'smooth',block:'start'});}});
+  document.getElementById('sticker-lib-close-editor')?.addEventListener('click',()=>{document.getElementById('sticker-lib-editor-card').hidden=true;});
+  document.getElementById('sticker-lib-toggle-manage')?.addEventListener('click',()=>{const rows=[...document.querySelectorAll('#sticker-lib-groups .sticker-lib-group')];const active=rows.some(r=>r.classList.contains('manage-mode'));rows.forEach(r=>r.classList.toggle('manage-mode',!active));showToast(active?'已退出分组管理':'已进入分组管理，可编辑任意分组名称或删除自定义分组');});
+  document.getElementById('sticker-lib-open-create')?.addEventListener('click', () => { createPanel.hidden = !createPanel.hidden; if (!createPanel.hidden) nameInput.focus(); });
+  document.getElementById('sticker-lib-cancel-create')?.addEventListener('click', () => { createPanel.hidden = true; nameInput.value = ''; createUrls.value = ''; });
+  const parseStickerLines = (raw, group) => {
+    let added = 0, skipped = 0;
+    if (!Array.isArray(group.stickers)) group.stickers = [];
+    for (const line of raw.split(/\r?\n/).map(x => x.trim()).filter(Boolean)) {
+      let name = '', url = '';
+      const split = line.match(/^(.+?)\s*[|｜]\s*(https?:\/\/\S+)$/i);
+      if (split) { name = split[1].trim(); url = split[2].trim(); }
+      else { url = line; let tail = (url.split(/[?#]/)[0].split('/').pop() || '').replace(/\.[^.]+$/, ''); try { tail = decodeURIComponent(tail); } catch (_) {} name = tail.slice(0, 24) || `表情${group.stickers.length + 1}`; }
+      if (!/^https?:\/\//i.test(url) || group.stickers.some(st => st.data === url || st.name === name)) { skipped++; continue; }
+      group.stickers.push({id:`sticker_${Date.now()}_${Math.random().toString(36).slice(2,7)}`,name,data:url}); added++;
+    }
+    return {added, skipped};
+  };
+  if (createBtn) createBtn.addEventListener('click', async () => {
+    const name = (nameInput.value || '').trim();
+    if (!name) { showToast('先输入分组名称'); return; }
+    if (!Array.isArray(db.stickerGroups)) db.stickerGroups = [];
+    if (db.stickerGroups.some(g => g.name.toLowerCase() === name.toLowerCase())) { showToast('这个分组已经存在'); return; }
+    const group = { id: `sticker_group_${Date.now()}_${Math.random().toString(36).slice(2,6)}`, name, stickers: [] };
+    const result = parseStickerLines(createUrls.value || '', group);
+    db.stickerGroups.push(group); window.currentStickerLibraryGroupId = group.id; nameInput.value = ''; createUrls.value = ''; createPanel.hidden = true; await saveData(); renderStickerLibrary(); showToast(`分组已创建${result.added ? `，导入 ${result.added} 个表情` : ''}`);
+  });
+  if (importBtn) importBtn.addEventListener('click', async () => {
+    const group = (db.stickerGroups || []).find(g => g.id === window.currentStickerLibraryGroupId);
+    if (!group) { showToast('请先创建并选择一个分组'); return; }
+    const lines = (textarea.value || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+    if (!lines.length) { showToast('请先粘贴图片 URL'); return; }
+    if (!Array.isArray(group.stickers)) group.stickers = [];
+    const result = parseStickerLines(lines.join('\n'), group);
+    await saveData(); textarea.value = ''; renderStickerLibrary();
+    showToast(`导入 ${result.added} 个${result.skipped ? `，跳过 ${result.skipped} 个无效或重复链接` : ''}`);
+  });
+  if (clearBtn) clearBtn.addEventListener('click', () => { if (textarea) textarea.value = ''; });
+  document.getElementById('sticker-lib-import-file-btn')?.addEventListener('click', () => document.getElementById('sticker-lib-import-file')?.click());
+  document.getElementById('sticker-lib-import-file')?.addEventListener('change', async e => {
+    const file = e.target.files?.[0]; if (!file) return;
+    try {
+      let textContent = '';
+      if (/\.txt$/i.test(file.name)) textContent = await file.text();
+      else if (/\.docx$/i.test(file.name)) {
+        if (!window.DecompressionStream) throw new Error('当前浏览器暂不支持 DOCX 解压，请另存为 TXT 后导入');
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const view = new DataView(bytes.buffer); let offset = 0, xmlBytes = null;
+        while (offset < bytes.length - 30) {
+          if (view.getUint32(offset, true) === 0x04034b50) {
+            const method=view.getUint16(offset+8,true), csize=view.getUint32(offset+18,true), nlen=view.getUint16(offset+26,true), elen=view.getUint16(offset+28,true);
+            const name=new TextDecoder().decode(bytes.slice(offset+30,offset+30+nlen)); const dataStart=offset+30+nlen+elen;
+            if(name==='word/document.xml') { const raw=bytes.slice(dataStart,dataStart+csize); if(method===0) xmlBytes=raw; else if(method===8) { const ds=new DecompressionStream('deflate-raw'); xmlBytes=new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(ds)).arrayBuffer()); } break; }
+            offset=dataStart+csize;
+          } else offset++;
+        }
+        if (!xmlBytes) throw new Error('未能读取 DOCX 正文');
+        const xml=new DOMParser().parseFromString(new TextDecoder().decode(xmlBytes),'application/xml');
+        textContent=Array.from(xml.getElementsByTagName('w:p')).map(p=>Array.from(p.getElementsByTagName('w:t')).map(t=>t.textContent).join('')).join('\n');
+      }
+      textarea.value = [textarea.value.trim(), textContent].filter(Boolean).join('\n'); showToast('文件内容已载入，请确认链接格式后批量导入');
+    } catch(err) { showToast(err.message || '文件读取失败'); }
+    e.target.value='';
+  });
+
+}
+
 async function setupStickerSystem() {
   stickerToggleBtn.addEventListener('click', () => {
     stickerModal.classList.toggle('visible');
@@ -11315,73 +11744,43 @@ async function setupStickerSystem() {
 
 function renderStickerGrid() {
   if (!Array.isArray(db.myStickers)) db.myStickers = [];
+  if (!Array.isArray(db.stickerGroups)) db.stickerGroups = [];
+  let tabs = document.getElementById('sticker-group-tabs');
+  if (!tabs) { tabs = document.createElement('div'); tabs.id = 'sticker-group-tabs'; stickerGridContainer.parentNode.insertBefore(tabs, stickerGridContainer); }
+  tabs.style.cssText = 'display:flex;gap:8px;overflow-x:auto;white-space:nowrap;padding:8px 12px;flex-shrink:0;scrollbar-width:none;background:#f7f7f7';
+  const visibleGroups = db.stickerGroups.filter(g => g.id !== db.activeStickerGroupId);
+  const mode = window.currentStickerPanelGroup || '__single__';
+  tabs.innerHTML = '';
+  const addTab = (id, label) => {
+    const b = document.createElement('button'); b.type='button'; b.textContent=label;
+    b.style.cssText=`border:1px solid ${mode===id?'#c6ccd5':'#e5e6e9'};background:${mode===id?'#e8ebf0':'#fff'};color:#454a53;border-radius:18px;padding:6px 13px;font:inherit;font-size:13px;flex:0 0 auto`;
+    b.addEventListener('click',()=>{window.currentStickerPanelGroup=id;renderStickerGrid();}); tabs.appendChild(b);
+  };
+  addTab('__single__','单个表情'); visibleGroups.forEach(g=>addTab(g.id,g.name));
   stickerGridContainer.innerHTML = '';
-  const addItem = document.createElement('div');
-  addItem.className = 'sticker-item';
-  addItem.innerHTML = `
-    <div style="width: 60px; height: 60px; border: 2px dashed #333; border-radius: 8px; display: flex; align-items: center; justify-content: center; box-sizing: border-box;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2" style="width: 24px; height: 24px;">
-        <line x1="12" y1="6" x2="12" y2="18"/>
-        <line x1="6" y1="12" x2="18" y2="12"/>
-      </svg>
-    </div>
-    <span>添加</span>`;
-  addItem.addEventListener('click', () => {
-    addStickerModalTitle.textContent = '添加新表情';
-    addStickerForm.reset();
-    stickerEditIdInput.value = '';
-    stickerPreview.innerHTML = '<span>预览</span>';
-    stickerUrlInput.disabled = false;
-    addStickerModal.classList.add('visible');
-  });
-  stickerGridContainer.appendChild(addItem);
-  if (db.myStickers.length === 0) return;
-  db.myStickers.forEach(sticker => {
-    const item = document.createElement('div');
-    item.className = 'sticker-item';
-    item.innerHTML = `<img src="${sticker.data}" alt="${sticker.name}"><span>${sticker.name}</span>`;
-
-    let pressTimer = null;
-    let longPressed = false;
-
-    const startPress = () => {
-      longPressed = false;
-      clearTimeout(pressTimer);
-      pressTimer = setTimeout(() => {
-        longPressed = true;
-        handleStickerLongPress(sticker.id);
-      }, 500);
-    };
-    const cancelPress = () => { clearTimeout(pressTimer); };
-
-    item.addEventListener('click', (e) => {
-      if (longPressed) {
-        longPressed = false;
-        e.preventDefault();
-        e.stopPropagation();
-        return;
-      }
-      sendSticker(sticker);
-    });
-
-    item.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      e.stopPropagation();
-      startPress();
-    });
-    item.addEventListener('mouseup', cancelPress);
-    item.addEventListener('mouseleave', cancelPress);
-
-    item.addEventListener('touchstart', (e) => {
-      e.stopPropagation();
-      startPress();
-    });
-    item.addEventListener('touchend', cancelPress);
-    item.addEventListener('touchcancel', cancelPress);
-    item.addEventListener('touchmove', cancelPress);
-
+  if (mode === '__single__' || !visibleGroups.some(g=>g.id===mode)) {
+    const addItem = document.createElement('div'); addItem.className='sticker-item';
+    addItem.innerHTML='<div style="width:60px;height:60px;border:2px dashed #333;border-radius:8px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;font-size:28px">＋</div><span>添加</span>';
+    addItem.addEventListener('click',()=>{addStickerModalTitle.textContent='添加新表情';addStickerForm.reset();stickerEditIdInput.value='';stickerPreview.innerHTML='<span>预览</span>';stickerUrlInput.disabled=false;addStickerModal.classList.add('visible');});
+    stickerGridContainer.appendChild(addItem);
+    db.myStickers.forEach(sticker=>appendStickerItem(sticker,false));
+  } else {
+    const group=visibleGroups.find(g=>g.id===mode);
+    (group.stickers||[]).forEach(sticker=>appendStickerItem(sticker,true));
+    if (!(group.stickers||[]).length) { const empty=document.createElement('div');empty.className='sticker-lib-muted';empty.textContent='这个分组还没有表情';empty.style.cssText='grid-column:1/-1;text-align:center;padding:22px';stickerGridContainer.appendChild(empty); }
+  }
+  function appendStickerItem(sticker, fromGroup) {
+    const item=document.createElement('div');item.className='sticker-item';
+    const img=document.createElement('img');img.src=sticker.data;img.alt=sticker.name;img.loading='lazy';img.onerror=()=>{img.onerror=null;img.src=buildStickerFallback(sticker.name);};
+    const label=document.createElement('span');label.textContent=sticker.name;item.append(img,label);
+    let pressTimer=null,longPressed=false;
+    const startPress=()=>{longPressed=false;clearTimeout(pressTimer);pressTimer=setTimeout(()=>{longPressed=true;if(fromGroup){showToast('分组表情请在「表情包管理」中编辑');}else handleStickerLongPress(sticker.id);},500);};
+    const cancelPress=()=>clearTimeout(pressTimer);
+    item.addEventListener('click',e=>{if(longPressed){longPressed=false;e.preventDefault();e.stopPropagation();return;}sendSticker(sticker);});
+    item.addEventListener('mousedown',e=>{if(e.button!==0)return;e.stopPropagation();startPress();});item.addEventListener('mouseup',cancelPress);item.addEventListener('mouseleave',cancelPress);
+    item.addEventListener('touchstart',e=>{e.stopPropagation();startPress();});item.addEventListener('touchend',cancelPress);item.addEventListener('touchcancel',cancelPress);item.addEventListener('touchmove',cancelPress);
     stickerGridContainer.appendChild(item);
-  });
+  }
 }
 function handleStickerLongPress(stickerId) {
   clearTimeout(longPressTimer);
@@ -12048,6 +12447,30 @@ if (ciAutoTranslateToggle) ciAutoTranslateToggle.addEventListener('change', asyn
   }
 });
 
+/* 私聊：心声自定义提示词。使用应用内输入框，不调用浏览器系统弹窗。 */
+const ciHeartPromptBtn = document.getElementById('chat-info-heart-prompt-btn');
+if (ciHeartPromptBtn) {
+  const openHeartPromptEditor = async () => {
+    const char = db.characters.find(c => c.id === currentChatId);
+    if (!char) return;
+    const value = await showHgInput({
+      title: '心声提示词',
+      sub: '这里的规则优先于默认心声要求。例如：严格写成三行小诗。留空则恢复默认规则。',
+      placeholder: '写下你希望心声如何生成……',
+      value: char.heartPrompt || '',
+      allowEmpty: true
+    });
+    if (value === null) return;
+    char.heartPrompt = value.trim();
+    await saveData();
+    const preview = document.getElementById('chat-info-heart-prompt-preview');
+    if (preview) preview.textContent = char.heartPrompt || '自定义心声生成规则，优先于默认提示词';
+    showToast(char.heartPrompt ? '心声提示词已保存' : '已恢复默认心声提示词');
+  };
+  ciHeartPromptBtn.addEventListener('click', openHeartPromptEditor);
+  ciHeartPromptBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHeartPromptEditor(); } });
+}
+
 /* 功能开始：时间戳开关（聊天信息页） */
 const ciTimestampToggle = document.getElementById('chat-info-timestamp-toggle');
 if (ciTimestampToggle) ciTimestampToggle.addEventListener('change', async (e) => {
@@ -12137,6 +12560,8 @@ function renderChatInfoScreen() {
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
   const autoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
   if (autoTranslateToggle) autoTranslateToggle.checked = !!char.autoTranslateEnabled;
+  const heartPromptPreview = document.getElementById('chat-info-heart-prompt-preview');
+  if (heartPromptPreview) heartPromptPreview.textContent = (char.heartPrompt || '').trim() || '自定义心声生成规则，优先于默认提示词';
 
   /* 时间戳开关回填：char 显式 true/false 优先，否则跟随全局 */
   const tsToggle = document.getElementById('chat-info-timestamp-toggle');
@@ -14761,6 +15186,9 @@ document.querySelectorAll('#me-screen .me-list-item').forEach(item => {
       } else if (name === '个人资料') {
         renderMyProfileInfoScreen();
         switchScreen('my-profile-info-screen');
+      } else if (name === '表情') {
+        renderStickerLibrary();
+        switchScreen('sticker-library-screen');
       }
     });
 });
@@ -16143,11 +16571,19 @@ function renderDecisionCards() {
   if (!stage) return;
   stage.innerHTML = '';
   decCardsRevealed = false;
-  db.decisionState.cardTexts.forEach((t, i) => {
+  // 每次进入/重新洗牌时随机打乱卡片位置，卡片内容与原始选项索引保持绑定。
+  const order = db.decisionState.cardTexts.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  order.forEach((i, position) => {
+    const t = db.decisionState.cardTexts[i];
     const card = document.createElement('div');
     card.className = 'dec-card';
     card.dataset.idx = i;
-    card.innerHTML = `<div class="dec-card-inner"><div class="dec-card-face dec-card-front">?</div><div class="dec-card-face dec-card-back">${escapeHtml(t)}</div></div>`;
+    card.style.setProperty('--card-delay', `${position * 65}ms`);
+    card.innerHTML = `<div class="dec-card-inner"><div class="dec-card-face dec-card-front"><span class="dec-card-question">?</span><span class="dec-card-mark">✦</span></div><div class="dec-card-face dec-card-back">${escapeHtml(t)}</div></div>`;
     card.addEventListener('click', () => onDecisionCardClick(card));
     stage.appendChild(card);
   });
@@ -16799,24 +17235,15 @@ function renderAcctCalendar() {
   const today = new Date();
   for (let i = 0; i < firstDay; i++) html += '<div class="acct-calendar-day"></div>';
   
-// 获取阴历的辅助函数
-function getLunarDate(date) {
-  try {
-    return new Intl.DateTimeFormat('zh-CN-u-ca-chinese', { day: 'numeric', month: 'numeric' }).format(date);
-  } catch(e) { return ''; }
-}
-
 for (let d = 1; d <= daysInMonth; d++) {
   const currentDate = new Date(year, month, d);
   const dayTx = db.accountingData.transactions.filter(t => { const td = new Date(t.timestamp); return td.getFullYear() === year && td.getMonth() === month && td.getDate() === d; });
   const dayExpense = dayTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
   const dayIncome = dayTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
   const isToday = today.getFullYear() === year && today.getMonth() === month && today.getDate() === d;
-  const lunarDate = getLunarDate(currentDate);
   
   html += `<div class="acct-calendar-day ${isToday ? 'today' : ''}" data-date="${year}-${month + 1}-${d}">
     <span class="solar-date">${d}</span>
-    <span class="lunar-date">${lunarDate}</span>
     <div class="day-stats">
       ${dayExpense > 0 ? `<span class="expense-stat">-${dayExpense.toFixed(0)}</span>` : ''}
       ${dayIncome > 0 ? `<span class="income-stat">+${dayIncome.toFixed(0)}</span>` : ''}
@@ -17120,6 +17547,8 @@ let offlineMultiSelectMode = false;
 let offlineSelectedIds = new Set();
 let offlineLongPressTimer = null;
 let offlineLongPressTriggered = false;
+let offlineEditingMessageId = null;
+let offlineEditingMessageWrapper = null;
 
 (function injectOfflineSelectStyle(){
     if (document.getElementById('offline-select-style')) return;
@@ -17128,6 +17557,106 @@ let offlineLongPressTriggered = false;
     st.textContent = `.offline-bubble-wrapper.offline-selected .offline-bubble{box-shadow:0 0 0 2px #07c160,0 2px 12px rgba(7,193,96,.15)!important;background-color:rgba(7,193,96,.06)!important;}`;
     document.head.appendChild(st);
 })();
+
+function getOfflineActiveChat() {
+    return (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+}
+function applyOfflineBackground(chat) {
+    const area = document.getElementById('offline-chat-area');
+    if (!area) return;
+    const bg = chat && chat.offlineSettings && chat.offlineSettings.background;
+    area.style.backgroundImage = bg ? `linear-gradient(rgba(248,248,250,.72),rgba(248,248,250,.72)),url("${bg}")` : '';
+    area.style.backgroundSize = bg ? 'cover' : '';
+    area.style.backgroundPosition = bg ? 'center' : '';
+    area.style.backgroundAttachment = bg ? 'local' : '';
+}
+function formatOfflineStoryText(input) {
+    const escapeHtml = (value) => value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(input || '').split(/\n{2,}/).map(block => {
+        let safe = escapeHtml(block).replace(/\n/g, '<br>');
+        safe = safe.replace(/\*([^*]+)\*/g, '<em class="offline-thought">$1</em>');
+        const hasDialogue = /[“”「」『』"]/.test(block) || /[“「『"]/.test(block);
+        return `<div class="${hasDialogue ? 'offline-dialogue' : 'offline-narration'}">${safe}</div>`;
+    }).join('');
+}
+function openOfflineSettings() {
+    const chat = getOfflineActiveChat();
+    if (!chat) return;
+    if (!chat.offlineSettings) chat.offlineSettings = {};
+    const cfg = chat.offlineSettings;
+    document.getElementById('offline-style-text').value = cfg.style || '';
+    document.getElementById('offline-custom-words').value = cfg.customWords || '';
+    document.getElementById('offline-banned-words').value = cfg.bannedWords || '';
+    document.querySelectorAll('input[name="offline-length"]').forEach(el => el.checked = el.value === (cfg.length || 'medium'));
+    document.getElementById('offline-char-perspective').value = cfg.charPerspective || 'third';
+    document.getElementById('offline-user-perspective').value = cfg.userPerspective || 'second';
+    const preview = document.getElementById('offline-bg-preview');
+    preview.style.backgroundImage = cfg.background ? `url("${cfg.background}")` : '';
+    preview.textContent = cfg.background ? '已选择自定义背景' : '当前背景 · 灰白';
+    document.getElementById('offline-settings-modal').style.display = 'flex';
+}
+function closeOfflineSettings() {
+    const modal = document.getElementById('offline-settings-modal');
+    if (modal) modal.style.display = 'none';
+}
+async function saveOfflineSettings() {
+    const chat = getOfflineActiveChat();
+    if (!chat) return;
+    const cfg = chat.offlineSettings || {};
+    cfg.style = document.getElementById('offline-style-text').value.trim();
+    cfg.customWords = document.getElementById('offline-custom-words').value.trim();
+    cfg.bannedWords = document.getElementById('offline-banned-words').value.trim();
+    cfg.length = document.querySelector('input[name="offline-length"]:checked')?.value || 'medium';
+    cfg.charPerspective = document.getElementById('offline-char-perspective').value;
+    cfg.userPerspective = document.getElementById('offline-user-perspective').value;
+    chat.offlineSettings = cfg;
+    try {
+        await saveData();
+        applyOfflineBackground(chat);
+        closeOfflineSettings();
+        showToast('线下设置已保存');
+    } catch (err) {
+        console.error('保存线下设置失败', err);
+        showToast('保存失败，请重试');
+    }
+}
+function clearOfflineBackground() {
+    const chat = getOfflineActiveChat();
+    if (!chat) return;
+    if (!chat.offlineSettings) chat.offlineSettings = {};
+    delete chat.offlineSettings.background;
+    const preview = document.getElementById('offline-bg-preview');
+    preview.style.backgroundImage = '';
+    preview.textContent = '当前背景 · 灰白';
+    applyOfflineBackground(chat);
+}
+document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'offline-bg-file') {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { showToast('请选择图片文件'); return; }
+        if (file.size > 5 * 1024 * 1024) { showToast('图片请控制在 5MB 以内'); e.target.value = ''; return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+            const chat = getOfflineActiveChat();
+            if (!chat) return;
+            if (!chat.offlineSettings) chat.offlineSettings = {};
+            chat.offlineSettings.background = String(reader.result);
+            const preview = document.getElementById('offline-bg-preview');
+            preview.style.backgroundImage = `url("${reader.result}")`;
+            preview.textContent = '已选择自定义背景';
+            applyOfflineBackground(chat);
+        };
+        reader.readAsDataURL(file);
+    }
+});
+document.addEventListener('click', (e) => {
+    if (e.target.closest('#offline-settings-open')) openOfflineSettings();
+    if (e.target.closest('#offline-settings-close') || e.target.closest('#offline-settings-cancel')) closeOfflineSettings();
+    if (e.target.closest('#offline-settings-save')) saveOfflineSettings();
+    if (e.target.closest('#offline-bg-clear')) clearOfflineBackground();
+    if (e.target.id === 'offline-settings-modal') closeOfflineSettings();
+});
 
 function openOfflineScreen() {
     if (!currentChatId || !currentChatType) return showToast('请先选择一个聊天');
@@ -17145,6 +17674,7 @@ function openOfflineScreen() {
         offlineScreen.classList.add(`offline-active-${chat.id}`);
     }
     
+    applyOfflineBackground(chat);
     renderOfflineMessages();
     switchScreen('offline-screen');
 }
@@ -17164,6 +17694,93 @@ function updateOfflineMultiBar() {
     }
 }
 
+function beginEditOfflineMessage(messageId) {
+    const chat = getOfflineActiveChat();
+    const msg = chat && chat.history.find(item => item.isOffline && item.id === messageId);
+    if (!msg) return;
+    exitOfflineMultiSelect();
+    // 编辑直接发生在原消息楼层内，不再把内容搬到底部输入栏或弹系统输入框。
+    offlineEditingMessageId = messageId;
+    const wrapped = String(msg.content || '').match(/^(\[.*?的消息：)([\s\S]+?)(\])$/);
+    offlineEditingMessageWrapper = wrapped ? { prefix: wrapped[1], suffix: wrapped[3] } : null;
+    const wrapper = document.querySelector(`#offline-chat-area .offline-bubble-wrapper[data-msg-id="${CSS.escape(messageId)}"]`);
+    const bubble = wrapper && wrapper.querySelector('.offline-bubble');
+    const textEl = bubble && bubble.querySelector('.offline-bubble-text');
+    if (!bubble || !textEl) { offlineEditingMessageId = null; offlineEditingMessageWrapper = null; return; }
+
+    let style = document.getElementById('offline-inline-edit-style');
+    if (!style) {
+        style = document.createElement('style');
+        style.id = 'offline-inline-edit-style';
+        style.textContent = `
+          #offline-chat-area .offline-inline-editor{display:flex;flex-direction:column;gap:10px;width:100%;min-width:0;box-sizing:border-box}
+          #offline-chat-area .offline-inline-editor textarea{display:block;width:100%;min-height:140px;max-height:55vh;resize:vertical;box-sizing:border-box;border:1px solid #d8dbe1;border-radius:12px;background:rgba(255,255,255,.88);color:#292b30;padding:12px;font:inherit;font-size:inherit;line-height:1.8;outline:none;overflow-wrap:anywhere;white-space:pre-wrap}
+          #offline-chat-area .offline-inline-editor textarea:focus{border-color:#aeb8c8;box-shadow:0 0 0 3px rgba(89,111,145,.09)}
+          #offline-chat-area .offline-inline-edit-actions{display:flex;justify-content:flex-end;gap:8px}
+          #offline-chat-area .offline-inline-edit-actions button{min-width:68px;border:1px solid #e0e2e7;border-radius:9px;background:#fff;color:#646873;padding:8px 14px;font:inherit;font-size:14px}
+          #offline-chat-area .offline-inline-edit-actions button.save{background:#202b3b;color:#fff;border-color:#202b3b}
+        `;
+        document.head.appendChild(style);
+    }
+    const editor = document.createElement('div');
+    editor.className = 'offline-inline-editor';
+    const textarea = document.createElement('textarea');
+    textarea.setAttribute('aria-label', '编辑这条线下消息');
+    textarea.value = String(msg.content || '').replace(/^\[.*?的消息：([\s\S]+?)\]$/, '$1');
+    const actions = document.createElement('div');
+    actions.className = 'offline-inline-edit-actions';
+    const cancel = document.createElement('button');
+    cancel.type = 'button'; cancel.textContent = '取消';
+    cancel.addEventListener('click', cancelEditOfflineMessage);
+    const save = document.createElement('button');
+    save.type = 'button'; save.className = 'save'; save.textContent = '保存';
+    save.addEventListener('click', saveEditedOfflineMessage);
+    actions.append(cancel, save);
+    editor.append(textarea, actions);
+    textEl.replaceWith(editor);
+    wrapper.classList.add('offline-inline-editing');
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+}
+
+function cancelEditOfflineMessage() {
+    const id = offlineEditingMessageId;
+    offlineEditingMessageId = null;
+    offlineEditingMessageWrapper = null;
+    // 重新渲染还原原气泡内容；不影响底部正常的剧情输入栏。
+    if (id) renderOfflineMessages();
+}
+
+async function saveEditedOfflineMessage() {
+    const id = offlineEditingMessageId;
+    if (!id) return;
+    const wrapper = document.querySelector(`#offline-chat-area .offline-bubble-wrapper[data-msg-id="${CSS.escape(id)}"]`);
+    const input = wrapper && wrapper.querySelector('.offline-inline-editor textarea');
+    const nextText = input ? input.value.trim() : '';
+    if (!nextText) return showToast('消息内容不能为空');
+    const chat = getOfflineActiveChat();
+    const msg = chat && chat.history.find(item => item.isOffline && item.id === id);
+    if (!msg) { cancelEditOfflineMessage(); return; }
+    const oldContent = msg.content;
+    const oldParts = msg.parts;
+    const storedText = offlineEditingMessageWrapper ? `${offlineEditingMessageWrapper.prefix}${nextText}${offlineEditingMessageWrapper.suffix}` : nextText;
+    msg.content = storedText;
+    msg.parts = [{ type: 'text', text: storedText }];
+    msg.editedAt = Date.now();
+    try {
+        await saveData();
+        offlineEditingMessageId = null;
+        offlineEditingMessageWrapper = null;
+        renderOfflineMessages();
+        renderChatList();
+        showToast('消息已编辑');
+    } catch (error) {
+        msg.content = oldContent;
+        msg.parts = oldParts;
+        console.error('编辑线下消息失败', error);
+        showToast('保存失败，请重试');
+    }
+}
 function updateOfflineAiBtnIcon() {
     const genIcon = document.getElementById('offline-icon-gen');
     const regenIcon = document.getElementById('offline-icon-regen');
@@ -17272,6 +17889,7 @@ function renderOfflineBubble(msg, turn) {
     const area = document.getElementById('offline-chat-area');
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     const isSent = msg.role === 'user';
+    if (!chat || !area) return;
 
     let avatarUrl, name;
     if (currentChatType === 'private') {
@@ -17286,15 +17904,17 @@ function renderOfflineBubble(msg, turn) {
     wrapper.className = `offline-bubble-wrapper ${isSent ? 'sent' : 'received'}`;
     wrapper.dataset.msgId = msg.id;
     if (offlineSelectedIds.has(msg.id)) wrapper.classList.add('offline-selected');
-    const safeText = msg.text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+    const safeText = formatOfflineStoryText(msg.text);
+    const safeName = String(name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const safeAvatar = String(avatarUrl || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
 
     wrapper.innerHTML = `
         <div class="offline-bubble-container">
             <div class="offline-turn-badge">#${turn}</div>
             <div class="offline-bubble ${isSent ? 'sent' : 'received'}">
                 <div class="offline-card-header">
-                    <img src="${avatarUrl}" alt="${name}">
-                    <span>${name}</span>
+                    <img src="${safeAvatar}" alt="${safeName}">
+                    <span>${safeName}</span>
                 </div>
                 <div class="offline-bubble-text">${safeText}</div>
             </div>
@@ -17307,8 +17927,8 @@ function renderOfflineBubble(msg, turn) {
         clearTimeout(offlineLongPressTimer);
         offlineLongPressTimer = setTimeout(() => {
             offlineLongPressTriggered = true;
-            enterOfflineMultiSelect(msg.id);
-        }, 500);
+            showOfflineMessageActions(msg.id);
+        }, 550);
     };
     const cancelPress = () => clearTimeout(offlineLongPressTimer);
 
@@ -17331,7 +17951,47 @@ function renderOfflineBubble(msg, turn) {
     area.appendChild(wrapper);
 }
 
+function showOfflineMessageActions(messageId) {
+    if (document.getElementById('offline-message-actions')) return;
+    const overlay = document.createElement('div');
+    overlay.id = 'offline-message-actions';
+    overlay.className = 'offline-message-actions-overlay';
+    overlay.innerHTML = `
+      <div class="offline-message-actions-panel" role="dialog" aria-modal="true" aria-label="消息操作">
+        <div class="offline-message-actions-grabber"></div>
+        <div class="offline-message-actions-title">消息操作</div>
+        <button type="button" data-action="edit">编辑消息</button>
+        <button type="button" data-action="delete" class="danger">删除消息</button>
+        <button type="button" data-action="cancel" class="cancel">取消</button>
+      </div>`;
+    const style = document.createElement('style');
+    style.id = 'offline-message-actions-style';
+    style.textContent = `
+      .offline-message-actions-overlay{position:fixed;inset:0;z-index:10050;background:rgba(25,27,32,.28);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + var(--safe-bottom, 0px));box-sizing:border-box;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}
+      .offline-message-actions-panel{width:min(100%,480px);background:#f8f8fa;border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:10px 12px calc(12px + var(--safe-bottom, 0px));box-shadow:0 10px 35px rgba(20,22,28,.16);font-family:inherit;box-sizing:border-box}
+      .offline-message-actions-grabber{width:34px;height:4px;border-radius:4px;background:#d4d5da;margin:2px auto 12px}
+      .offline-message-actions-title{text-align:center;color:#898b94;font-size:12px;letter-spacing:1px;padding:4px 0 10px}
+      .offline-message-actions-panel button{display:block;width:100%;min-height:46px;border:1px solid #e8e8ed;border-radius:12px;background:#fff;color:#3c3e45;font:inherit;font-size:15px;margin-top:8px;padding:11px 14px}
+      .offline-message-actions-panel button:active{background:#eeeeF2}
+      .offline-message-actions-panel button.danger{color:#b84b50}
+      .offline-message-actions-panel button.cancel{background:#eeeff2;color:#777983;border-color:transparent;margin-top:12px}
+    `;
+    if (!document.getElementById('offline-message-actions-style')) document.head.appendChild(style);
+    overlay.addEventListener('click', async (event) => {
+        if (event.target === overlay) { overlay.remove(); return; }
+        const button = event.target.closest('button[data-action]');
+        if (!button) return;
+        const action = button.dataset.action;
+        overlay.remove();
+        if (action === 'edit') beginEditOfflineMessage(messageId);
+        if (action === 'delete') enterOfflineMultiSelect(messageId);
+    });
+    document.body.appendChild(overlay);
+}
+
 async function sendOfflineMessage() {
+    // 编辑时只允许通过原气泡内的「保存」按钮提交，底部输入栏不参与编辑。
+    if (offlineEditingMessageId) return;
     const input = document.getElementById('offline-input');
     const text = input.value.trim();
     if (!text || isGenerating) return;
@@ -17580,7 +18240,7 @@ function buildMemoryBlock(chat, query = '') {
 }
 
 /* 韩系输入弹窗 */
-function showHgInput({ title, sub, placeholder, value } = {}) {
+function showHgInput({ title, sub, placeholder, value, allowEmpty = false } = {}) {
   return new Promise(resolve => {
     const overlay = document.getElementById('hg-input-modal');
     if (!overlay) return resolve(null);
@@ -17608,7 +18268,7 @@ function showHgInput({ title, sub, placeholder, value } = {}) {
       resolve(val);
     };
     cancelBtn.onclick = () => close(null);
-    confirmBtn.onclick = () => close(inputEl.value.trim() || null);
+    confirmBtn.onclick = () => close(allowEmpty ? inputEl.value : (inputEl.value.trim() || null));
     inputEl.onkeydown = (e) => {
       if (e.key === 'Escape') cancelBtn.click();
       if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) confirmBtn.click();
