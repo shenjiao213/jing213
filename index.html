@@ -1116,6 +1116,64 @@ label.btn-primary { color: var(--white-color) !important; }
 #group-settings-sidebar .add-member-btn:hover .add-icon { color: var(--primary-color); border-color: var(--primary-color); }
 #group-settings-sidebar .group-member span,
 #group-settings-sidebar .add-member-btn span { font-size: 12px; text-align: center; color: var(--text-color); }
+/* 群聊设置：全屏页面，结构与私聊信息页统一 */
+#group-settings-sidebar {
+  position:absolute !important; inset:0 auto 0 0 !important; right:auto !important;
+  width:100% !important; max-width:none !important; height:100% !important;
+  box-sizing:border-box; box-shadow:none !important; z-index:120 !important;
+  background:#fff; transform:translateX(100%); transition:transform .28s ease;
+}
+#group-settings-sidebar.open { right:auto !important; transform:translateX(0); }
+#group-settings-sidebar > .header {
+  display:grid; grid-template-columns:44px 1fr 44px; align-items:center;
+  flex:0 0 auto; min-height:58px; box-sizing:border-box; padding:10px 14px;
+  background:#fff; color:var(--text-color); border-bottom:1px solid #eee;
+  text-align:center; font-size:18px; font-weight:600;
+}
+#group-settings-sidebar .group-settings-back { border:0; background:transparent; color:var(--text-color); font-size:34px; line-height:1; padding:0; width:40px; height:40px; cursor:pointer; }
+#group-settings-sidebar .group-settings-header-spacer { width:40px; }
+#group-settings-sidebar > .content { flex:1 1 auto; min-height:0; overflow-y:auto; box-sizing:border-box; padding:0 20px calc(24px + var(--safe-bottom, 0px)); }
+#group-settings-sidebar #group-settings-form { display:flex; flex-direction:column; }
+/* 紧凑布局：保持与私聊设置相同的列表节奏，群成员只是多几个人 */
+#group-settings-sidebar .group-members-section { order:0; padding:18px 0 16px; border-bottom:1px solid #eee; }
+#group-settings-sidebar .group-members-title { margin:0 0 12px; color:var(--secondary-color); font-weight:600; font-size:15px; }
+#group-settings-sidebar .group-members-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:12px 10px; margin-top:0; }
+#group-settings-sidebar .group-member, #group-settings-sidebar .add-member-btn { min-width:0; display:flex; flex-direction:column; align-items:center; cursor:pointer; position:relative; }
+#group-settings-sidebar .group-member img { width:62px; height:62px; border-radius:10px; object-fit:cover; margin:0 0 5px; border:1px solid #e6e6e6; }
+#group-settings-sidebar .group-member span, #group-settings-sidebar .add-member-btn span { font-size:12px; text-align:center; color:var(--text-color); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#group-settings-sidebar .group-member-remove { cursor:pointer; margin-top:4px !important; width:22px !important; height:22px !important; line-height:18px !important; }
+#group-settings-sidebar .add-member-btn .add-icon { width:62px; height:62px; box-sizing:border-box; border-radius:10px; border:2px dashed #ccc; display:flex; align-items:center; justify-content:center; font-size:24px; color:#bbb; margin-bottom:5px; }
+#group-settings-sidebar .group-avatar-setting { order:1; min-height:58px; display:grid; grid-template-columns:72px 1fr 20px; align-items:center; gap:10px; margin:0; padding:10px 0; border-bottom:1px solid #eee; cursor:pointer; }
+#group-settings-sidebar .group-avatar-setting .group-row-label { font-size:16px; color:var(--text-color); }
+#group-settings-sidebar .group-avatar-preview { grid-column:2; grid-row:1; justify-self:end; width:44px; height:44px; border-radius:9px; object-fit:cover; border:0; cursor:pointer; }
+#group-settings-sidebar .group-avatar-setting .avatar-row-arrow { grid-column:3; grid-row:1; color:#c7c7c7; font-size:24px; }
+#group-settings-sidebar .group-avatar-setting label, #group-settings-sidebar .group-avatar-setting .btn { display:none !important; }
+#group-settings-sidebar .group-name-row { order:2; min-height:54px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; }
+#group-settings-sidebar .group-name-row label { margin:0; flex:0 0 110px; color:var(--text-color); font-size:16px; font-weight:400; }
+#group-settings-sidebar .group-name-row input { min-width:0; flex:1; width:auto; border:0; outline:none; box-shadow:none; padding:8px 0; margin:0; text-align:right; background:transparent; color:var(--text-color); font-size:16px; }
+#group-settings-sidebar .group-name-row input:focus { border:0; box-shadow:none; }
+#group-settings-sidebar .group-chat-info-item { min-height:56px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 2px; border-bottom:1px solid #eee; color:var(--text-color); font-size:16px; }
+#group-settings-sidebar .group-chat-info-item .chat-info-arrow { color:#c7c7c7; font-size:25px; font-weight:300; }
+#group-settings-sidebar #group-chat-mute-row { order:3; }
+#group-settings-sidebar #group-chat-search-btn { order:4; margin-top:0; }
+#group-settings-sidebar #group-chat-pin-row { order:5; }
+#group-settings-sidebar #group-chat-translate-row { order:6; }
+#group-settings-sidebar #group-chat-bg-gap { order:7; }
+#group-settings-sidebar #group-chat-bg-btn { order:8; }
+#group-settings-sidebar #group-chat-bg-upload { order:8; }
+#group-settings-sidebar #group-chat-clear-gap { order:9; }
+#group-settings-sidebar #group-chat-clear-btn { order:10; }
+#group-settings-sidebar #group-chat-timestamp-row { order:11; }
+#group-settings-sidebar .group-chat-info-gap { height:10px; background:#ededed; margin:0 -20px; }
+#group-settings-sidebar #group-chat-timestamp-toggle { accent-color:var(--primary-color); }
+#group-settings-sidebar #group-settings-form > button[type="submit"] { order:12; margin-top:16px; }
+#group-settings-sidebar #delete-group-chat-btn { margin:18px 0 8px; }
+@media (max-width:380px) {
+  #group-settings-sidebar > .content { padding-left:16px; padding-right:16px; }
+  #group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:10px 6px; }
+  #group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:56px; height:56px; }
+  #group-settings-sidebar .group-name-row label { flex-basis:100px; }
+}
 /* ==========================================================
    功能结束：群聊成员选择 / 群设置
    ========================================================== */
@@ -2611,6 +2669,54 @@ input:checked + .slider:before { transform: translateX(22px); }
   #contacts-screen .wechat-header { padding-top: calc(12px + var(--safe-top, 0px)) !important; }
 }
 </style>
+<style id="group-settings-one-size-refinement">
+
+/* 群聊设置微调版：比原版小一号，按约定顺序排列 */
+#group-settings-sidebar > .header { min-height:54px; padding:8px 12px; font-size:17px; }
+#group-settings-sidebar .group-settings-back { width:36px; height:36px; font-size:30px; }
+#group-settings-sidebar .group-settings-header-spacer { width:36px; }
+#group-settings-sidebar > .content { padding-left:17px; padding-right:17px; padding-bottom:calc(16px + var(--safe-bottom, 0px)); }
+#group-settings-sidebar .group-members-section { padding:14px 0 12px; }
+#group-settings-sidebar .group-members-title { margin-bottom:9px; font-size:14px; }
+#group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:9px 8px; }
+#group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:56px; height:56px; border-radius:9px; }
+#group-settings-sidebar .add-member-btn .add-icon { font-size:22px; }
+#group-settings-sidebar .group-member span, #group-settings-sidebar .add-member-btn span { font-size:11px; }
+#group-settings-sidebar .group-member-remove { width:20px !important; height:20px !important; }
+#group-settings-sidebar .group-avatar-setting { min-height:52px; grid-template-columns:66px 1fr 18px; gap:8px; padding:8px 0; }
+#group-settings-sidebar .group-avatar-setting .group-row-label,
+#group-settings-sidebar .group-name-row label,
+#group-settings-sidebar .group-name-row input { font-size:15px; }
+#group-settings-sidebar .group-avatar-preview { width:40px; height:40px; }
+#group-settings-sidebar .group-name-row { min-height:48px; gap:10px; }
+#group-settings-sidebar .group-name-row label { flex-basis:104px; }
+#group-settings-sidebar .group-name-row input { padding:6px 0; }
+#group-settings-sidebar .group-chat-info-item { min-height:49px; font-size:15px; gap:10px; }
+#group-settings-sidebar .group-chat-info-item .chat-info-arrow { font-size:22px; }
+#group-settings-sidebar .group-chat-info-gap { height:7px; margin:0 -17px; }
+/* 顺序：免打扰、置顶、翻译、查找记录、时间戳、背景、清空 */
+#group-settings-sidebar #group-chat-mute-row { order:3; }
+#group-settings-sidebar #group-chat-pin-row { order:4; }
+#group-settings-sidebar #group-chat-translate-row { order:5; }
+#group-settings-sidebar #group-chat-search-btn { order:6; margin-top:0; }
+#group-settings-sidebar #group-chat-timestamp-row { order:7; }
+#group-settings-sidebar #group-chat-bg-gap { order:8; }
+#group-settings-sidebar #group-chat-bg-btn, #group-settings-sidebar #group-chat-bg-upload { order:9; }
+#group-settings-sidebar #group-chat-clear-gap { order:10; }
+#group-settings-sidebar #group-chat-clear-btn { order:11; }
+#group-settings-sidebar #group-settings-form > button[type="submit"] { order:13; min-height:48px; padding:10px 14px; margin-top:7px; border-radius:10px; font-size:15px; background:#e5e5e5 !important; color:#555 !important; border:1px solid #dedede !important; }
+#group-settings-sidebar #delete-group-chat-btn { display:block; order:12; min-height:48px; padding:10px 14px; margin:10px 0 0 !important; border-radius:10px; font-size:15px; }
+#group-settings-sidebar #group-settings-form { display:flex; flex-direction:column; }
+#group-settings-sidebar > .content > hr { display:none; }
+@media (max-width:380px) {
+ #group-settings-sidebar > .content { padding-left:14px; padding-right:14px; }
+ #group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:8px 6px; }
+ #group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:52px; height:52px; }
+ #group-settings-sidebar .group-name-row label { flex-basis:96px; }
+ #group-settings-sidebar .group-chat-info-gap { margin:0 -14px; }
+}
+
+</style>
 </head>
 <body>
 <div class="phone-screen">
@@ -4020,10 +4126,6 @@ input:checked + .slider:before { transform: translateX(22px); }
         <input type="checkbox" id="setting-blacklist-toggle">
         <span class="slider round"></span>
       </label>
-    </div>
-    <div style="background: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;" onclick="showToast('投诉暂未开放')">
-      <span style="font-size: 16px; color: #333;">投诉</span>
-      <span style="color: #ccc; font-size: 18px;">›</span>
     </div>
     <div style="height: 10px; background: #f7f7f7;"></div>
     <div style="background: #fff; padding: 20px; display: flex; justify-content: center;">
@@ -5605,6 +5707,10 @@ input:checked + .slider:before { transform: translateX(22px); }
       <span>置顶聊天</span>
       <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-pin-toggle"><span class="slider round"></span></label>
     </div>
+    <div class="chat-info-item">
+      <span>外语自动翻译</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-auto-translate-toggle"><span class="slider round"></span></label>
+    </div>
     
 
 <div class="chat-info-section-gap"></div>
@@ -5640,11 +5746,6 @@ input:checked + .slider:before { transform: translateX(22px); }
     </div>
     <div class="chat-info-section-gap"></div>
 
-    <div class="chat-info-item" id="chat-info-report-btn">
-      <span>投诉</span>
-      <span class="chat-info-arrow">›</span>
-    </div>
-    <div class="chat-info-section-gap"></div>
   </main>
 </div>
 
@@ -5733,50 +5834,37 @@ input:checked + .slider:before { transform: translateX(22px); }
      功能开始：群聊设置侧边栏
      ========================================================== -->
 <div id="group-settings-sidebar" class="settings-sidebar">
-  <div class="header">群聊设置</div>
+  <div class="header"><button type="button" class="group-settings-back" id="group-settings-back-btn" aria-label="返回">‹</button><span>群聊设置</span><span class="group-settings-header-spacer"></span></div>
   <div class="content">
     <form id="group-settings-form">
-      <div class="group-avatar-setting">
+      <section class="group-members-section">
+        <div class="group-members-title">群成员</div>
+        <div class="group-members-list" id="group-members-list-container"></div>
+      </section>
+      <div class="group-chat-info-item" id="group-chat-search-btn"><span>查找聊天记录</span><span class="chat-info-arrow">›</span></div>
+      <div class="group-avatar-setting" id="group-avatar-row" role="button" tabindex="0" aria-label="更换群头像">
+        <span class="group-row-label">头像</span>
         <img src="" alt="群头像" id="setting-group-avatar-preview" class="group-avatar-preview">
+        <span class="avatar-row-arrow">›</span>
         <input type="file" id="setting-group-avatar-upload" accept="image/*" style="display:none;">
-        <label for="setting-group-avatar-upload" class="btn btn-primary" style="flex-grow:1;">更换群头像</label>
+        <label for="setting-group-avatar-upload" class="btn btn-primary">更换群头像</label>
       </div>
-      <div class="form-group"><label for="setting-group-name">群名 (AI也可见)</label><input type="text" id="setting-group-name"></div>
-      <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-      
-<div class="form-group"><label for="setting-group-my-nickname">我的群昵称</label><input type="text" id="setting-group-my-nickname"></div>
-
-<!-- ★ 新增：时间戳开关（放在自定义气泡上方） -->
-<div class="form-group" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
-  <div>
-    <label for="setting-group-timestamp-toggle" style="margin-bottom: 2px; color: #333; font-weight: 600;">时间戳</label>
-    <div style="font-size: 12px; color: #888; line-height: 1.4; margin-top: 2px;">开启后，群成员会读取当前时间；关闭则忽略。</div>
-  </div>
-  <label class="switch" style="margin: 0;">
-    <input type="checkbox" id="setting-group-timestamp-toggle">
-    <span class="slider round"></span>
-  </label>
-</div>
-
-<hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-      <div class="form-group"><label>群成员</label><div class="group-members-list" id="group-members-list-container"></div></div>
-      
-<hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-<div class="form-group">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <label for="setting-group-use-custom-css" style="margin-bottom:0;">自定义气泡样式</label>
-          <input type="checkbox" id="setting-group-use-custom-css" style="width: auto;">
-        </div>
-        <div id="group-bubble-css-preview" class="bubble-css-preview" style="background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;"></div>
-        <textarea id="setting-group-custom-bubble-css" rows="6" placeholder="在此输入CSS代码..." disabled></textarea>
-        <button type="button" class="btn btn-neutral" id="reset-group-custom-bubble-css-btn" style="margin-top: 10px; width: auto; padding: 5px 15px; font-size: 14px;">恢复默认</button>
-      </div>
-      <div class="form-group"><label for="setting-group-max-memory">最大记忆轮数</label><input type="number" id="setting-group-max-memory" value="300" min="1"></div>
-      <div class="form-group"><label for="setting-group-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input type="file" id="setting-group-chat-bg-upload" accept="image/*" style="display:none;"></div>
-      <button type="submit" class="btn btn-primary">保存设置</button>
+      <div class="group-name-row"><label for="setting-group-name">群名字</label><input type="text" id="setting-group-name" placeholder="设置群名字"></div>
+      <div class="group-name-row"><label for="setting-group-my-nickname">我的群昵称</label><input type="text" id="setting-group-my-nickname" placeholder="设置我的群昵称"></div>
+      <div class="group-chat-info-item" id="group-chat-mute-row"><span>消息免打扰</span><label class="switch" style="margin:0"><input type="checkbox" id="group-chat-mute-toggle"><span class="slider round"></span></label></div>
+      <div class="group-chat-info-item" id="group-chat-pin-row"><span>置顶聊天</span><label class="switch" style="margin:0"><input type="checkbox" id="group-chat-pin-toggle"><span class="slider round"></span></label></div>
+      <div class="group-chat-info-item" id="group-chat-translate-row"><span>外语自动翻译</span><label class="switch" style="margin:0"><input type="checkbox" id="group-chat-translate-toggle"><span class="slider round"></span></label></div>
+      <div class="group-chat-info-gap" id="group-chat-bg-gap"></div>
+      <div class="group-chat-info-item" id="group-chat-bg-btn"><span>设置当前聊天背景</span><span class="chat-info-arrow">›</span></div>
+      <input type="file" id="group-chat-bg-upload" accept="image/*" style="display:none;">
+      <div class="group-chat-info-gap" id="group-chat-clear-gap"></div>
+      <div class="group-chat-info-item" id="group-chat-clear-btn"><span>清空聊天记录</span><span class="chat-info-arrow">›</span></div>
+      <div class="group-chat-info-gap"></div>
+      <div class="group-chat-info-item" id="group-chat-timestamp-row"><span>时间戳</span><label class="switch" style="margin:0"><input type="checkbox" id="group-chat-timestamp-toggle"><span class="slider round"></span></label></div>
+      <button type="submit" class="btn btn-primary" style="width:100%;">保存设置</button>
     </form>
-    <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-    <button type="button" class="btn btn-danger" id="clear-group-chat-history-btn">清空聊天记录</button>
+    <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
+    <button type="button" class="btn btn-danger" id="delete-group-chat-btn" style="width:100%;">删除群聊</button>
   </div>
 </div>
 <!-- ==========================================================
@@ -6614,6 +6702,8 @@ if (c.isMuted === undefined) c.isMuted = false;
 db.groups.forEach(g => {
   if (g.maxMemory === undefined) g.maxMemory = 300;
   if (g.isPinned === undefined) g.isPinned = false;
+  if (g.isMuted === undefined) g.isMuted = false;
+  if (g.autoTranslateEnabled === undefined) g.autoTranslateEnabled = false;
   if (!g.worldBookIds) g.worldBookIds = [];
     if (g.customBubbleCss === undefined) g.customBubbleCss = '';
     if (g.useCustomBubbleCss === undefined) g.useCustomBubbleCss = false;
@@ -9407,7 +9497,7 @@ async function saveReceivedSticker(message) {
 
 
 /* 微信式消息翻译：将消息内容翻译为简体中文，并以内嵌翻译栏展示 */
-async function translateMessageToChinese(messageId) {
+async function translateMessageToChinese(messageId, autoMode = false) {
   const chat = getCurrentChat();
   const message = chat && chat.history.find(m => m.id === messageId);
   const wrapper = document.querySelector('.message-wrapper[data-id="' + CSS.escape(messageId) + '"]');
@@ -9415,10 +9505,13 @@ async function translateMessageToChinese(messageId) {
   const raw = extractFavoriteText(message.content || '').trim();
   if (!raw || raw === '[非文本消息]') { showToast('这条消息暂不支持翻译'); return; }
   const existing = wrapper.querySelector('.message-translation-bar');
-  if (existing) { existing.remove(); return; }
+  if (existing) {
+    if (autoMode) return;
+    existing.remove(); return;
+  }
   const bar = document.createElement('div');
   bar.className = 'message-translation-bar';
-  bar.style.cssText = 'box-sizing:border-box;width:fit-content;max-width:min(82%,440px);margin:6px 42px 0;padding:10px 13px 8px;border-radius:9px;background:#fff;color:#191919;font-size:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;align-self:' + (wrapper.classList.contains('sent') ? 'flex-end' : 'flex-start') + ';box-shadow:0 1px 2px rgba(0,0,0,.035)';
+  bar.style.cssText = 'box-sizing:border-box;width:' + (autoMode ? 'calc(100% - 84px)' : 'fit-content') + ';max-width:' + (autoMode ? 'none' : 'min(82%,440px)') + ';margin:6px 42px 0;padding:10px 13px 8px;border-radius:9px;background:#fff;color:#191919;font-size:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;align-self:' + (wrapper.classList.contains('sent') ? 'flex-end' : 'flex-start') + ';box-shadow:0 1px 2px rgba(0,0,0,.035)';
   const translatedText = document.createElement('div');
   translatedText.className = 'message-translation-text';
   translatedText.textContent = '正在翻译…';
@@ -9791,6 +9884,17 @@ function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
   const existingLoadBtn = document.getElementById('load-more-btn');
   if (existingLoadBtn) existingLoadBtn.remove();
   messageArea.prepend(fragment);
+  // 私聊或群聊开启外语自动翻译后，AI/群成员发来的外语文本自动追加全宽中文翻译气泡。
+  if ((currentChatType === 'private' || currentChatType === 'group') && chat.autoTranslateEnabled) {
+    messagesToRender.forEach(msg => {
+      const sourceText = extractFavoriteText((msg && msg.content) || '');
+      if (msg && msg.role !== 'user' && msg.role !== 'system' && msg.id &&
+          /[A-Za-zÀ-ÿА-я]/.test(sourceText) &&
+          !/^\s*(?:\[非文本消息\]|https?:\/\/\S+)\s*$/.test(sourceText)) {
+        translateMessageToChinese(msg.id, true);
+      }
+    });
+  }
   if (totalMessages > currentPage * MESSAGES_PER_PAGE) {
     const loadMoreButton = document.createElement('button');
     loadMoreButton.id = 'load-more-btn';
@@ -10043,6 +10147,16 @@ async function addMessageBubble(message, chat, chatType) {
     if (el) {
       messageArea.appendChild(el);
       messageArea.scrollTop = messageArea.scrollHeight;
+      // 实时自动翻译：开关开启时，AI 每发来一条外语文本就立即追加中文翻译块，无需手动点击。
+      if (currentChatType === 'private' && chat.autoTranslateEnabled &&
+          message.role !== 'user' && message.role !== 'system' && message.id) {
+        const sourceText = extractFavoriteText((message.content || '')).trim();
+        if (/[A-Za-zÀ-ÿА-я]/.test(sourceText) &&
+            !/^\s*(?:\[非文本消息\]|https?:\/\/\S+)\s*$/.test(sourceText)) {
+          // 等当前消息节点进入 DOM 后执行，确保翻译栏能准确挂到对应消息下方。
+          requestAnimationFrame(() => translateMessageToChinese(message.id, true));
+        }
+      }
     }
   } catch (e) {
     console.warn('渲染消息气泡失败:', e);
@@ -11920,6 +12034,20 @@ if (ciPinToggle) ciPinToggle.addEventListener('change', async (e) => {
   showToast(char.isPinned ? '已置顶' : '已取消置顶');
 });
 
+const ciAutoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
+if (ciAutoTranslateToggle) ciAutoTranslateToggle.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  char.autoTranslateEnabled = e.target.checked;
+  await saveData();
+  if (char.autoTranslateEnabled) {
+    showToast('已开启外语自动翻译，新收到的外语消息将自动显示中文');
+    renderMessages(false, false);
+  } else {
+    showToast('已关闭外语自动翻译');
+  }
+});
+
 /* 功能开始：时间戳开关（聊天信息页） */
 const ciTimestampToggle = document.getElementById('chat-info-timestamp-toggle');
 if (ciTimestampToggle) ciTimestampToggle.addEventListener('change', async (e) => {
@@ -11990,8 +12118,6 @@ if (ciClearBtn) ciClearBtn.addEventListener('click', async () => {
   const ciPatBack = document.getElementById('chat-info-pat-back');
   if (ciPatBack) ciPatBack.addEventListener('click', () => switchScreen('chat-info-screen'));
 
-  const ciReportBtn = document.getElementById('chat-info-report-btn');
-  if (ciReportBtn) ciReportBtn.addEventListener('click', () => showToast('投诉功能开发中，敬请期待'));
 
   const ciSearchInput = document.getElementById('chat-info-search-input');
   if (ciSearchInput) ciSearchInput.addEventListener('input', (e) => executeChatInfoSearch(e.target.value));
@@ -12009,6 +12135,8 @@ function renderChatInfoScreen() {
   document.getElementById('chat-info-avatar-name').textContent = char.remarkName || '';
   document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
+  const autoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
+  if (autoTranslateToggle) autoTranslateToggle.checked = !!char.autoTranslateEnabled;
 
   /* 时间戳开关回填：char 显式 true/false 优先，否则跟随全局 */
   const tsToggle = document.getElementById('chat-info-timestamp-toggle');
@@ -12644,46 +12772,57 @@ function setupGroupChatSystem() {
     showToast(`群聊“${groupName}”创建成功！`);
   });
   groupSettingsForm.addEventListener('submit', e => { e.preventDefault(); saveGroupSettingsFromSidebar(); groupSettingsSidebar.classList.remove('open'); });
-  const useGroupCustomCssCheckbox = document.getElementById('setting-group-use-custom-css'),
-    groupCustomCssTextarea = document.getElementById('setting-group-custom-bubble-css'),
-    resetGroupCustomCssBtn = document.getElementById('reset-group-custom-bubble-css-btn'),
-    groupPreviewBox = document.getElementById('group-bubble-css-preview');
-  useGroupCustomCssCheckbox.addEventListener('change', (e) => {
-    groupCustomCssTextarea.disabled = !e.target.checked;
-    const group = db.groups.find(g => g.id === currentChatId);
-    if (group) updateBubbleCssPreview(groupPreviewBox, groupCustomCssTextarea.value, !e.target.checked, colorThemes[group.theme || 'black_white']);
-  });
-  groupCustomCssTextarea.addEventListener('input', (e) => {
-    const group = db.groups.find(g => g.id === currentChatId);
-    if (group && useGroupCustomCssCheckbox.checked) updateBubbleCssPreview(groupPreviewBox, e.target.value, false, colorThemes[group.theme || 'black_white']);
-  });
-  resetGroupCustomCssBtn.addEventListener('click', () => {
-    const group = db.groups.find(g => g.id === currentChatId);
-    if (group) {
-      groupCustomCssTextarea.value = '';
-      useGroupCustomCssCheckbox.checked = false;
-      groupCustomCssTextarea.disabled = true;
-      updateBubbleCssPreview(groupPreviewBox, '', true, colorThemes[group.theme || 'black_white']);
-      showToast('样式已重置为默认');
-    }
-  });
+  document.getElementById('group-settings-back-btn').addEventListener('click', () => groupSettingsSidebar.classList.remove('open'));
+  const groupAvatarRow = document.getElementById('group-avatar-row');
+  groupAvatarRow.addEventListener('click', e => { if (e.target.id !== 'setting-group-avatar-upload') document.getElementById('setting-group-avatar-upload').click(); });
+  groupAvatarRow.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('setting-group-avatar-upload').click(); } });
 
-  /* 功能开始：时间戳开关（群聊） */
-  const tsToggleGroup = document.getElementById('setting-group-timestamp-toggle');
-  if (tsToggleGroup) {
-    tsToggleGroup.addEventListener('change', async (e) => {
-      const group = db.groups.find(g => g.id === currentChatId);
-      if (!group) return;
-      if (e.target.checked) {
-        group.timestampEnabled = true;
-      } else {
-        group.timestampEnabled = (db.timestampEnabled === false) ? null : false;
-      }
-      await saveData();
-      showToast(e.target.checked ? '时间戳已开启，群成员将读取当前时间' : '时间戳已关闭，群成员不会读取时间');
-    });
-  }
-  /* 功能结束：时间戳开关（群聊） */
+  const groupMuteToggle = document.getElementById('group-chat-mute-toggle');
+  groupMuteToggle.addEventListener('change', async e => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    group.isMuted = e.target.checked; await saveData(); renderChatList();
+    showToast(group.isMuted ? '已开启群聊消息免打扰' : '已关闭群聊消息免打扰');
+  });
+  const groupPinToggle = document.getElementById('group-chat-pin-toggle');
+  groupPinToggle.addEventListener('change', async e => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    group.isPinned = e.target.checked; await saveData(); renderChatList();
+    showToast(group.isPinned ? '群聊已置顶' : '已取消群聊置顶');
+  });
+  const groupTranslateToggle = document.getElementById('group-chat-translate-toggle');
+  groupTranslateToggle.addEventListener('change', async e => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    group.autoTranslateEnabled = e.target.checked; await saveData();
+    if (group.autoTranslateEnabled) { renderMessages(false, false); showToast('已开启群聊外语自动翻译'); }
+    else showToast('已关闭群聊外语自动翻译');
+  });
+  const groupTimestampToggle = document.getElementById('group-chat-timestamp-toggle');
+  groupTimestampToggle.addEventListener('change', async e => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    group.timestampEnabled = e.target.checked ? true : (db.timestampEnabled === false ? null : false);
+    await saveData();
+    showToast(e.target.checked ? '群聊时间戳已开启，AI 将读取当前时间' : '群聊时间戳已关闭');
+  });
+  document.getElementById('group-chat-bg-btn').addEventListener('click', () => document.getElementById('group-chat-bg-upload').click());
+  document.getElementById('group-chat-bg-upload').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    try { const url = await compressImage(file, {quality:0.85,maxWidth:1080,maxHeight:1920}); group.chatBg = url; chatRoomScreen.style.backgroundImage = `url(${url})`; await saveData(); showToast('群聊背景已更换'); }
+    catch(err) { showToast('背景压缩失败，请重试'); }
+    e.target.value = '';
+  });
+  document.getElementById('group-chat-clear-btn').addEventListener('click', async () => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    if (!confirm(`确定要清空群聊“${group.name || '群聊'}”的所有聊天记录吗？此操作不可恢复！`)) return;
+    group.history = []; await saveData(); currentPage = 1; renderMessages(false, true); renderChatList(); showToast('群聊聊天记录已清空');
+  });
+  document.getElementById('group-chat-search-btn').addEventListener('click', () => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    const keyword = prompt('输入关键词查找群聊记录'); if (!keyword || !keyword.trim()) return;
+    const matches = (group.history || []).filter(m => String(m.content || '').toLowerCase().includes(keyword.trim().toLowerCase()));
+    const preview = matches.slice(-20).map(m => `${new Date(m.timestamp || Date.now()).toLocaleString()}  ${m.senderName || m.senderNickname || m.role || '消息'}：${String(m.content || '').replace(/\s+/g,' ').slice(0,180)}`).join('\n\n');
+    alert(matches.length ? `找到 ${matches.length} 条记录（最多显示最近 20 条）：\n\n${preview}` : '没有找到匹配的聊天记录。');
+  });
 
   document.getElementById('setting-group-avatar-upload').addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -12695,38 +12834,75 @@ function setupGroupChatSystem() {
       } catch (error) { showToast('群头像压缩失败，请重试'); }
     }
   });
-  document.getElementById('setting-group-chat-bg-upload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      try {
-        const compressedUrl = await compressImage(file, { quality: 0.85, maxWidth: 1080, maxHeight: 1920 });
-        const group = db.groups.find(g => g.id === currentChatId);
-        if (group) {
-          group.chatBg = compressedUrl;
-          chatRoomScreen.style.backgroundImage = `url(${compressedUrl})`;
-          await saveData();
-          showToast('聊天背景已更换');
-        }
-      } catch (error) { showToast('群聊背景压缩失败，请重试'); }
-    }
-  });
-  document.getElementById('clear-group-chat-history-btn').addEventListener('click', async () => {
+  document.getElementById('delete-group-chat-btn').addEventListener('click', async () => {
     const group = db.groups.find(g => g.id === currentChatId);
     if (!group) return;
-    if (confirm(`你确定要清空群聊“${group.name}”的所有聊天记录吗？这个操作是不可恢复的！`)) {
-      group.history = [];
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay visible';
+    overlay.style.zIndex = '10050';
+    overlay.innerHTML = `<div class="modal-content" style="max-width:360px;padding:22px;background:#fff !important;opacity:1 !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;box-shadow:0 8px 28px rgba(0,0,0,.18);"><h3 style="margin-top:0;">删除群聊</h3><p style="line-height:1.6;">确定删除群聊“${String(group.name || '群聊').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}”吗？</p><label style="display:flex;align-items:center;gap:9px;margin:16px 0;cursor:pointer;"><input type="checkbox" id="delete-group-history-checkbox" style="width:18px;height:18px;">删除聊天记录和群聊记忆</label><p style="font-size:12px;color:#888;line-height:1.5;">勾选后将一并清除本群聊天记录与记忆；不勾选则保留记录与记忆备份。</p><div style="display:flex;gap:10px;margin-top:18px;"><button type="button" id="cancel-delete-group" class="btn btn-neutral" style="flex:1;">取消</button><button type="button" id="confirm-delete-group" class="btn btn-danger" style="flex:1;">删除群聊</button></div></div>`;
+    document.body.appendChild(overlay);
+    overlay.querySelector('#cancel-delete-group').onclick = () => overlay.remove();
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('#confirm-delete-group').onclick = async () => {
+      const clearHistory = overlay.querySelector('#delete-group-history-checkbox').checked;
+      const groupId = group.id;
+      if (!clearHistory) {
+        if (!db.deletedGroupArchives) db.deletedGroupArchives = [];
+        db.deletedGroupArchives.push({ ...group, deletedAt: Date.now(), history: Array.isArray(group.history) ? [...group.history] : [] });
+      } else {
+        group.history = [];
+        delete group.memory;
+        delete group.memories;
+        delete group.longTermMemory;
+        delete group.summary;
+        delete group.memorySummary;
+      }
+      db.groups = db.groups.filter(g => g.id !== groupId);
+      if (Array.isArray(db.messageReminders)) db.messageReminders = db.messageReminders.filter(r => !(r.chatType === 'group' && r.chatId === groupId));
       await saveData();
-      renderMessages(false, true);
-      renderChatList();
+      overlay.remove();
       groupSettingsSidebar.classList.remove('open');
-      showToast('聊天记录已清空');
-    }
+      currentChatId = null;
+      currentChatType = null;
+      renderChatList();
+      switchScreen('chat-list-screen');
+      showToast(clearHistory ? '群聊及聊天记录、记忆已删除' : '群聊已删除，聊天记录和记忆已保留');
+    };
   });
-  groupMembersListContainer.addEventListener('click', e => {
+  groupMembersListContainer.addEventListener('click', async e => {
+    const removeBtn = e.target.closest('.group-member-remove');
     const memberDiv = e.target.closest('.group-member');
     const addBtn = e.target.closest('.add-member-btn');
-    if (memberDiv) openGroupMemberEditModal(memberDiv.dataset.id);
-    else if (addBtn) addMemberActionSheet.classList.add('visible');
+    const group = db.groups.find(g => g.id === currentChatId);
+    if (!group) return;
+    if (removeBtn) {
+      const member = group.members.find(m => m.id === removeBtn.dataset.memberId);
+      if (!member) return;
+      if (!confirm(`确定将“${member.groupNickname || member.realName}”移出群聊吗？`)) return;
+      group.members = group.members.filter(m => m.id !== member.id);
+      const eventText = `[${group.me?.nickname || '我'}将${member.realName || member.groupNickname}移出了群聊]`;
+      group.history.push({ id: `msg_${Date.now()}`, role: 'user', content: eventText, parts: [{ type: 'text', text: eventText }], timestamp: Date.now() });
+      await saveData();
+      renderGroupMembersInSettings(group);
+      renderMessages(false, true);
+      showToast('已移出群成员');
+      return;
+    }
+    if (memberDiv) {
+      const member = group.members.find(m => m.id === memberDiv.dataset.id);
+      if (!member) return;
+      const linkedChar = member.originalCharId && db.characters.find(c => c.id === member.originalCharId);
+      if (linkedChar) {
+        groupSettingsSidebar.classList.remove('open');
+        renderFriendProfile(linkedChar);
+        const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
+        if (fpBackBtn) fpBackBtn.onclick = () => { switchScreen('chat-room-screen'); groupSettingsSidebar.classList.add('open'); };
+        switchScreen('friend-profile-screen');
+      } else {
+        openGroupMemberEditModal(member.id);
+      }
+    } else if (addBtn) addMemberActionSheet.classList.add('visible');
   });
   document.getElementById('edit-member-avatar-preview').addEventListener('click', () => document.getElementById('edit-member-avatar-upload').click());
   document.getElementById('edit-member-avatar-upload').addEventListener('change', async (e) => {
@@ -12853,23 +13029,15 @@ function renderMemberSelectionList() {
 function loadGroupSettingsToSidebar() {
   const group = db.groups.find(g => g.id === currentChatId);
   if (!group) return;
-  document.getElementById('setting-group-avatar-preview').src = group.avatar;
-  document.getElementById('setting-group-name').value = group.name;
-  document.getElementById('setting-group-my-nickname').value = group.me.nickname;
-  document.getElementById('setting-group-max-memory').value = group.maxMemory;
+  document.getElementById('setting-group-avatar-preview').src = group.avatar || '';
+  document.getElementById('setting-group-name').value = group.name || '';
+  document.getElementById('setting-group-my-nickname').value = (group.me && group.me.nickname) || '';
+  document.getElementById('group-chat-mute-toggle').checked = !!group.isMuted;
+  document.getElementById('group-chat-pin-toggle').checked = !!group.isPinned;
+  document.getElementById('group-chat-translate-toggle').checked = !!group.autoTranslateEnabled;
+  const groupTsToggle = document.getElementById('group-chat-timestamp-toggle');
+  if (groupTsToggle) groupTsToggle.checked = group.timestampEnabled === true || (group.timestampEnabled !== false && db.timestampEnabled !== false);
   renderGroupMembersInSettings(group);
-  const useGroupCustomCssCheckbox = document.getElementById('setting-group-use-custom-css'),
-    groupCustomCssTextarea = document.getElementById('setting-group-custom-bubble-css'),
-    groupPreviewBox = document.getElementById('group-bubble-css-preview');
-  useGroupCustomCssCheckbox.checked = group.useCustomBubbleCss || false;
-  groupCustomCssTextarea.value = group.customBubbleCss || '';
-  groupCustomCssTextarea.disabled = !useGroupCustomCssCheckbox.checked;
-  updateBubbleCssPreview(groupPreviewBox, group.customBubbleCss, !group.useCustomBubbleCss, colorThemes[group.theme || 'black_white']);
-  /* 时间戳开关 */
-  const tsToggleGroup = document.getElementById('setting-group-timestamp-toggle');
-  if (tsToggleGroup) {
-    tsToggleGroup.checked = (group.timestampEnabled === true) || (group.timestampEnabled !== false && db.timestampEnabled !== false);
-  }
 }
 
 function renderGroupMembersInSettings(group) {
@@ -12878,12 +13046,12 @@ function renderGroupMembersInSettings(group) {
     const memberDiv = document.createElement('div');
     memberDiv.className = 'group-member';
     memberDiv.dataset.id = member.id;
-    memberDiv.innerHTML = `<img src="${member.avatar}" alt="${member.groupNickname}"><span>${member.groupNickname}</span>`;
+    memberDiv.innerHTML = `<img src="${member.avatar || ''}" alt="${member.groupNickname || member.realName || ''}"><span>${member.groupNickname || member.realName || '群成员'}</span><button type="button" class="group-member-remove" data-member-id="${member.id}" aria-label="移除成员" style="margin-top:4px;border:1px solid #ddd;border-radius:50%;width:22px;height:22px;padding:0;background:#fff;color:#888;line-height:18px;">−</button>`;
     groupMembersListContainer.appendChild(memberDiv);
   });
   const addBtn = document.createElement('div');
   addBtn.className = 'add-member-btn';
-  addBtn.innerHTML = `<div class="add-icon">+</div><span>添加</span>`;
+  addBtn.innerHTML = `<div class="add-icon">+</div><span>邀请成员</span>`;
   groupMembersListContainer.appendChild(addBtn);
 }
 
@@ -12908,17 +13076,14 @@ function renderGroupRecipientSelectionList(actionText) {
 async function saveGroupSettingsFromSidebar() {
   const group = db.groups.find(g => g.id === currentChatId);
   if (!group) return;
-  const oldName = group.name;
-  const newName = document.getElementById('setting-group-name').value;
-  if (oldName !== newName) { group.name = newName; sendRenameNotification(group, newName); }
-  
-group.avatar = document.getElementById('setting-group-avatar-preview').src;
-group.me.nickname = document.getElementById('setting-group-my-nickname').value;
-group.theme = 'black_white';
-  group.maxMemory = parseInt(document.getElementById('setting-group-max-memory').value) || 10;
-  group.useCustomBubbleCss = document.getElementById('setting-group-use-custom-css').checked;
-  group.customBubbleCss = document.getElementById('setting-group-custom-bubble-css').value;
-  updateCustomBubbleStyle(currentChatId, group.customBubbleCss, group.useCustomBubbleCss);
+  const newName = document.getElementById('setting-group-name').value.trim() || group.name;
+  if (group.name !== newName) {
+    group.name = newName;
+    sendRenameNotification(group, newName);
+  }
+  group.avatar = document.getElementById('setting-group-avatar-preview').src;
+  if (!group.me) group.me = { nickname: '我' };
+  group.me.nickname = document.getElementById('setting-group-my-nickname').value.trim() || '我';
   await saveData();
   showToast('群聊设置已保存！');
   chatRoomTitle.textContent = group.name;
