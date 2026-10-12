@@ -931,36 +931,6 @@ body {
 
 
 /* ==========================================================
-   功能开始：设置侧边栏（通用）
-   ========================================================== */
-.settings-sidebar {
-  position: absolute; top: 0; right: -100%;
-  width: 80%; height: 100%;
-  background: #fff;
-  box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-  transition: right 0.4s ease-in-out;
-  z-index: 101; display: flex; flex-direction: column;
-}
-.settings-sidebar.open { right: 0; }
-.settings-sidebar .header {
-  padding: 15px; border-bottom: 1px solid #eee;
-  font-weight: bold; text-align: center;
-  color: var(--primary-color);
-}
-.settings-sidebar .content { padding: 20px; overflow-y: auto; flex-grow: 1; }
-.settings-sidebar .form-group textarea { height: 100px; resize: vertical; }
-.settings-sidebar .avatar-setting { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-.settings-sidebar .avatar-preview {
-  width: 60px; height: 60px; border-radius: 50%;
-  object-fit: cover; border: 2px solid var(--primary-color);
-  cursor: pointer;
-}
-/* ==========================================================
-   功能结束：设置侧边栏（通用）
-   ========================================================== */
-
-
-/* ==========================================================
    功能开始：表单通用样式
    ========================================================== */
 .form-group { margin-bottom: 20px; }
@@ -1099,94 +1069,91 @@ label.btn-primary { color: var(--white-color) !important; }
 .member-selection-item input[type="checkbox"] { margin-right: 15px; width: 20px; height: 20px; flex-shrink: 0; }
 .member-selection-item img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
 .member-selection-item label { font-weight: 500; color: var(--text-color); }
-#group-settings-sidebar .group-avatar-setting { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
-#group-settings-sidebar .group-avatar-preview {
+#group-settings-screen .group-avatar-setting { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+#group-settings-screen .group-avatar-preview {
   width: 60px; height: 60px; border-radius: 10px;
   object-fit: cover; border: 2px solid var(--primary-color);
   cursor: pointer;
 }
-#group-settings-sidebar .group-members-list {
+#group-settings-screen .group-members-list {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
   gap: 15px; margin-top: 10px;
 }
-#group-settings-sidebar .group-member,
-#group-settings-sidebar .add-member-btn {
+#group-settings-screen .group-member,
+#group-settings-screen .add-member-btn {
   display: flex; flex-direction: column; align-items: center; cursor: pointer;
 }
-#group-settings-sidebar .group-member img {
+#group-settings-screen .group-member img {
   width: 50px; height: 50px; border-radius: 50%;
   object-fit: cover; margin-bottom: 5px;
   border: 2px solid #eee;
 }
-#group-settings-sidebar .add-member-btn .add-icon {
+#group-settings-screen .add-member-btn .add-icon {
   width: 50px; height: 50px; border-radius: 50%;
   border: 2px dashed #ccc;
   display: flex; align-items: center; justify-content: center;
   font-size: 24px; color: #ccc;
   margin-bottom: 5px; transition: all 0.2s ease;
 }
-#group-settings-sidebar .add-member-btn:hover .add-icon { color: var(--primary-color); border-color: var(--primary-color); }
-#group-settings-sidebar .group-member span,
-#group-settings-sidebar .add-member-btn span { font-size: 12px; text-align: center; color: var(--text-color); }
-/* 群聊设置：全屏页面，结构与私聊信息页统一 */
-#group-settings-sidebar {
-  position:absolute !important; inset:0 auto 0 0 !important; right:auto !important;
-  width:100% !important; max-width:none !important; height:100% !important;
-  box-sizing:border-box; box-shadow:none !important; z-index:120 !important;
-  background:#fff; transform:translateX(100%); transition:transform .28s ease;
+#group-settings-screen .add-member-btn:hover .add-icon { color: var(--primary-color); border-color: var(--primary-color); }
+#group-settings-screen .group-member span,
+#group-settings-screen .add-member-btn span { font-size: 12px; text-align: center; color: var(--text-color); }
+/* 群聊设置是独立全屏页面，不再作为侧边栏浮层。 */
+#group-settings-screen {
+  position: absolute !important; inset: 0 !important; width: 100% !important;
+  max-width: none !important; height: 100% !important; box-sizing: border-box;
+  box-shadow: none !important; z-index: 120 !important; background: #fff;
+  transform: none !important; transition: none !important; visibility: visible;
 }
-#group-settings-sidebar.open { right:auto !important; transform:translateX(0); pointer-events:auto !important; visibility:visible !important; }
-/* 关闭状态的群聊设置不接收触摸，避免手机长按输入框时误触到隐藏页面 */
-#group-settings-sidebar:not(.open) { pointer-events:none !important; visibility:hidden !important; }
-#group-settings-sidebar > .header {
+#group-settings-screen > .header {
   display:grid; grid-template-columns:44px 1fr 44px; align-items:center;
   flex:0 0 auto; min-height:58px; box-sizing:border-box; padding:10px 14px;
   background:#fff; color:var(--text-color); border-bottom:1px solid #eee;
   text-align:center; font-size:18px; font-weight:600;
 }
-#group-settings-sidebar .group-settings-back { border:0; background:transparent; color:var(--text-color); font-size:34px; line-height:1; padding:0; width:40px; height:40px; cursor:pointer; }
-#group-settings-sidebar .group-settings-header-spacer { width:40px; }
-#group-settings-sidebar > .content { flex:1 1 auto; min-height:0; overflow-y:auto; box-sizing:border-box; padding:0 20px calc(24px + var(--safe-bottom, 0px)); }
-#group-settings-sidebar #group-settings-form { display:flex; flex-direction:column; }
+#group-settings-screen .group-settings-back { border:0; background:transparent; color:var(--text-color); font-size:34px; line-height:1; padding:0; width:40px; height:40px; cursor:pointer; }
+#group-settings-screen .group-settings-header-spacer { width:40px; }
+#group-settings-screen > .content { flex:1 1 auto; min-height:0; overflow-y:auto; box-sizing:border-box; padding:0 20px calc(24px + var(--safe-bottom, 0px)); }
+#group-settings-screen #group-settings-form { display:flex; flex-direction:column; }
 /* 紧凑布局：保持与私聊设置相同的列表节奏，群成员只是多几个人 */
-#group-settings-sidebar .group-members-section { order:0; padding:18px 0 16px; border-bottom:1px solid #eee; }
-#group-settings-sidebar .group-members-title { margin:0 0 12px; color:var(--secondary-color); font-weight:600; font-size:15px; }
-#group-settings-sidebar .group-members-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:12px 10px; margin-top:0; }
-#group-settings-sidebar .group-member, #group-settings-sidebar .add-member-btn { min-width:0; display:flex; flex-direction:column; align-items:center; cursor:pointer; position:relative; }
-#group-settings-sidebar .group-member img { width:62px; height:62px; border-radius:10px; object-fit:cover; margin:0 0 5px; border:1px solid #e6e6e6; }
-#group-settings-sidebar .group-member span, #group-settings-sidebar .add-member-btn span { font-size:12px; text-align:center; color:var(--text-color); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-#group-settings-sidebar .group-member-remove { cursor:pointer; margin-top:4px !important; width:22px !important; height:22px !important; line-height:18px !important; }
-#group-settings-sidebar .add-member-btn .add-icon { width:62px; height:62px; box-sizing:border-box; border-radius:10px; border:2px dashed #ccc; display:flex; align-items:center; justify-content:center; font-size:24px; color:#bbb; margin-bottom:5px; }
-#group-settings-sidebar .group-avatar-setting { order:1; min-height:58px; display:grid; grid-template-columns:72px 1fr 20px; align-items:center; gap:10px; margin:0; padding:10px 0; border-bottom:1px solid #eee; cursor:pointer; }
-#group-settings-sidebar .group-avatar-setting .group-row-label { font-size:16px; color:var(--text-color); }
-#group-settings-sidebar .group-avatar-preview { grid-column:2; grid-row:1; justify-self:end; width:44px; height:44px; border-radius:9px; object-fit:cover; border:0; cursor:pointer; }
-#group-settings-sidebar .group-avatar-setting .avatar-row-arrow { grid-column:3; grid-row:1; color:#c7c7c7; font-size:24px; }
-#group-settings-sidebar .group-avatar-setting label, #group-settings-sidebar .group-avatar-setting .btn { display:none !important; }
-#group-settings-sidebar .group-name-row { order:2; min-height:54px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; }
-#group-settings-sidebar .group-name-row label { margin:0; flex:0 0 110px; color:var(--text-color); font-size:16px; font-weight:400; }
-#group-settings-sidebar .group-name-row input { min-width:0; flex:1; width:auto; border:0; outline:none; box-shadow:none; padding:8px 0; margin:0; text-align:right; background:transparent; color:var(--text-color); font-size:16px; }
-#group-settings-sidebar .group-name-row input:focus { border:0; box-shadow:none; }
-#group-settings-sidebar .group-chat-info-item { min-height:56px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 2px; border-bottom:1px solid #eee; color:var(--text-color); font-size:16px; }
-#group-settings-sidebar .group-chat-info-item .chat-info-arrow { color:#c7c7c7; font-size:25px; font-weight:300; }
-#group-settings-sidebar #group-chat-mute-row { order:3; }
-#group-settings-sidebar #group-chat-search-btn { order:4; margin-top:0; }
-#group-settings-sidebar #group-chat-pin-row { order:5; }
-#group-settings-sidebar #group-chat-translate-row { order:6; }
-#group-settings-sidebar #group-chat-bg-gap { order:7; }
-#group-settings-sidebar #group-chat-bg-btn { order:8; }
-#group-settings-sidebar #group-chat-bg-upload { order:8; }
-#group-settings-sidebar #group-chat-clear-gap { order:9; }
-#group-settings-sidebar #group-chat-clear-btn { order:10; }
-#group-settings-sidebar #group-chat-timestamp-row { order:11; }
-#group-settings-sidebar .group-chat-info-gap { height:10px; background:#ededed; margin:0 -20px; }
-#group-settings-sidebar #group-chat-timestamp-toggle { accent-color:var(--primary-color); }
-#group-settings-sidebar #group-settings-form > button[type="submit"] { order:12; margin-top:16px; }
-#group-settings-sidebar #delete-group-chat-btn { margin:18px 0 8px; }
+#group-settings-screen .group-members-section { order:0; padding:18px 0 16px; border-bottom:1px solid #eee; }
+#group-settings-screen .group-members-title { margin:0 0 12px; color:var(--secondary-color); font-weight:600; font-size:15px; }
+#group-settings-screen .group-members-list { display:grid; grid-template-columns:repeat(auto-fill,minmax(68px,1fr)); gap:12px 10px; margin-top:0; }
+#group-settings-screen .group-member, #group-settings-screen .add-member-btn { min-width:0; display:flex; flex-direction:column; align-items:center; cursor:pointer; position:relative; }
+#group-settings-screen .group-member img { width:62px; height:62px; border-radius:10px; object-fit:cover; margin:0 0 5px; border:1px solid #e6e6e6; }
+#group-settings-screen .group-member span, #group-settings-screen .add-member-btn span { font-size:12px; text-align:center; color:var(--text-color); max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+#group-settings-screen .group-member-remove { cursor:pointer; margin-top:4px !important; width:22px !important; height:22px !important; line-height:18px !important; }
+#group-settings-screen .add-member-btn .add-icon { width:62px; height:62px; box-sizing:border-box; border-radius:10px; border:2px dashed #ccc; display:flex; align-items:center; justify-content:center; font-size:24px; color:#bbb; margin-bottom:5px; }
+#group-settings-screen .group-avatar-setting { order:1; min-height:58px; display:grid; grid-template-columns:72px 1fr 20px; align-items:center; gap:10px; margin:0; padding:10px 0; border-bottom:1px solid #eee; cursor:pointer; }
+#group-settings-screen .group-avatar-setting .group-row-label { font-size:16px; color:var(--text-color); }
+#group-settings-screen .group-avatar-preview { grid-column:2; grid-row:1; justify-self:end; width:44px; height:44px; border-radius:9px; object-fit:cover; border:0; cursor:pointer; }
+#group-settings-screen .group-avatar-setting .avatar-row-arrow { grid-column:3; grid-row:1; color:#c7c7c7; font-size:24px; }
+#group-settings-screen .group-avatar-setting label, #group-settings-screen .group-avatar-setting .btn { display:none !important; }
+#group-settings-screen .group-name-row { order:2; min-height:54px; display:flex; align-items:center; gap:12px; border-bottom:1px solid #eee; }
+#group-settings-screen .group-name-row label { margin:0; flex:0 0 110px; color:var(--text-color); font-size:16px; font-weight:400; }
+#group-settings-screen .group-name-row input { min-width:0; flex:1; width:auto; border:0; outline:none; box-shadow:none; padding:8px 0; margin:0; text-align:right; background:transparent; color:var(--text-color); font-size:16px; }
+#group-settings-screen .group-name-row input:focus { border:0; box-shadow:none; }
+#group-settings-screen .group-chat-info-item { min-height:56px; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:0 2px; border-bottom:1px solid #eee; color:var(--text-color); font-size:16px; }
+#group-settings-screen .group-chat-info-item .chat-info-arrow { color:#c7c7c7; font-size:25px; font-weight:300; }
+#group-settings-screen #group-chat-mute-row { order:3; }
+#group-settings-screen #group-chat-search-btn { order:4; margin-top:0; }
+#group-settings-screen #group-chat-pin-row { order:5; }
+#group-settings-screen #group-chat-translate-row { order:6; }
+#group-settings-screen #group-chat-bg-gap { order:7; }
+#group-settings-screen #group-chat-bg-btn { order:8; }
+#group-settings-screen #group-chat-bg-upload { order:8; }
+#group-settings-screen #group-chat-clear-gap { order:9; }
+#group-settings-screen #group-chat-clear-btn { order:10; }
+#group-settings-screen #group-chat-timestamp-row { order:11; }
+#group-settings-screen .group-chat-info-gap { height:10px; background:#ededed; margin:0 -20px; }
+#group-settings-screen #group-chat-timestamp-toggle { accent-color:var(--primary-color); }
+#group-settings-screen #group-settings-form > button[type="submit"] { order:12; margin-top:16px; }
+#group-settings-screen #delete-group-chat-btn { margin:18px 0 8px; }
 @media (max-width:380px) {
-  #group-settings-sidebar > .content { padding-left:16px; padding-right:16px; }
-  #group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:10px 6px; }
-  #group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:56px; height:56px; }
-  #group-settings-sidebar .group-name-row label { flex-basis:100px; }
+  #group-settings-screen > .content { padding-left:16px; padding-right:16px; }
+  #group-settings-screen .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:10px 6px; }
+  #group-settings-screen .group-member img, #group-settings-screen .add-member-btn .add-icon { width:56px; height:56px; }
+  #group-settings-screen .group-name-row label { flex-basis:100px; }
 }
 /* ==========================================================
    功能结束：群聊成员选择 / 群设置
@@ -2802,56 +2769,55 @@ input:checked + .slider:before { transform: translateX(22px); }
 
 
 /* 修复：API 设置页编辑密钥时，聊天/群聊设置属于后台浮层，不能盖到 API 页面上。 */
-body:has(#api-settings-screen.active) #chat-settings-sidebar,
-body:has(#api-settings-screen.active) #group-settings-sidebar {
+body:has(#api-settings-screen.active) #group-settings-screen {
   display:none !important; visibility:hidden !important; pointer-events:none !important;
 }
 </style>
 <style id="group-settings-one-size-refinement">
 
 /* 群聊设置微调版：比原版小一号，按约定顺序排列 */
-#group-settings-sidebar > .header { min-height:54px; padding:8px 12px; font-size:17px; }
-#group-settings-sidebar .group-settings-back { width:36px; height:36px; font-size:30px; }
-#group-settings-sidebar .group-settings-header-spacer { width:36px; }
-#group-settings-sidebar > .content { padding-left:17px; padding-right:17px; padding-bottom:calc(16px + var(--safe-bottom, 0px)); }
-#group-settings-sidebar .group-members-section { padding:14px 0 12px; }
-#group-settings-sidebar .group-members-title { margin-bottom:9px; font-size:14px; }
-#group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:9px 8px; }
-#group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:56px; height:56px; border-radius:9px; }
-#group-settings-sidebar .add-member-btn .add-icon { font-size:22px; }
-#group-settings-sidebar .group-member span, #group-settings-sidebar .add-member-btn span { font-size:11px; }
-#group-settings-sidebar .group-member-remove { width:20px !important; height:20px !important; }
-#group-settings-sidebar .group-avatar-setting { min-height:52px; grid-template-columns:66px 1fr 18px; gap:8px; padding:8px 0; }
-#group-settings-sidebar .group-avatar-setting .group-row-label,
-#group-settings-sidebar .group-name-row label,
-#group-settings-sidebar .group-name-row input { font-size:15px; }
-#group-settings-sidebar .group-avatar-preview { width:40px; height:40px; }
-#group-settings-sidebar .group-name-row { min-height:48px; gap:10px; }
-#group-settings-sidebar .group-name-row label { flex-basis:104px; }
-#group-settings-sidebar .group-name-row input { padding:6px 0; }
-#group-settings-sidebar .group-chat-info-item { min-height:49px; font-size:15px; gap:10px; }
-#group-settings-sidebar .group-chat-info-item .chat-info-arrow { font-size:22px; }
-#group-settings-sidebar .group-chat-info-gap { height:7px; margin:0 -17px; }
+#group-settings-screen > .header { min-height:54px; padding:8px 12px; font-size:17px; }
+#group-settings-screen .group-settings-back { width:36px; height:36px; font-size:30px; }
+#group-settings-screen .group-settings-header-spacer { width:36px; }
+#group-settings-screen > .content { padding-left:17px; padding-right:17px; padding-bottom:calc(16px + var(--safe-bottom, 0px)); }
+#group-settings-screen .group-members-section { padding:14px 0 12px; }
+#group-settings-screen .group-members-title { margin-bottom:9px; font-size:14px; }
+#group-settings-screen .group-members-list { grid-template-columns:repeat(auto-fill,minmax(62px,1fr)); gap:9px 8px; }
+#group-settings-screen .group-member img, #group-settings-screen .add-member-btn .add-icon { width:56px; height:56px; border-radius:9px; }
+#group-settings-screen .add-member-btn .add-icon { font-size:22px; }
+#group-settings-screen .group-member span, #group-settings-screen .add-member-btn span { font-size:11px; }
+#group-settings-screen .group-member-remove { width:20px !important; height:20px !important; }
+#group-settings-screen .group-avatar-setting { min-height:52px; grid-template-columns:66px 1fr 18px; gap:8px; padding:8px 0; }
+#group-settings-screen .group-avatar-setting .group-row-label,
+#group-settings-screen .group-name-row label,
+#group-settings-screen .group-name-row input { font-size:15px; }
+#group-settings-screen .group-avatar-preview { width:40px; height:40px; }
+#group-settings-screen .group-name-row { min-height:48px; gap:10px; }
+#group-settings-screen .group-name-row label { flex-basis:104px; }
+#group-settings-screen .group-name-row input { padding:6px 0; }
+#group-settings-screen .group-chat-info-item { min-height:49px; font-size:15px; gap:10px; }
+#group-settings-screen .group-chat-info-item .chat-info-arrow { font-size:22px; }
+#group-settings-screen .group-chat-info-gap { height:7px; margin:0 -17px; }
 /* 顺序：免打扰、置顶、翻译、查找记录、时间戳、背景、清空 */
-#group-settings-sidebar #group-chat-mute-row { order:3; }
-#group-settings-sidebar #group-chat-pin-row { order:4; }
-#group-settings-sidebar #group-chat-translate-row { order:5; }
-#group-settings-sidebar #group-chat-search-btn { order:6; margin-top:0; }
-#group-settings-sidebar #group-chat-timestamp-row { order:7; }
-#group-settings-sidebar #group-chat-bg-gap { order:8; }
-#group-settings-sidebar #group-chat-bg-btn, #group-settings-sidebar #group-chat-bg-upload { order:9; }
-#group-settings-sidebar #group-chat-clear-gap { order:10; }
-#group-settings-sidebar #group-chat-clear-btn { order:11; }
-#group-settings-sidebar #group-settings-form > button[type="submit"] { order:13; min-height:48px; padding:10px 14px; margin-top:7px; border-radius:10px; font-size:15px; background:#e5e5e5 !important; color:#555 !important; border:1px solid #dedede !important; }
-#group-settings-sidebar #delete-group-chat-btn { display:block; order:12; min-height:48px; padding:10px 14px; margin:10px 0 0 !important; border-radius:10px; font-size:15px; }
-#group-settings-sidebar #group-settings-form { display:flex; flex-direction:column; }
-#group-settings-sidebar > .content > hr { display:none; }
+#group-settings-screen #group-chat-mute-row { order:3; }
+#group-settings-screen #group-chat-pin-row { order:4; }
+#group-settings-screen #group-chat-translate-row { order:5; }
+#group-settings-screen #group-chat-search-btn { order:6; margin-top:0; }
+#group-settings-screen #group-chat-timestamp-row { order:7; }
+#group-settings-screen #group-chat-bg-gap { order:8; }
+#group-settings-screen #group-chat-bg-btn, #group-settings-screen #group-chat-bg-upload { order:9; }
+#group-settings-screen #group-chat-clear-gap { order:10; }
+#group-settings-screen #group-chat-clear-btn { order:11; }
+#group-settings-screen #group-settings-form > button[type="submit"] { order:13; min-height:48px; padding:10px 14px; margin-top:7px; border-radius:10px; font-size:15px; background:#e5e5e5 !important; color:#555 !important; border:1px solid #dedede !important; }
+#group-settings-screen #delete-group-chat-btn { display:block; order:12; min-height:48px; padding:10px 14px; margin:10px 0 0 !important; border-radius:10px; font-size:15px; }
+#group-settings-screen #group-settings-form { display:flex; flex-direction:column; }
+#group-settings-screen > .content > hr { display:none; }
 @media (max-width:380px) {
- #group-settings-sidebar > .content { padding-left:14px; padding-right:14px; }
- #group-settings-sidebar .group-members-list { grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:8px 6px; }
- #group-settings-sidebar .group-member img, #group-settings-sidebar .add-member-btn .add-icon { width:52px; height:52px; }
- #group-settings-sidebar .group-name-row label { flex-basis:96px; }
- #group-settings-sidebar .group-chat-info-gap { margin:0 -14px; }
+ #group-settings-screen > .content { padding-left:14px; padding-right:14px; }
+ #group-settings-screen .group-members-list { grid-template-columns:repeat(auto-fill,minmax(58px,1fr)); gap:8px 6px; }
+ #group-settings-screen .group-member img, #group-settings-screen .add-member-btn .add-icon { width:52px; height:52px; }
+ #group-settings-screen .group-name-row label { flex-basis:96px; }
+ #group-settings-screen .group-chat-info-gap { margin:0 -14px; }
 }
 
 </style>
@@ -6056,55 +6022,9 @@ body:has(#api-settings-screen.active) #group-settings-sidebar {
 
 
 <!-- ==========================================================
-     功能开始：聊天设置侧边栏（私聊）
-     ========================================================== -->
-<div id="chat-settings-sidebar" class="settings-sidebar">
-  <div class="header">聊天设置</div>
-  <div class="content">
-    <form id="chat-settings-form">
-      
-<div class="form-group"><label for="setting-my-name">我的姓名</label><input type="text" id="setting-my-name"></div>
-
-<!-- ★ 新增：时间戳开关（放在自定义气泡上方） -->
-<div class="form-group" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-top: 1px solid #eee; border-bottom: 1px solid #eee;">
-  <div>
-    <label for="setting-timestamp-toggle" style="margin-bottom: 2px; color: #333; font-weight: 600;">时间戳</label>
-    <div style="font-size: 12px; color: #888; line-height: 1.4; margin-top: 2px;">开启后，AI 会读取当前时间；关闭则忽略。</div>
-  </div>
-  <label class="switch" style="margin: 0;">
-    <input type="checkbox" id="setting-timestamp-toggle">
-    <span class="slider round"></span>
-  </label>
-</div>
-
-<hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-<div class="form-group">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-    <label for="setting-use-custom-css" style="margin-bottom:0;">自定义气泡样式</label>
-          <input type="checkbox" id="setting-use-custom-css" style="width: auto;">
-        </div>
-        <div id="private-bubble-css-preview" class="bubble-css-preview" style="background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;"></div>
-        <textarea id="setting-custom-bubble-css" rows="6" placeholder="在此输入CSS代码...&#10;例如：&#10;.message-bubble.sent { background-color: #A5D6A7; }&#10;.message-bubble.received { background-color: #E1E1E1; }" disabled></textarea>
-        <button type="button" class="btn btn-neutral" id="reset-custom-bubble-css-btn" style="margin-top: 10px; width: auto; padding: 5px 15px; font-size: 14px;">恢复默认</button>
-      </div>
-      
-<div class="form-group"><label for="setting-max-memory">最大记忆轮数</label><input type="number" id="setting-max-memory" value="300" min="1"></div>
-<div class="form-group"><label for="setting-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input type="file" id="setting-chat-bg-upload" accept="image/*" style="display:none;"></div>
-<button type="submit" class="btn btn-primary">保存设置</button>
-    </form>
-    <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-    <button type="button" class="btn btn-danger" id="clear-chat-history-btn">清空聊天记录</button>
-  </div>
-</div>
-<!-- ==========================================================
-     功能结束：聊天设置侧边栏（私聊）
-     ========================================================== -->
-
-
-<!-- ==========================================================
      功能开始：群聊设置侧边栏
      ========================================================== -->
-<div id="group-settings-sidebar" class="settings-sidebar">
+<div id="group-settings-screen" class="screen group-settings-screen">
   <div class="header"><button type="button" class="group-settings-back" id="group-settings-back-btn" aria-label="返回">‹</button><span>群聊设置</span><span class="group-settings-header-spacer"></span></div>
   <div class="content">
     <form id="group-settings-form">
@@ -6421,8 +6341,6 @@ const sendMessageBtn = document.getElementById('send-message-btn');
 const getReplyBtn = document.getElementById('get-reply-btn');
 const typingIndicator = document.getElementById('typing-indicator');
 const chatSettingsBtn = document.getElementById('chat-settings-btn');
-const settingsSidebar = document.getElementById('chat-settings-sidebar');
-const settingsForm = document.getElementById('chat-settings-form');
 const messageEditBar = document.getElementById('message-edit-bar');
 const messageEditInput = document.getElementById('message-edit-input');
 const saveEditBtn = document.getElementById('save-edit-btn');
@@ -6467,7 +6385,6 @@ const timeSkipBtn = document.getElementById('time-skip-btn');
 const timeSkipModal = document.getElementById('time-skip-modal');
 const timeSkipForm = document.getElementById('time-skip-form');
 const timeSkipInput = document.getElementById('time-skip-input');
-const clearChatHistoryBtn = document.getElementById('clear-chat-history-btn');
 const worldBookListContainer = document.getElementById('world-book-list-container');
 const noWorldBooksPlaceholder = document.getElementById('no-world-books-placeholder');
 const addWorldBookBtn = document.getElementById('add-world-book-btn');
@@ -6488,7 +6405,7 @@ const createGroupModal = document.getElementById('create-group-modal');
 const createGroupForm = document.getElementById('create-group-form');
 const memberSelectionList = document.getElementById('member-selection-list');
 const groupNameInput = document.getElementById('group-name-input');
-const groupSettingsSidebar = document.getElementById('group-settings-sidebar');
+const groupSettingsScreen = document.getElementById('group-settings-screen');
 const groupSettingsForm = document.getElementById('group-settings-form');
 const groupMembersListContainer = document.getElementById('group-members-list-container');
 const editGroupMemberModal = document.getElementById('edit-group-member-modal');
@@ -7080,9 +6997,8 @@ window.switchScreen = (targetId, isBack = false) => {
     if (!targetScreen) return;
     // 先关闭侧边页/浮层，再判断目标页面是否已经激活；否则目标页已激活时会提前 return，
     // 导致群聊设置侧栏残留在最上层，点 API 等入口看起来仍然停在群聊设置。
-    document.querySelectorAll('.modal-overlay, .action-sheet-overlay, .settings-sidebar').forEach(o => o.classList.remove('visible', 'open'));
-    const groupSidebar = document.getElementById('group-settings-sidebar');
-    if (groupSidebar) groupSidebar.classList.remove('open');
+    document.querySelectorAll('.modal-overlay, .action-sheet-overlay').forEach(o => o.classList.remove('visible', 'open'));
+    
     if (targetScreen.classList.contains('active')) return;
 const currentScreen = document.querySelector('.screen.active');
 if (!isBack && currentScreen) {
@@ -7093,7 +7009,7 @@ if (currentScreen && currentScreen.id === 'friend-info-edit-screen' && typeof wi
 }
 screens.forEach(screen => screen.classList.remove('active'));
 targetScreen.classList.add('active');
-    const overlays = document.querySelectorAll('.modal-overlay, .action-sheet-overlay, .settings-sidebar');
+    const overlays = document.querySelectorAll('.modal-overlay, .action-sheet-overlay');
     overlays.forEach(o => o.classList.remove('visible', 'open'));
   } catch (error) { console.error("切换界面失败:", error); }
 };
@@ -12542,12 +12458,10 @@ function renderWorldBookList() {
 
 
 /* ==========================================================
-   功能开始：私聊设置（侧边栏 + 聊天信息页）
+   功能开始：聊天信息页（旧私聊侧边栏已移除）
    ========================================================== */
 function setupChatSettings() {
-  chatSettingsBtn.addEventListener('click', (event) => {
-    // 仅在真实聊天页面响应设置按钮。移动端长按输入框弹出系统选词菜单时，
-    // 浏览器偶尔会派发延迟/幽灵点击；不能让它把后台残留的群聊设置重新打开。
+  if (chatSettingsBtn) chatSettingsBtn.addEventListener('click', (event) => {
     const chatScreen = document.getElementById('chat-room-screen');
     if (!chatScreen || !chatScreen.classList.contains('active')) {
       if (event) { event.preventDefault(); event.stopPropagation(); }
@@ -12557,89 +12471,10 @@ function setupChatSettings() {
       renderChatInfoScreen();
       switchScreen('chat-info-screen');
     } else if (currentChatType === 'group' && db.groups.some(g => g.id === currentChatId)) {
-      loadGroupSettingsToSidebar();
-      groupSettingsSidebar.classList.add('open');
+      loadGroupSettingsScreen();
+      switchScreen('group-settings-screen');
     }
   });
-  document.querySelector('.phone-screen').addEventListener('click', e => {
-    const openSidebar = document.querySelector('.settings-sidebar.open');
-    if (openSidebar && !openSidebar.contains(e.target) && !chatSettingsBtn.contains(e.target) && !e.target.closest('.modal-overlay') && !e.target.closest('.action-sheet-overlay')) {
-      openSidebar.classList.remove('open');
-    }
-  });
-  settingsForm.addEventListener('submit', e => { e.preventDefault(); saveSettingsFromSidebar(); settingsSidebar.classList.remove('open'); });
-  const useCustomCssCheckbox = document.getElementById('setting-use-custom-css'),
-    customCssTextarea = document.getElementById('setting-custom-bubble-css'),
-    resetCustomCssBtn = document.getElementById('reset-custom-bubble-css-btn'),
-    privatePreviewBox = document.getElementById('private-bubble-css-preview');
-  useCustomCssCheckbox.addEventListener('change', (e) => {
-    customCssTextarea.disabled = !e.target.checked;
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (char) {
-      const themeKey = char.theme || 'black_white';
-      updateBubbleCssPreview(privatePreviewBox, customCssTextarea.value, !e.target.checked, colorThemes[themeKey]);
-    }
-  });
-  customCssTextarea.addEventListener('input', (e) => {
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (char && useCustomCssCheckbox.checked) updateBubbleCssPreview(privatePreviewBox, e.target.value, false, colorThemes[char.theme || 'black_white']);
-  });
-  resetCustomCssBtn.addEventListener('click', () => {
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (char) {
-      customCssTextarea.value = '';
-      useCustomCssCheckbox.checked = false;
-      customCssTextarea.disabled = true;
-      updateBubbleCssPreview(privatePreviewBox, '', true, colorThemes[char.theme || 'black_white']);
-      showToast('样式已重置为默认');
-    }
-  });
-  
-document.getElementById('setting-chat-bg-upload').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const char = db.characters.find(c => c.id === currentChatId);
-      if (char) {
-        try {
-          const compressedUrl = await compressImage(file, { quality: 0.85, maxWidth: 1080, maxHeight: 1920 });
-          char.chatBg = compressedUrl;
-          chatRoomScreen.style.backgroundImage = `url(${compressedUrl})`;
-          await saveData();
-          showToast('聊天背景已更换');
-        } catch (error) { showToast('背景压缩失败，请重试'); }
-      }
-    }
-  });
-clearChatHistoryBtn.addEventListener('click', async () => {
-    const character = db.characters.find(c => c.id === currentChatId);
-    if (!character) return;
-    if (confirm(`你确定要清空与“${character.remarkName}”的所有聊天记录吗？这个操作是不可恢复的！`)) {
-      character.history = [];
-      await saveData();
-      renderMessages(false, true);
-      renderChatList();
-      settingsSidebar.classList.remove('open');
-      showToast('聊天记录已清空');
-    }
-  });
-
-  /* 功能开始：时间戳开关（私聊） */
-  const tsToggle = document.getElementById('setting-timestamp-toggle');
-  if (tsToggle) {
-    tsToggle.addEventListener('change', async (e) => {
-      const char = db.characters.find(c => c.id === currentChatId);
-      if (!char) return;
-      if (e.target.checked) {
-        char.timestampEnabled = true;
-      } else {
-        // 关掉时，判断是否与全局一致 → 一致则回退成 null（跟随全局），不一致则显式 false
-        char.timestampEnabled = (db.timestampEnabled === false) ? null : false;
-      }
-      await saveData();
-      showToast(e.target.checked ? '时间戳已开启，AI 将读取当前时间' : '时间戳已关闭，AI 不会读取时间');
-    });
-  }
-  /* 功能结束：时间戳开关（私聊） */
 
   /* 功能开始：聊天信息页逻辑 */
   const ciBack = document.getElementById('chat-info-back-btn');
@@ -12873,49 +12708,6 @@ function executeChatInfoSearch(keyword) {
 }
 /* 功能结束：渲染聊天信息页 */
 
-function loadSettingsToSidebar() {
-  const e = db.characters.find(e => e.id === currentChatId);
-  if (e) {
-    document.getElementById('setting-my-name').value = e.myName;
-    document.getElementById('setting-max-memory').value = e.maxMemory;
-    const useCustomCssCheckbox = document.getElementById('setting-use-custom-css'),
-      customCssTextarea = document.getElementById('setting-custom-bubble-css'),
-      privatePreviewBox = document.getElementById('private-bubble-css-preview');
-    useCustomCssCheckbox.checked = e.useCustomBubbleCss || false;
-    customCssTextarea.value = e.customBubbleCss || '';
-    customCssTextarea.disabled = !useCustomCssCheckbox.checked;
-    updateBubbleCssPreview(privatePreviewBox, e.customBubbleCss, !e.useCustomBubbleCss, colorThemes[e.theme || 'black_white']);
-    /* 时间戳开关 */
-    const tsToggle = document.getElementById('setting-timestamp-toggle');
-    if (tsToggle) {
-      tsToggle.checked = (e.timestampEnabled === true) || (e.timestampEnabled !== false && db.timestampEnabled !== false);
-    }
-  }
-}
-
-async function saveSettingsFromSidebar() {
-  const e = db.characters.find(e => e.id === currentChatId);
-  
-if (e) {
-  e.myName = document.getElementById('setting-my-name').value;
-    e.theme = 'black_white';
-    e.maxMemory = parseInt(document.getElementById('setting-max-memory').value) || 10;
-    e.useCustomBubbleCss = document.getElementById('setting-use-custom-css').checked;
-    e.customBubbleCss = document.getElementById('setting-custom-bubble-css').value;
-    await saveData();
-    showToast('设置已保存！');
-    chatRoomTitle.textContent = e.remarkName;
-    renderChatList();
-    updateCustomBubbleStyle(currentChatId, e.customBubbleCss, e.useCustomBubbleCss);
-    currentPage = 1;
-    renderMessages(false, true);
-  }
-}
-/* ==========================================================
-   功能结束：私聊设置
-   ========================================================== */
-
-
 /* ==========================================================
    功能开始：API 设置
    ========================================================== */
@@ -13088,20 +12880,7 @@ if (messageArea && !messageArea.dataset.minimaxVoiceDelegateReady) {
     if (event.stopImmediatePropagation) event.stopImmediatePropagation();
   }, true);
 
-  // 无论哪个旧逻辑尝试打开侧栏，只要 API 页面正在显示，就立刻关掉后台设置层。
-  const closeSettingsBehindApi = () => {
-    const apiScreen = document.getElementById('api-settings-screen');
-    if (!apiScreen || !apiScreen.classList.contains('active')) return;
-    document.querySelectorAll('#chat-settings-sidebar, #group-settings-sidebar').forEach(sidebar => {
-      sidebar.classList.remove('open', 'visible');
-    });
-  };
-  document.addEventListener('click', closeSettingsBehindApi, true);
-  const apiScreen = document.getElementById('api-settings-screen');
-  if (apiScreen && window.MutationObserver) {
-    new MutationObserver(closeSettingsBehindApi).observe(apiScreen, { attributes: true, attributeFilter: ['class'] });
-  }
-  closeSettingsBehindApi();
+
 })();
 
 function setupApiSettingsApp() {
@@ -13648,8 +13427,8 @@ function setupGroupChatSystem() {
     createGroupModal.classList.remove('visible');
     showToast(`群聊“${groupName}”创建成功！`);
   });
-  groupSettingsForm.addEventListener('submit', e => { e.preventDefault(); saveGroupSettingsFromSidebar(); groupSettingsSidebar.classList.remove('open'); });
-  document.getElementById('group-settings-back-btn').addEventListener('click', () => groupSettingsSidebar.classList.remove('open'));
+  groupSettingsForm.addEventListener('submit', e => { e.preventDefault(); saveGroupSettingsScreen(); switchScreen('chat-room-screen'); });
+  document.getElementById('group-settings-back-btn').addEventListener('click', () => switchScreen('chat-room-screen'));
   const groupAvatarRow = document.getElementById('group-avatar-row');
   groupAvatarRow.addEventListener('click', e => { if (e.target.id !== 'setting-group-avatar-upload') document.getElementById('setting-group-avatar-upload').click(); });
   groupAvatarRow.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); document.getElementById('setting-group-avatar-upload').click(); } });
@@ -13739,7 +13518,7 @@ function setupGroupChatSystem() {
       if (Array.isArray(db.messageReminders)) db.messageReminders = db.messageReminders.filter(r => !(r.chatType === 'group' && r.chatId === groupId));
       await saveData();
       overlay.remove();
-      groupSettingsSidebar.classList.remove('open');
+      groupSettingsScreen.classList.remove('active');
       currentChatId = null;
       currentChatType = null;
       renderChatList();
@@ -13771,10 +13550,10 @@ function setupGroupChatSystem() {
       if (!member) return;
       const linkedChar = member.originalCharId && db.characters.find(c => c.id === member.originalCharId);
       if (linkedChar) {
-        groupSettingsSidebar.classList.remove('open');
+        groupSettingsScreen.classList.remove('active');
         renderFriendProfile(linkedChar);
         const fpBackBtn = document.querySelector('#friend-profile-screen .back-btn');
-        if (fpBackBtn) fpBackBtn.onclick = () => { switchScreen('chat-room-screen'); groupSettingsSidebar.classList.add('open'); };
+        if (fpBackBtn) fpBackBtn.onclick = () => { switchScreen('chat-room-screen'); switchScreen('group-settings-screen'); };
         switchScreen('friend-profile-screen');
       } else {
         openGroupMemberEditModal(member.id);
@@ -13903,7 +13682,7 @@ function renderMemberSelectionList() {
   });
 }
 
-function loadGroupSettingsToSidebar() {
+function loadGroupSettingsScreen() {
   const group = db.groups.find(g => g.id === currentChatId);
   if (!group) return;
   document.getElementById('setting-group-avatar-preview').src = group.avatar || '';
@@ -13950,7 +13729,7 @@ function renderGroupRecipientSelectionList(actionText) {
   });
 }
 
-async function saveGroupSettingsFromSidebar() {
+async function saveGroupSettingsScreen() {
   const group = db.groups.find(g => g.id === currentChatId);
   if (!group) return;
   const newName = document.getElementById('setting-group-name').value.trim() || group.name;
@@ -14205,9 +13984,8 @@ const homeScreenHTML = `
   const apiBtn = document.getElementById('go-to-api-settings-btn');
   if (apiBtn) apiBtn.onclick = (e) => {
     if (e) { e.preventDefault(); e.stopPropagation(); }
-    const groupSidebar = document.getElementById('group-settings-sidebar');
-    if (groupSidebar) groupSidebar.classList.remove('open');
-    document.querySelectorAll('.settings-sidebar').forEach(sidebar => sidebar.classList.remove('open', 'visible'));
+    
+    
     switchScreen('api-settings-screen');
   };
   const customizeBtn = document.getElementById('go-to-customize-btn');
