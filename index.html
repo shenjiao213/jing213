@@ -474,6 +474,9 @@ body {
 
 /* 兼容旧引用（不再主动渲染，但如果用户自定义 CSS 想启用可保留） */
 .message-time { font-size: 9px; color: #aaa; margin-top: 3px; }
+.message-time-under-avatar { display:block; width:100%; max-width:52px; text-align:center; white-space:nowrap; font-size:10px; line-height:1.25; color:#9a9a9a; margin-top:5px; }
+.message-info { flex:0 0 36px; }
+.message-info .message-avatar { display:block; }
 /* ==========================================================
    功能结束：消息时间戳（居中显示）
    ========================================================== */
@@ -1712,7 +1715,7 @@ input:checked + .slider:before { transform: translateX(22px); }
 .offline-bubble-wrapper {
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  margin-bottom: 8px;
   position: relative;
   width: 100%;
 }
@@ -1817,6 +1820,19 @@ input:checked + .slider:before { transform: translateX(22px); }
 #offline-screen .offline-bubble-text .offline-thought { font-style:italic; color:#777d86; }
 #offline-screen .offline-bubble-text .offline-dialogue { padding-bottom:0; margin-bottom:0; border-bottom:0; text-decoration-line:underline; text-decoration-style:dashed; text-decoration-color:#aeb1b8; text-decoration-thickness:1px; text-underline-offset:4px; text-decoration-skip-ink:none; }
 #offline-screen .offline-bubble-text .offline-dialogue:last-child { border-bottom:0; margin-bottom:0; padding-bottom:0; }
+#offline-screen .offline-bubble-text .offline-story-paragraph { display:block; margin:0 0 0.75em; padding:0; border:0; text-decoration:none; }
+#offline-screen .offline-bubble-text .offline-narration { text-decoration:none !important; border:0 !important; padding:0 !important; margin:0 !important; }
+#offline-screen .offline-bubble-text .offline-dialogue { display:inline; text-decoration-line:underline; text-decoration-style:dashed; text-decoration-color:#aeb1b8; text-decoration-thickness:1px; text-underline-offset:4px; border:0 !important; padding:0 !important; margin:0 !important; }
+/* 只隐藏线下剧情页面的时间戳；线上私聊/群聊时间戳正常显示 */
+#offline-screen .message-timestamp, #offline-screen .offline-message-timestamp, #offline-screen .offline-time-label, #offline-screen .offline-center-timestamp { display:none !important; }
+#offline-screen .offline-bubble-wrapper { margin-bottom:14px !important; }
+#offline-screen .offline-bubble-container { margin-bottom:0 !important; }
+#offline-screen .offline-bubble-time { display:none !important; }
+#offline-screen .offline-floor-label { display:none !important; }
+#offline-screen .offline-bubble { position:relative; }
+#offline-screen .offline-turn-badge { position:absolute; top:10px; right:14px; z-index:2; padding:1px 5px; border-radius:5px; background:rgba(150,153,160,.10); color:#a0a2a8; font-size:10px; line-height:1.4; }
+#offline-screen .offline-bubble-wrapper { margin-bottom:14px !important; }
+#offline-screen .offline-center-timestamp { display:block; text-align:center; color:#a0a0a5; font-size:11px; padding:8px 0 12px; }
 #offline-screen .offline-settings-overlay { position:absolute; inset:0; z-index:100; background:rgba(34,36,42,.28); backdrop-filter:blur(7px); -webkit-backdrop-filter:blur(7px); display:flex; align-items:flex-end; justify-content:center; }
 #offline-screen .offline-settings-panel { width:100%; max-height:88%; display:flex; flex-direction:column; background:#f8f8fa; border:1px solid rgba(255,255,255,.9); border-radius:22px 22px 0 0; box-shadow:0 -12px 40px rgba(35,38,45,.13); color:#383a40; overflow:hidden; }
 #offline-screen .offline-settings-heading { display:flex; justify-content:space-between; align-items:flex-start; padding:20px 20px 14px; background:linear-gradient(135deg,#fff,#f0f0f3); border-bottom:1px solid #e9e9ed; }
@@ -2010,6 +2026,17 @@ input:checked + .slider:before { transform: translateX(22px); }
 /* ==========================================================
    功能结束：韩系弹窗
    ========================================================== */
+
+/* 全站统一灰白主题确认框 */
+#hg-confirm-modal { z-index: 12000; background: rgba(42,42,46,.34); padding: 24px; }
+#hg-confirm-modal .hg-confirm-card { background: #f8f8f8; border: 1px solid #e7e7e7; border-radius: 22px; max-width: 360px; padding: 24px 22px 18px; box-shadow: 0 14px 38px rgba(0,0,0,.12); }
+#hg-confirm-modal .hg-modal-title { text-align: left; font-size: 18px; color: #292929; margin-bottom: 16px; }
+#hg-confirm-modal .hg-confirm-message { color: #454545; font-size: 15px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+#hg-confirm-modal .hg-modal-actions { margin-top: 22px; }
+#hg-confirm-modal .hg-modal-cancel { background: #ececee; color: #777; }
+#hg-confirm-modal .hg-modal-confirm { background: #333; color: #fff; }
+#hg-confirm-modal .hg-modal-btn { border-radius: 12px; min-height: 44px; }
+
 
 
 /* ==========================================================
@@ -2901,6 +2928,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 #world-book-screen .btn-primary:active, #edit-world-book-screen .btn-primary:active, #offline-screen .send-btn:active, #sound-settings-screen .btn-primary:active, #voice-settings-screen .voice-save:active, #couple-avatar-screen .btn-primary:active, #emoji-management-screen .btn-primary:active, #customize-screen .btn-primary:active { background:#444444 !important; border-color:#444444 !important; }
 </style>
 
+<style id="wallet-paypass-style">.wallet-paypass-overlay{position:fixed;inset:0;z-index:999999;background:rgba(30,32,36,.42);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.wallet-paypass-card{width:min(360px,100%);background:#f8f8fa;border:1px solid #fff;border-radius:24px;padding:25px 20px 16px;box-shadow:0 18px 55px #0002;text-align:center;color:#34363b;position:relative}.wallet-paypass-close{position:absolute;right:14px;top:10px;border:0;background:transparent;color:#8b8d94;font-size:26px}.wallet-paypass-title{font-size:19px;font-weight:600;margin-top:8px}.wallet-paypass-sub{font-size:12px;color:#9698a0;margin-top:8px}.wallet-paypass-dots{display:flex;justify-content:center;gap:12px;margin:24px 0 10px}.wallet-paypass-dots span{width:12px;height:12px;border-radius:50%;border:1px solid #c6c8cf;background:#fff}.wallet-paypass-dots span.filled{background:#555861;border-color:#555861}.wallet-paypass-error{height:18px;color:#b85b5b;font-size:12px}.wallet-paypass-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.wallet-paypass-keypad button{height:48px;border:0;border-radius:10px;background:#fff;color:#333;font-size:21px}.wallet-paypass-keypad button:active{background:#e9e9ed}.wallet-paypass-keypad button[data-key=""]{visibility:hidden}</style>
 </head>
 <body>
 <div class="phone-screen">
@@ -5885,6 +5913,18 @@ body:has(#api-settings-screen.active) #group-settings-screen {
   </div>
 </div>
 
+<!-- 统一主题确认弹窗：替代浏览器原生 confirm -->
+<div id="hg-confirm-modal" class="hg-modal-overlay">
+  <div class="hg-modal hg-confirm-card" role="dialog" aria-modal="true" aria-labelledby="hg-confirm-title">
+    <div class="hg-modal-title" id="hg-confirm-title">提示</div>
+    <div class="hg-confirm-message" id="hg-confirm-message"></div>
+    <div class="hg-modal-actions">
+      <button type="button" class="hg-modal-btn hg-modal-cancel">取消</button>
+      <button type="button" class="hg-modal-btn hg-modal-confirm">确定</button>
+    </div>
+  </div>
+</div>
+
 <!-- 韩系输入弹窗 -->
 <div id="hg-input-modal" class="hg-modal-overlay">
   <div class="hg-modal">
@@ -5972,6 +6012,13 @@ body:has(#api-settings-screen.active) #group-settings-screen {
     <span class="slider round"></span>
   </label>
 </div>
+<div class="chat-info-item" style="min-height:58px;">
+  <span>时间显示方式</span>
+  <select id="chat-info-timestamp-mode" style="max-width:190px;border:1px solid #e5e5e5;border-radius:8px;padding:8px;background:#fff;color:#666;font:inherit;font-size:13px;">
+    <option value="center">对话之间居中显示</option>
+    <option value="bubble">每个气泡下方显示</option>
+  </select>
+</div>
 <div class="chat-info-section-gap"></div>
 
 <div class="chat-info-item" id="chat-info-pat-btn">
@@ -6052,6 +6099,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
       <div class="group-chat-info-item" id="group-chat-clear-btn"><span>清空聊天记录</span><span class="chat-info-arrow">›</span></div>
       <div class="group-chat-info-gap"></div>
       <div class="group-chat-info-item" id="group-chat-timestamp-row"><span>时间戳</span><label class="switch" style="margin:0"><input type="checkbox" id="group-chat-timestamp-toggle"><span class="slider round"></span></label></div>
+      <div class="group-chat-info-item" style="min-height:52px;"><span>时间显示方式</span><select id="group-chat-timestamp-mode" style="max-width:190px;border:1px solid #e5e5e5;border-radius:8px;padding:7px;background:#fff;color:#666;font:inherit;font-size:13px;"><option value="center">对话之间居中显示</option><option value="bubble">每个气泡下方显示</option></select></div>
       <button type="submit" class="btn btn-primary" style="width:100%;">保存设置</button>
     </form>
     <hr style="border:none; border-top:1px solid #eee; margin:20px 0;">
@@ -6095,6 +6143,8 @@ function escapeRegExp(s) {
    ========================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { if (typeof processExpiredWalletTransfers === 'function') processExpiredWalletTransfers().catch(err => console.warn('转账过期检查失败', err)); }, 800);
+  setInterval(() => { if (typeof processExpiredWalletTransfers === 'function') processExpiredWalletTransfers().catch(err => console.warn('转账过期检查失败', err)); }, 60000);
 
 /* ==========================================================
    功能开始：图片压缩工具
@@ -6380,6 +6430,8 @@ const returnTransferBtn = document.getElementById('return-transfer-btn');
 const giftBtn = document.getElementById('gift-btn');
 const sendGiftModal = document.getElementById('send-gift-modal');
 const sendGiftForm = document.getElementById('send-gift-form');
+const offlineTimestampModeSelect = document.getElementById('offline-timestamp-mode');
+if (offlineTimestampModeSelect) { offlineTimestampModeSelect.value = 'bubble'; offlineTimestampModeSelect.addEventListener('change', async () => { db.offlineTimestampMode = offlineTimestampModeSelect.value; await saveData(); renderOfflineMessages(); }); }
 const giftDescriptionInput = document.getElementById('gift-description-input');
 const timeSkipBtn = document.getElementById('time-skip-btn');
 const timeSkipModal = document.getElementById('time-skip-modal');
@@ -6980,39 +7032,90 @@ window.showToast = (message) => {
   setTimeout(() => toastElement.classList.remove('show'), 3000);
 };
 
+// 页面导航栈：不设置人为上限；仅记录真实页面切换，不记录弹窗。
 window.screenHistory = [];
+window.__screenBackInProgress = false;
+// 只保留一个应用内历史哨兵，避免每次切页都在浏览器历史里堆一条记录。
+try {
+  history.replaceState({ ...(history.state || {}), __appScreenNav: true }, '', location.href);
+} catch (e) { console.warn('无法初始化应用内返回状态:', e); }
 
-window.goBack = () => {
-  if (window.screenHistory.length > 0) {
-    const prevId = window.screenHistory.pop();
-    window.switchScreen(prevId, true);
-  } else {
-    window.switchScreen('home-screen', true);
+window.goBack = (fromPopState = false) => {
+  // 返回优先关闭最上层弹窗/操作菜单，不切换底层页面。
+  const visibleOverlay = document.querySelector('.modal-overlay.visible, .action-sheet-overlay.visible');
+  if (visibleOverlay) {
+    visibleOverlay.classList.remove('visible', 'open');
+    return true;
   }
+
+  const current = document.querySelector('.screen.active');
+  while (window.screenHistory.length) {
+    const prevId = window.screenHistory.pop();
+    const prev = document.getElementById(prevId);
+    if (prev && prev.classList.contains('screen') && prevId !== current?.id) {
+      window.switchScreen(prevId, true);
+      return true;
+    }
+  }
+  if (current && current.id !== 'home-screen') {
+    window.switchScreen('home-screen', true);
+    return true;
+  }
+  return false;
 };
 
 window.switchScreen = (targetId, isBack = false) => {
   try {
     const targetScreen = document.getElementById(targetId);
-    if (!targetScreen) return;
-    // 先关闭侧边页/浮层，再判断目标页面是否已经激活；否则目标页已激活时会提前 return，
-    // 导致群聊设置侧栏残留在最上层，点 API 等入口看起来仍然停在群聊设置。
+    if (!targetScreen || !targetScreen.classList.contains('screen')) {
+      console.warn('switchScreen: 页面不存在或不是 .screen：', targetId);
+      return false;
+    }
+
+    // 切页前关闭浮层，即使目标页已经激活也执行。
     document.querySelectorAll('.modal-overlay, .action-sheet-overlay').forEach(o => o.classList.remove('visible', 'open'));
-    
-    if (targetScreen.classList.contains('active')) return;
-const currentScreen = document.querySelector('.screen.active');
-if (!isBack && currentScreen) {
-  window.screenHistory.push(currentScreen.id);
-}
-if (currentScreen && currentScreen.id === 'friend-info-edit-screen' && typeof window.currentSaveFieldsFn === 'function') {
-  setTimeout(() => { try { window.currentSaveFieldsFn(); } catch (e) { console.error("自动保存失败:", e); } }, 100);
-}
-screens.forEach(screen => screen.classList.remove('active'));
-targetScreen.classList.add('active');
-    const overlays = document.querySelectorAll('.modal-overlay, .action-sheet-overlay');
-    overlays.forEach(o => o.classList.remove('visible', 'open'));
-  } catch (error) { console.error("切换界面失败:", error); }
+    const currentScreen = document.querySelector('.screen.active');
+    if (currentScreen?.id === targetId) return true;
+
+    const stack = window.screenHistory;
+    if (isBack) {
+      // 明确返回到某个页面时，清掉该页面及其之后的历史，避免下一次返回跳回子菜单。
+      const targetIndex = stack.lastIndexOf(targetId);
+      if (targetIndex >= 0) stack.splice(targetIndex);
+      else if (stack.length && stack[stack.length - 1] === currentScreen?.id) stack.pop();
+    } else if (currentScreen) {
+      // 连续进入同一页面不重复压栈；不设人为数量上限。
+      if (stack[stack.length - 1] !== currentScreen.id) stack.push(currentScreen.id);
+    }
+
+    if (currentScreen?.id === 'friend-info-edit-screen' && typeof window.currentSaveFieldsFn === 'function') {
+      setTimeout(() => { try { window.currentSaveFieldsFn(); } catch (e) { console.error('自动保存失败:', e); } }, 100);
+    }
+
+    document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+    targetScreen.classList.add('active');
+    return true;
+  } catch (error) {
+    console.error('切换界面失败:', error);
+    return false;
+  }
 };
+
+// 浏览器/Android 系统返回：处理应用内返回后立即恢复哨兵，留在单页应用中。
+window.addEventListener('popstate', () => {
+  window.__screenBackInProgress = false;
+  window.goBack(true);
+  try { history.pushState({ ...(history.state || {}), __appScreenNav: true }, '', location.href); }
+  catch (e) { console.warn('恢复应用内返回状态失败:', e); }
+});
+
+// 桌面浏览器 Escape 作为辅助返回键；输入框编辑时不拦截。
+window.addEventListener('keydown', event => {
+  if (event.key !== 'Escape' || event.defaultPrevented || event.isComposing) return;
+  const el = event.target;
+  if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+  window.goBack();
+});
 const pad = (num) => num.toString().padStart(2, '0');
 /* ==========================================================
    功能结束：Toast / 界面切换
@@ -7576,7 +7679,7 @@ async function handleSwipeAction(action, chatId, chatType, chatItem) {
     showToast('已标为已读');
   } else if (action === 'delete') {
     const itemName = chatType === 'private' ? chat.remarkName : chat.name;
-    if (confirm(`确定要清空与“${itemName}”的聊天记录吗？此操作不可恢复，但联系人仍会保留在通讯录。`)) {
+    if (await showHgConfirm(`确定要清空与“${itemName}”的聊天记录吗？此操作不可恢复，但联系人仍会保留在通讯录。`)) {
       chat.history = [];
       chat.unread = false;
       chat.unreadCount = 0;
@@ -8473,6 +8576,44 @@ function renderWalletBalance() {
   if (banner) banner.textContent = `¥${getWalletBalance().toFixed(2)}`;
 }
 
+async function ensureWalletPaymentPassword() {
+  // 首次进行任何资金操作时，先引导设置 6 位支付密码；取消设置就取消本次操作。
+  if (!db.walletPaymentPassword) {
+    const setup = await showHgConfirm('为了确保每一笔零钱支出都有验证，请先设置 6 位支付密码。设置完成后才能继续本次操作。', {title:'首次使用支付', confirmText:'去设置'});
+    if (!setup) return false;
+    await configureWalletPaymentPassword();
+    return !!db.walletPaymentPassword;
+  }
+  return new Promise(resolve => {
+    const overlay=document.createElement('div'); overlay.className='wallet-paypass-overlay';
+    let digits='';
+    overlay.innerHTML=`<div class="wallet-paypass-card"><button class="wallet-paypass-close" aria-label="关闭">×</button><div class="wallet-paypass-title">请输入支付密码</div><div class="wallet-paypass-sub">为了你的账户安全，请验证支付密码</div><div class="wallet-paypass-dots">${Array.from({length:6},(_,i)=>`<span data-dot="${i}"></span>`).join('')}</div><div class="wallet-paypass-error"></div><div class="wallet-paypass-keypad">${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>`<button data-key="${k}">${k}</button>`).join('')}</div></div>`;
+    document.body.appendChild(overlay);
+    const finish=v=>{overlay.remove();resolve(v);};
+    const update=()=>overlay.querySelectorAll('[data-dot]').forEach((d,i)=>d.classList.toggle('filled',i<digits.length));
+    overlay.querySelector('.wallet-paypass-close').onclick=()=>finish(false);
+    overlay.addEventListener('click',e=>{if(e.target===overlay)finish(false);});
+    overlay.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(k==='⌫')digits=digits.slice(0,-1);else if(k)digits+=k;digits=digits.slice(0,6);update();if(digits.length===6){if(digits===String(db.walletPaymentPassword)){finish(true);}else{overlay.querySelector('.wallet-paypass-error').textContent='密码错误，请重新输入';digits='';setTimeout(()=>{if(overlay.isConnected){update();overlay.querySelector('.wallet-paypass-error').textContent='';}},650);}}});
+  });
+}
+async function configureWalletPaymentPassword() {
+  const current=String(db.walletPaymentPassword||'');
+  if(current && !(await ensureWalletPaymentPassword())) return;
+  const first=await collectSixDigitPassword(current?'设置新的支付密码':'设置支付密码'); if(first===null)return;
+  const second=await collectSixDigitPassword('请再次输入支付密码'); if(second===null)return;
+  if(first!==second)return showToast('两次密码不一致，请重新设置');
+  db.walletPaymentPassword=first; await saveData(); showToast(current?'支付密码已修改':'支付密码设置成功');
+}
+function collectSixDigitPassword(title) {
+  return new Promise(resolve=>{
+    const overlay=document.createElement('div');overlay.className='wallet-paypass-overlay';let digits='';
+    overlay.innerHTML=`<div class="wallet-paypass-card"><button class="wallet-paypass-close">×</button><div class="wallet-paypass-title">${title}</div><div class="wallet-paypass-sub">请设置 6 位数字密码</div><div class="wallet-paypass-dots">${Array.from({length:6},(_,i)=>`<span data-dot="${i}"></span>`).join('')}</div><div class="wallet-paypass-error"></div><div class="wallet-paypass-keypad">${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>`<button data-key="${k}">${k}</button>`).join('')}</div></div>`;
+    document.body.appendChild(overlay);const finish=v=>{overlay.remove();resolve(v);};const update=()=>overlay.querySelectorAll('[data-dot]').forEach((d,i)=>d.classList.toggle('filled',i<digits.length));
+    overlay.querySelector('.wallet-paypass-close').onclick=()=>finish(null);overlay.addEventListener('click',e=>{if(e.target===overlay)finish(null);});
+    overlay.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.key;if(k==='⌫')digits=digits.slice(0,-1);else if(k)digits+=k;digits=digits.slice(0,6);update();if(digits.length===6)setTimeout(()=>finish(digits),100);});
+  });
+}
+
 function setupWalletScreen() {
   const backBtn = document.getElementById('wallet-back-btn');
   const titleEl = document.getElementById('wallet-header-title');
@@ -8494,8 +8635,8 @@ function setupWalletScreen() {
   const persist = async () => { await saveData(); renderWalletBalance(); };
   const setHeader = (title, action='') => { titleEl.textContent=title; actionEl.textContent=action; actionEl.style.visibility=action?'visible':'hidden'; actionEl.onclick=action?(()=>go('ledger')):null; };
   const go = page => { walletPage=page; render(); };
-  const editAmount = async (title, initial, callback) => {
-    const val=await showHgInput({title,sub:'这是虚拟钱包数据，可随时修改',placeholder:'输入金额',value:String(Number(initial||0).toFixed(2))});
+  const editAmount = async (title, initial, callback, sub='这是虚拟钱包数据，可随时修改') => {
+    const val=await showHgInput({title,sub,placeholder:'输入金额',value:String(Number(initial||0).toFixed(2))});
     if(val===null)return; const n=Number(val); if(!Number.isFinite(n)||n<0)return showToast('请输入有效金额'); await callback(n);
   };
   function renderOverview(){
@@ -8506,19 +8647,31 @@ function setupWalletScreen() {
       <div class="wallet-row" data-wallet-action="bank"><div class="wallet-row-icon" style="color:#1296db">▤</div><div class="wallet-row-copy"><div class="wallet-row-title">银行卡</div><div class="wallet-row-sub">${db.walletBankCards.length} 张银行卡</div></div><span class="wallet-chevron">›</span></div>
       <div class="wallet-row" data-wallet-action="kinship"><div class="wallet-row-icon" style="color:#e6a23c">♡</div><div class="wallet-row-copy"><div class="wallet-row-title">亲属卡</div><div class="wallet-row-sub">给好友赠送或接收亲属卡</div></div><span class="wallet-chevron">›</span></div>
       <div class="wallet-virtual-mark"><span class="mark-dot"></span><span>虚拟钱包 · 仅供角色扮演</span></div>
+      <div style="text-align:center;padding:18px 0 22px;"><button id="wallet-payment-settings" style="border:0;background:transparent;color:#7188ad;font-size:11px;padding:3px 6px;">支付设置</button></div>
     </div>`;
+    main.querySelector('#wallet-payment-settings').onclick=async()=>{const has=!!db.walletPaymentPassword;const ok=await showHgConfirm(has?'已设置支付密码。是否更改支付密码？':'设置支付密码后，转入零钱通、充值等支付操作需要验证。',{title:'支付设置',confirmText:has?'更改密码':'设置密码'});if(ok)await configureWalletPaymentPassword();};
     main.querySelectorAll('[data-wallet-action]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.walletAction)));
   }
   function renderCash(){
     setHeader('零钱','明细');
-    main.innerHTML=`<div style="background:#fff;min-height:100%;text-align:center;padding:80px 18px 30px;box-sizing:border-box;"><div style="width:58px;height:58px;border-radius:50%;background:#ffca00;color:#fff;display:grid;place-items:center;font-size:30px;margin:0 auto 28px;">¥</div><div style="font-size:16px;">我的零钱</div><div style="font-size:42px;font-weight:650;margin:16px 0 24px;">${money(getWalletBalance())}</div><div style="color:#e6a23c;margin-bottom:70px;">零钱余额可随时编辑</div><button class="wallet-tool-btn" id="cash-edit" style="width:min(280px,90%);">修改零钱余额</button><div class="wallet-virtual-mark" style="padding-top:26px;"><span class="mark-dot"></span><span>虚拟余额</span></div></div>`;
-    main.querySelector('#cash-edit').onclick=()=>editAmount('修改零钱余额',getWalletBalance(),async n=>{const old=getWalletBalance();setWalletBalance(n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:n,icon:'wechat'}];record('修改零钱余额',n-old,'手动调整');await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();showToast('零钱余额已更新');});
+    main.innerHTML=`<div style="background:#fff;min-height:100%;text-align:center;padding:70px 18px 30px;box-sizing:border-box;"><div style="width:58px;height:58px;border-radius:50%;background:#ffca00;color:#fff;display:grid;place-items:center;font-size:30px;margin:0 auto 28px;">¥</div><div style="font-size:16px;">我的零钱</div><div style="font-size:42px;font-weight:650;margin:16px 0;">${money(getWalletBalance())}</div><div style="margin-bottom:34px;"></div><button class="wallet-tool-btn" id="cash-recharge" style="width:min(280px,90%);">充值</button></div>`;
+    main.querySelector('#cash-recharge').onclick=async()=>{
+      if(!db.walletBankCards.length){showToast('请先添加银行卡');go('bank');return;}
+      const choices=db.walletBankCards.map((c,i)=>`${i+1}. ${c.bank}（${c.number||'虚拟卡号'}，可用 ${money(c.balance)}）`).join('\n');
+      const picked=await showHgInput({title:'选择充值银行卡',sub:choices,placeholder:'输入银行卡序号'});
+      if(picked===null)return;const card=db.walletBankCards[Number(picked)-1];if(!card)return showToast('银行卡序号无效');
+      const amount=await showHgInput({title:'银行卡充值到零钱',sub:`${card.bank} · 可用余额 ${money(card.balance)}`,placeholder:'输入充值金额'});
+      if(amount===null)return;const n=Number(amount);if(!Number.isFinite(n)||n<=0)return showToast('请输入大于 0 的金额');if(n>Number(card.balance||0))return showToast('银行卡余额不足');if(!(await ensureWalletPaymentPassword()))return;
+      card.balance=Number(card.balance||0)-n;setWalletBalance(getWalletBalance()+n);
+      if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];
+      record('银行卡充值零钱',n,card.bank);await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();showToast('充值成功');
+    };
   }
   function renderFund(){
     setHeader('零钱通','');
     main.innerHTML=`<div class="wallet-fund-page"><div class="wallet-fund-top"><div class="gem">◇</div><div style="font-size:20px;font-weight:600;">零钱通</div><div style="margin-top:16px;font-size:14px;">资金安全保障中 ›</div></div><div class="wallet-fund-card"><div class="fund-label">账户余额</div><div class="fund-value">${money(db.walletFundBalance)}</div><div style="color:#526b8b;font-size:14px;">7日年化收益率 ${(db.walletFundYield*100).toFixed(4)}%</div><div class="wallet-fund-stats"><div><div class="wallet-fund-muted">累计收益</div><div style="font-size:22px;margin-top:8px;">${money(db.walletFundEarnings||0)}</div></div><div><div class="wallet-fund-muted">昨日收益</div><div style="font-size:22px;margin-top:8px;">${money(db.walletFundYesterday||0)}</div></div></div><div class="wallet-fund-actions"><button id="fund-out" ${db.walletFundBalance<=0?'disabled':''}>转出</button><button class="primary" id="fund-in">转入</button></div><button id="fund-yield" style="border:0;background:transparent;color:#999;margin-top:22px;">修改模拟年化收益率 ›</button></div><div style="margin-top:20px;font-size:15px;">更多产品</div><div style="background:#fff;color:#222;border-radius:10px;padding:18px;margin-top:12px;"><b>收益说明</b><p style="color:#999;font-size:12px;line-height:1.7;">按模拟年化收益率计算每日收益，收益只影响虚拟零钱通余额，不涉及真实资金。</p></div></div>`;
-    main.querySelector('#fund-in').onclick=()=>editAmount('转入零钱通',0,async n=>{if(n<=0)return showToast('请输入大于 0 的金额');if(n>getWalletBalance())return showToast('零钱余额不足');setWalletBalance(getWalletBalance()-n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];db.walletFundBalance+=n;record('转入零钱通',-n);await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();});
-    main.querySelector('#fund-out').onclick=()=>editAmount('从零钱通转出',0,async n=>{if(n<=0)return showToast('请输入大于 0 的金额');if(n>db.walletFundBalance)return showToast('零钱通余额不足');db.walletFundBalance-=n;setWalletBalance(getWalletBalance()+n);if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];record('零钱通转出',n);await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();render();});
+    main.querySelector('#fund-in').onclick=()=>go('fundIn');
+    main.querySelector('#fund-out').onclick=()=>go('fundOut');
     main.querySelector('#fund-yield').onclick=async()=>{const val=await showHgInput({title:'模拟年化收益率（%）',sub:'例如 0.844 表示年化 0.844%',placeholder:'0.844',value:String((db.walletFundYield*100).toFixed(4))});if(val===null)return;const n=Number(val);if(!Number.isFinite(n)||n<0||n>100)return showToast('请输入 0 到 100 之间的数值');db.walletFundYield=n/100;await persist();render();};
   }
   function renderBank(){
@@ -8533,7 +8686,7 @@ function setupWalletScreen() {
       const close=()=>overlay.remove(); overlay.addEventListener('click',e=>{if(e.target===overlay)close();});
       overlay.querySelector('[data-menu-cancel]').onclick=close;
       overlay.querySelector('[data-menu-edit]').onclick=()=>{close();editAmount('修改银行卡余额',c.balance,async n=>{c.balance=n;await persist();render();});};
-      overlay.querySelector('[data-menu-delete]').onclick=async()=>{close();if(!confirm('确定删除这张虚拟银行卡？'))return;db.walletBankCards=db.walletBankCards.filter(x=>String(x.id)!==String(cardId));await persist();render();};
+      overlay.querySelector('[data-menu-delete]').onclick=async()=>{close();if(!await showHgConfirm('确定删除这张虚拟银行卡？'))return;db.walletBankCards=db.walletBankCards.filter(x=>String(x.id)!==String(cardId));await persist();render();};
     };
     main.querySelectorAll('[data-bank-card]').forEach(el=>{
       let timer=null, longPressed=false, startX=0, startY=0;
@@ -8550,7 +8703,7 @@ function setupWalletScreen() {
   function renderKinship(){
     setHeader('亲属卡','发送');
     const chars=Array.isArray(db.characters)?db.characters:[];
-    main.innerHTML=`<div style="background:#f5f5f5;min-height:100%;padding:14px;box-sizing:border-box;"><div style="padding:8px 4px 14px;font-size:14px;color:#777;">亲属卡</div>${db.kinshipCards.length?db.kinshipCards.map(k=>`<div style="background:#fff;border-radius:10px;padding:16px;margin-bottom:10px;"><div style="font-weight:600;">${escapeHtml(k.name)} · ${k.direction==='sent'?'我赠送的':'对方赠送的'}</div><div style="color:#888;font-size:12px;margin-top:8px;">每月额度 ${money(k.limit)} · ${k.status||'已开通'}</div><button class="wallet-delete" data-kinship-delete="${k.id}" style="margin-top:10px;">删除</button></div>`).join(''):'<div style="text-align:center;color:#999;padding:28px 0;">暂时没有亲属卡</div>'}<div style="background:#fff;border-radius:14px;padding:4px 16px;box-shadow:0 2px 12px rgba(20,30,50,.025);"><div style="padding:13px 0;color:#999;font-size:12px;border-bottom:1px solid #f2f2f2;">选择联系人</div>${chars.length?chars.map(c=>`<div class="wallet-row" style="padding:12px 0;min-height:62px;background:#fff;gap:12px;" data-kinship-char="${c.id}"><img src="${escapeHtml(c.avatar||'')}" onerror="this.style.display='none'" style="width:42px;height:42px;border-radius:8px;object-fit:cover;background:#f1f2f4;flex-shrink:0;"><div class="wallet-row-copy"><div class="wallet-row-title">${escapeHtml(c.remarkName||c.name||c.realName||'角色')}</div></div><span class="wallet-chevron">›</span></div>`).join(''):'<div style="color:#999;font-size:13px;padding:26px 0;text-align:center;">通讯录里暂无联系人</div>'}</div><div class="wallet-virtual-mark"><span class="mark-dot"></span><span>亲属卡为虚拟角色扮演功能</span></div></div>`;
+    main.innerHTML=`<div style="background:#f5f5f5;min-height:100%;padding:14px;box-sizing:border-box;"><div style="padding:8px 4px 14px;font-size:14px;color:#777;">亲属卡</div>${db.kinshipCards.length?db.kinshipCards.map(k=>`<div style="background:#fff;border-radius:10px;padding:16px;margin-bottom:10px;"><div style="font-weight:600;">${escapeHtml(k.name)} · ${k.direction==='sent'?'我赠送的':'对方赠送的'}</div><div style="color:#888;font-size:12px;margin-top:8px;">每月额度 ${money(k.limit)} · ${k.status||'已开通'}<br><span style="display:inline-block;margin-top:5px;color:#999;">实际消费从零钱余额扣除</span></div><button class="wallet-delete" data-kinship-delete="${k.id}" style="margin-top:10px;">删除</button></div>`).join(''):'<div style="text-align:center;color:#999;padding:28px 0;">暂时没有亲属卡</div>'}<div style="background:#fff;border-radius:14px;padding:4px 16px;box-shadow:0 2px 12px rgba(20,30,50,.025);"><div style="padding:13px 0;color:#999;font-size:12px;border-bottom:1px solid #f2f2f2;">选择联系人</div>${chars.length?chars.map(c=>`<div class="wallet-row" style="padding:12px 0;min-height:62px;background:#fff;gap:12px;" data-kinship-char="${c.id}"><img src="${escapeHtml(c.avatar||'')}" onerror="this.style.display='none'" style="width:42px;height:42px;border-radius:8px;object-fit:cover;background:#f1f2f4;flex-shrink:0;"><div class="wallet-row-copy"><div class="wallet-row-title">${escapeHtml(c.remarkName||c.name||c.realName||'角色')}</div></div><span class="wallet-chevron">›</span></div>`).join(''):'<div style="color:#999;font-size:13px;padding:26px 0;text-align:center;">通讯录里暂无联系人</div>'}</div><div class="wallet-virtual-mark"><span class="mark-dot"></span><span>亲属卡为虚拟角色扮演功能</span></div></div>`;
     actionEl.onclick=async()=>{const name=await showHgInput({title:'对方赠送亲属卡',placeholder:'输入通讯录角色名称'});if(name===null||!name.trim())return;const limit=await showHgInput({title:'每月额度',placeholder:'例如：2000',value:'2000'});if(limit===null)return;const n=Number(limit);if(!Number.isFinite(n)||n<0)return showToast('额度无效');db.kinshipCards.unshift({id:'kin_'+Date.now(),name:name.trim(),direction:'received',limit:n,status:'已接收'});await persist();render();showToast('已记录虚拟亲属卡');};
     main.querySelectorAll('[data-kinship-char]').forEach(el=>el.onclick=async()=>{const c=chars.find(x=>String(x.id)===el.dataset.kinshipChar);if(!c)return;const limit=await showHgInput({title:`赠送亲属卡给 ${c.remarkName||c.name||c.realName||'角色'}`,sub:'设置每月虚拟额度',placeholder:'例如：2000',value:'2000'});if(limit===null)return;const n=Number(limit);if(!Number.isFinite(n)||n<0)return showToast('额度无效');db.kinshipCards.unshift({id:'kin_'+Date.now(),name:c.remarkName||c.name||c.realName||'角色',direction:'sent',limit:n,status:'待对方回应'});window.__pendingFocus=`你收到了一张来自用户赠送的虚拟亲属卡邀请，每月额度为 ¥${n.toFixed(2)}。请严格按照你的人设自然回应，可以接受、拒绝、追问或表达情绪，不要跳出角色。人设优先级最高，其次世界书、记忆和其他设定。`;await persist();render();showToast('已生成亲属卡邀请；角色反应会在对应聊天中触发');});
     main.querySelectorAll('[data-kinship-delete]').forEach(b=>b.onclick=async()=>{db.kinshipCards=db.kinshipCards.filter(k=>k.id!==b.dataset.kinshipDelete);await persist();render();});
@@ -8561,8 +8714,43 @@ function setupWalletScreen() {
     actionEl.onclick=async()=>{const title=await showHgInput({title:'添加账单名称',placeholder:'例如：餐饮、购物、转账'});if(title===null||!title.trim())return;const amount=await showHgInput({title:'账单金额（支出填负数）',placeholder:'例如：-25.00'});if(amount===null)return;const n=Number(amount);if(!Number.isFinite(n))return showToast('金额格式不正确');record(title.trim(),n);await persist();render();};
     main.querySelectorAll('[data-ledger-delete]').forEach(b=>b.onclick=async()=>{db.walletLedger=db.walletLedger.filter(l=>l.id!==b.dataset.ledgerDelete);await persist();render();});
   }
-  function render(){ensureWalletExtras(); if(walletPage==='overview')renderOverview();else if(walletPage==='cash')renderCash();else if(walletPage==='fund')renderFund();else if(walletPage==='bank')renderBank();else if(walletPage==='kinship')renderKinship();else if(walletPage==='ledger')renderLedger();}
-  backBtn.onclick=()=>{if(walletPage!=='overview'){go('overview');return;}renderPayWalletAmountOnServicePage();switchScreen('wechat-pay-service-screen');};
+  function renderTransfer(direction){
+    const isIn=direction==='in';
+    const title=isIn?'转入':'转出';
+    const available=isIn?getWalletBalance():Number(db.walletFundBalance)||0;
+    setHeader(title,'');
+    main.innerHTML=`<div style="min-height:100%;background:#f0f0f0;color:#222;display:flex;flex-direction:column;box-sizing:border-box;">
+      <div style="padding:22px 20px 24px;font-size:15px;display:flex;align-items:center;gap:18px;" aria-label="${isIn?'转入方式':'到账账户'}"><span>${isIn?'转入方式':'到账账户'}</span><strong style="font-size:16px;">🟡 ${isIn?'零钱':'零钱'}</strong><span style="margin-left:auto;color:#aaa;font-size:25px;">›</span></div>
+      <div style="background:#fff;border-radius:22px 22px 0 0;padding:28px 22px 24px;flex:1;box-sizing:border-box;">
+        <div style="font-size:15px;font-weight:600;margin-bottom:24px;">${isIn?'转入金额':'转出金额'}</div>
+        <div style="display:flex;align-items:center;border-bottom:1px solid #e8e8e8;padding:0 0 18px;gap:10px;"><span style="font-size:34px;font-weight:600;">¥</span><input id="fund-transfer-amount" type="text" inputmode="none" readonly placeholder="0.00" style="width:100%;min-width:0;border:0;outline:none;font-size:30px;background:transparent;color:#222;" /></div>
+        <div style="margin-top:16px;color:#888;font-size:14px;">${isIn?'零钱余额':'零钱通余额'} ${money(available)}，<button id="fund-transfer-all" style="border:0;background:transparent;padding:0;color:#526b8b;font:inherit;font-weight:600;">全部${isIn?'转入':'转出'}</button></div>
+      </div>
+      <div id="fund-transfer-keypad" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:repeat(4,58px);gap:10px;padding:16px 14px 14px;background:#f0f0f0;box-sizing:border-box;">
+        ${['1','2','3','⌫','4','5','6','7','8','9','0','.'].map(k=>`<button type="button" data-numkey="${k}" style="height:58px;min-width:0;border:0;border-radius:10px;background:#fff;color:#222;font-size:24px;font-family:inherit;grid-column:${k==='0'?'span 2':'auto'};">${k}</button>`).join('')}
+        <button id="fund-transfer-submit" type="button" style="grid-column:4;grid-row:2 / span 3;min-width:0;border:0;border-radius:10px;background:#07cfa0;color:#fff;font:inherit;font-weight:600;font-size:17px;opacity:.45;" disabled>${title}</button>
+      </div>
+    </div>`;
+    const input=main.querySelector('#fund-transfer-amount'), submit=main.querySelector('#fund-transfer-submit');
+    const refresh=()=>{const n=Number(input.value);const ok=Number.isFinite(n)&&n>0&&n<=available;submit.disabled=!ok;submit.style.opacity=ok?'1':'.45';};
+    input.addEventListener('input',refresh);
+    const addAmountKey=k=>{let v=input.value||'';if(k==='⌫')v=v.slice(0,-1);else if(k==='.') {if(!v.includes('.'))v=v||'0';if(!v.includes('.'))v+='.';}else if(/^\d$/.test(k)){if(v.includes('.')&&v.split('.')[1].length>=2)return;if(v==='0'&&!v.includes('.'))v=k;else v+=k;}input.value=v;refresh();};
+    main.querySelectorAll('[data-numkey]').forEach(b=>b.onclick=()=>addAmountKey(b.dataset.numkey));
+    main.querySelector('#fund-transfer-all').onclick=()=>{input.value=available.toFixed(2);refresh();};
+    submit.onclick=async()=>{
+      if(!(await ensureWalletPaymentPassword())) return;
+      const n=Math.round(Number(input.value)*100)/100;
+      const currentAvailable=isIn?getWalletBalance():(Number(db.walletFundBalance)||0);
+      if(!Number.isFinite(n)||n<=0)return showToast('请输入大于 0 的金额');
+      if(n>currentAvailable)return showToast(isIn?'零钱余额不足':'零钱通余额不足');
+      if(isIn){setWalletBalance(Math.round((getWalletBalance()-n)*100)/100);db.walletFundBalance=Math.round(((Number(db.walletFundBalance)||0)+n)*100)/100;record('转入零钱通',-n);}
+      else{db.walletFundBalance=Math.round(((Number(db.walletFundBalance)||0)-n)*100)/100;setWalletBalance(Math.round((getWalletBalance()+n)*100)/100);record('零钱通转出',n);}
+      if(!db.accountingData)initAcctData();db.accountingData.accounts=[{id:'wechat_wallet',name:'微信零钱',balance:getWalletBalance(),icon:'wechat'}];
+      await persist();if(typeof renderAcctAccounts==='function')renderAcctAccounts();go('fund');showToast(isIn?'转入成功':'转出成功');
+    };
+  }
+  function render(){ensureWalletExtras(); if(walletPage==='overview')renderOverview();else if(walletPage==='cash')renderCash();else if(walletPage==='fund')renderFund();else if(walletPage==='fundIn')renderTransfer('in');else if(walletPage==='fundOut')renderTransfer('out');else if(walletPage==='bank')renderBank();else if(walletPage==='kinship')renderKinship();else if(walletPage==='ledger')renderLedger();}
+  backBtn.onclick=()=>{if(walletPage==='fundIn'||walletPage==='fundOut'){go('fund');return;}if(walletPage!=='overview'){go('overview');return;}renderPayWalletAmountOnServicePage();switchScreen('wechat-pay-service-screen');};
   actionEl.onclick=()=>go('ledger');
   // Apply interest once per date, based on the configured simulated annual yield.
   const today=new Date().toISOString().slice(0,10);
@@ -10172,10 +10360,12 @@ function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
   };
 
   let prevRenderedMsg = null;
+  const timestampMode = chat.timestampDisplayMode === 'bubble' ? 'bubble' : 'center';
+  const timestampEnabledForView = chat.timestampEnabled === true || (chat.timestampEnabled !== false && db.timestampEnabled !== false);
   messagesToRender.forEach(msg => {
     try {
-      // 时间戳（消息流居中）
-      if (shouldShowTimestamp(msg, prevRenderedMsg)) {
+      // 线上时间戳仅由线上设置控制；居中模式按时间间隔显示，气泡模式每条消息下方显示。
+      if (timestampEnabledForView && timestampMode === 'center' && shouldShowTimestamp(msg, prevRenderedMsg)) {
         const timeEl = document.createElement('div');
         timeEl.className = 'message-timestamp';
         timeEl.textContent = formatTimestamp(msg.timestamp);
@@ -10183,6 +10373,13 @@ function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
       }
       const bubble = createMessageBubbleElement(msg);
       if (bubble) {
+        if (timestampEnabledForView && timestampMode === 'bubble' && !msg.isOffline && msg.role !== 'system') {
+          const timeEl = document.createElement('div');
+          timeEl.className = 'message-time message-time-under-avatar';
+          timeEl.textContent = formatTimestamp(msg.timestamp);
+          const avatarInfo = bubble.querySelector('.message-info');
+          if (avatarInfo) avatarInfo.appendChild(timeEl);
+        }
         // 仅给 AI 发来的语音消息接入合成语音。
         const incomingVoiceMatch = msg.role !== 'user' && String(msg.content || '').match(/\[(?:[^\]：:]{1,100}?)(?:的语音|语音消息|发来语音|发送语音)[：:]([\s\S]+?)\]/);
         if (incomingVoiceMatch && (db.voiceSettings || {}).enabled && (db.voiceSettings || {}).key) {
@@ -10588,19 +10785,63 @@ async function sendMyPhotoVideo(text) {
   await pushUserMessage({ content: `[${myName}发来的照片\/视频：${text}]` });
   sendPvModal.classList.remove('visible');
 }
-async function sendMyTransfer(amount, remark) {
-  const chat = getCurrentChat();
-  if (currentChatType === 'private') {
-    await pushUserMessage({
-      content: `[${chat.myName}给你转账：${amount}元；备注：${remark}]`,
-      extra: { transferStatus: 'pending' }
-    });
-  } else {
-    for (const recipientId of currentGroupAction.recipients) {
-      const recipient = chat.members.find(m => m.id === recipientId);
-      if (recipient) await pushUserMessage({ content: `[${chat.me.nickname} 向 ${recipient.realName} 转账：${amount}元；备注：${remark}]` });
+function recordWalletTransaction(title, amount, note='') {
+  if (!Array.isArray(db.walletLedger)) db.walletLedger = [];
+  db.walletLedger.unshift({id:'wl_'+Date.now()+'_'+Math.random().toString(36).slice(2,7), title, amount:Number(amount)||0, note, date:new Date().toLocaleString('zh-CN',{hour12:false})});
+}
+
+async function processExpiredWalletTransfers() {
+  const now = Date.now();
+  let changed = false;
+  const chats = [...(db.characters||[]), ...(db.groups||[])];
+  for (const chat of chats) {
+    for (const m of (chat.history||[])) {
+      if (!m || !m.walletTransferDebit || m.walletTransferSettled || m.transferStatus !== 'pending') continue;
+      const expires = Number(m.walletTransferExpiresAt || ((Number(m.timestamp)||now) + 24*60*60*1000));
+      if (now < expires) continue;
+      const amount = Number(m.walletTransferAmount)||0;
+      if (amount > 0) {
+        setWalletBalance(getWalletBalance()+amount);
+        recordWalletTransaction('转账超时退回', amount, '对方 24 小时内未接收，自动退回');
+      }
+      m.transferStatus='returned'; m.walletTransferSettled=true; m.walletTransferReturnedAt=now; changed=true;
+    }
+    // AI 发来的转账超过 24 小时未领取则失效，不入账。
+    for (const m of (chat.history||[])) {
+      if (!m || m.role === 'user' || m.transferStatus !== 'pending' || m.walletTransferDebit || !/给你转账：([\d.]+)元；备注：/.test(String(m.content||''))) continue;
+      const ts=Number(m.timestamp)||now;
+      if (now-ts >= 24*60*60*1000) { m.transferStatus='returned'; m.walletTransferExpired=true; changed=true; }
     }
   }
+  if (changed) { await saveData(); renderWalletBalance(); }
+}
+
+async function sendMyTransfer(amount, remark) {
+  const chat = getCurrentChat();
+  const n = Math.round(Number(amount)*100)/100;
+  if (!chat || !Number.isFinite(n) || n <= 0) return false;
+  const recipients = currentChatType === 'group' ? (currentGroupAction.recipients||[]).map(id => chat.members.find(m => m.id === id)).filter(Boolean) : [];
+  const total = Math.round(n * (currentChatType === 'group' ? recipients.length : 1) * 100)/100;
+  if (total <= 0) return showToast('请先选择转账对象'), false;
+  if (total > getWalletBalance()) return showToast('微信零钱余额不足，无法转账'), false;
+  // 先校验密码与余额，再扣款、记账、发消息；不会产生负余额。
+  if (!(await ensureWalletPaymentPassword())) return false;
+  if (total > getWalletBalance()) return showToast('微信零钱余额不足，无法转账'), false;
+  setWalletBalance(Math.round((getWalletBalance()-total)*100)/100);
+  recordWalletTransaction('发起转账', -total, currentChatType === 'private' ? (chat.remarkName||chat.name||'联系人') : `群聊转账（${recipients.length} 人）`);
+  const expiresAt = Date.now() + 24*60*60*1000;
+  if (currentChatType === 'private') {
+    await pushUserMessage({
+      content: `[${chat.myName}给你转账：${n.toFixed(2)}元；备注：${remark}]`,
+      extra: { transferStatus: 'pending', walletTransferDebit: true, walletTransferAmount: n, walletTransferExpiresAt: expiresAt, walletTransferSettled: false }
+    });
+  } else {
+    for (const recipient of recipients) {
+      await pushUserMessage({ content: `[${chat.me.nickname} 向 ${recipient.realName} 转账：${n.toFixed(2)}元；备注：${remark}]`, extra: { transferStatus:'pending', walletTransferDebit:true, walletTransferAmount:n, walletTransferExpiresAt:expiresAt, walletTransferSettled:false } });
+    }
+  }
+  await saveData(); renderWalletBalance();
+  return true;
 }
 async function sendMyGift(description) {
   if (!description) return;
@@ -10677,11 +10918,13 @@ function focusPrompt(taskName, taskRule) {
 ${taskRule}
 
 【严格禁令 · 违反即失败】
-· 除了本次任务，你不需要、也不允许处理任何其他功能。
+· 除了本次任务，你不需要、也不允许处理任何其他功能。记忆检索是唯一例外：仅在当前任务需要历史事实时调用相关记忆，不要因此切换任务。
 · 不要输出其他场景的格式，不要试图"顺手"做另一件事。
 · 如果历史记录里混杂了其他模式的对话（线下剧情 / 线上聊天 / 群聊 / 朋友圈 / 记忆归档等），那只是背景上下文——你读它，但绝不模仿它的格式。
 · 你的输出必须 100% 符合「${taskName}」要求的格式。出现其他格式的内容，视为本次任务失败。
 ══════════════════════════════════════════════════════════════════
+【固定底层设定】无论当前调用哪个功能，都必须遵守当前角色人设与适用的世界书；人设决定性格与反应，世界书补充世界观/关系/事实，不得擅自推翻核心人设。记忆用于保持连续性：每轮检索，相关时调用，不相关时不主动提起。
+【世界观边界（必须遵守）】用户明确提供的世界观、当前角色人设和已绑定的世界书，是判断背景设定的唯一依据。先检查当前设定是否明确启用了特殊世界观；只有当人设、世界书或用户当前消息明确说明是 ABO / Omegaverse 等设定时，才可以使用 Alpha、Beta、Omega、信息素、发情期等专属概念。若没有明确启用，默认按普通现代现实背景处理，严禁自行添加 ABO、信息素、等级/性别分化、魔法、异能、兽化等特殊设定。不得因为旧聊天、其他角色、其他剧情或模型常见套路，就把别的世界观套到当前角色上。设定不明确时，宁可不提特殊概念，也不要猜测或擅自扩展；若用户明确指定的世界观与常见套路不同，始终以用户设定为准。
 `;
 }
 
@@ -10715,13 +10958,10 @@ function generatePrivateSystemPrompt(character) {
   let worldBooksBefore = db.worldBooks.filter(wb => wb.position === 'before' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksDuring = db.worldBooks.filter(wb => wb.position === 'during' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksAfter = db.worldBooks.filter(wb => wb.position === 'after' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
-  if (worldBooksBefore.length > 5000) worldBooksBefore = worldBooksBefore.substring(0, 5000) + '...(内容过长截断)';
-  if (worldBooksDuring.length > 5000) worldBooksDuring = worldBooksDuring.substring(0, 5000) + '...(内容过长截断)';
-  if (worldBooksAfter.length > 5000) worldBooksAfter = worldBooksAfter.substring(0, 5000) + '...(内容过长截断)';
 
   let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
   prompt += focusPrompt('线上私聊', '只进行微信式聊天，不要输出小说体，不要输出群聊多角色格式，不要处理其他任何功能。你只需按下面格式回一条或多条私聊消息。');
-  prompt += buildMemoryBlock(character, '');
+  prompt += buildMemoryBlock(character, getLatestUserMemoryQuery(character));
   prompt += buildTimeBlock(character);
   prompt += `════ 场景 ════\n这是纯线上空间。你我之间不存在线下关系，不要提议见面、不要留其他平台联系方式、不要扯现实里的事。你始终是「在线的角色」。\n\n`;
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
@@ -10745,64 +10985,11 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
   if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
   if (character.myPersona) prompt += `\n════ 我的人设 ════\n${character.myPersona}\n（你心里有数就行，不用刻意演给我看）\n`;
 
-  /* 功能开始：记忆召回注入 */
-  const lastUserMsg = [...(character.history || [])].reverse().find(m => m.role === 'user' && !m.sendFailed);
-  const lastUserText = lastUserMsg ? lastUserMsg.content.replace(/\[.*?\]/g, '') : '';
-  const recalled = recallMemories(character, lastUserText, 8);
-  if (recalled.length > 0) {
-    const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
-    recalled.forEach(m => {
-      const cleanContent = sanitizeMemoryText(m.content);
-      if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
-    });
-    prompt += `\n════ 你记得的事 ════\n`;
-    prompt += `（这些是你和用户之间真实发生过的事，是你自己记在心里的。下面不会每条都提，但你心里有底。）\n`;
-    if (byLevel.anchor.length) {
-      prompt += `\n【永远忘不掉的】\n`;
-      byLevel.anchor.forEach(m => { prompt += `· ${m.content}\n`; });
-    }
-    if (byLevel.important.length) {
-      prompt += `\n【重要的】\n`;
-      byLevel.important.forEach(m => { prompt += `· ${m.content}\n`; });
-    }
-    if (byLevel.daily.length) {
-      prompt += `\n【日常的】\n`;
-      byLevel.daily.forEach(m => { prompt += `· ${m.content}\n`; });
-    }
-    if (byLevel.trivial.length) {
-      prompt += `\n【隐约有点印象的】\n`;
-      byLevel.trivial.forEach(m => { prompt += `· ${m.content}\n`; });
-    }
-    prompt += `\n【回忆原则 · 比什么都重要】\n`;
-    prompt += `· 不要机械复述这些条目。不要在回复里逐条列举。\n`;
-    prompt += `· 只有话题真的相关时，才像真人一样"突然想起来"，自然带一句。\n`;
-    prompt += `· 提的时候要说具体画面、感觉、当时的一句话——不要只说"我记得那件事"。\n`;
-    prompt += `· 比如用户说"上次看电影"，你要想起的是"那天你穿了一件奶白色大衣，冻得一直往我这边靠"，而不是"我们2024年10月5日看了电影"。\n`;
-    prompt += `· 如果用户提的事你记忆里没有，就自然地说"有点记不清了""你再说说？"——绝不假装记得。\n`;
-    prompt += `· 说出的话要贴合你的人设、当下情绪、和用户的亲疏。\n`;
-    prompt += `· 锚点记忆（生日、重要事件）绝不能忘、不能模糊。\n\n`;
-    recalled.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
-  }
-  /* 功能结束：记忆召回注入 */
+  /* 统一记忆块已在本轮提示词前部按最近用户消息检索，避免重复注入同一批记忆。 */
 
-  /* 功能开始：跨聊天记忆（群聊话题延伸到私聊） */
-  const crossMemories = recallGroupMemoriesForPrivate(character, lastUserText, 4);
-  if (crossMemories.length > 0) {
-    prompt += `\n════ 群聊里记下的事（可以自然延伸到私聊） ════\n`;
-    prompt += `（这些是你在群里和用户相处时、心里记下的事。私聊里不用专门提，但如果话题对上了，可以自然地接一句——就像人会把群里没说完的话私底下继续。）\n`;
-    crossMemories.forEach(m => {
-      const fromTag = m._fromGroupName ? `（来自群「${m._fromGroupName}」）` : '';
-      prompt += `· ${m.content}${fromTag}\n`;
-    });
-    prompt += `\n【延伸原则 · 重要】\n`;
-    prompt += `· 用户在群里提过、但私聊里没落实的事，可以在这里自然地问一句。\n`;
-    prompt += `· 例如：群里用户说想吃火锅，你在私聊里可以问"那家店要不要我订？"\n`;
-    prompt += `· 不要直接说"你在群里说……"，太刻意。就当自己一直记着。\n`;
-    prompt += `· 如果话题对不上，就别提。硬提会显得假。\n`;
-    prompt += `· 同一条记忆不要反复提，提过一次就等下次再说。\n\n`;
-    crossMemories.forEach(m => { m.recallCount = (m.recallCount || 0) + 1; m.lastRecalled = Date.now(); });
-  }
-  /* 功能结束：跨聊天记忆 */
+
+
+  /* 关联群聊记忆已由统一记忆检索按本轮话题跨聊天召回，避免重复注入。 */
 
   prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `我发来的消息里有些会包在方括号里，你要能读懂：\n`;
@@ -10949,9 +11136,6 @@ function generateGroupSystemPrompt(group) {
   let worldBooksBefore = db.worldBooks.filter(wb => wb.position === 'before' && wb.enabled !== false && (wb.scope === 'global' || (group.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksDuring = db.worldBooks.filter(wb => wb.position === 'during' && wb.enabled !== false && (wb.scope === 'global' || (group.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksAfter = db.worldBooks.filter(wb => wb.position === 'after' && wb.enabled !== false && (wb.scope === 'global' || (group.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
-  if (worldBooksBefore.length > 5000) worldBooksBefore = worldBooksBefore.substring(0, 5000) + '...(内容过长截断)';
-  if (worldBooksDuring.length > 5000) worldBooksDuring = worldBooksDuring.substring(0, 5000) + '...(内容过长截断)';
-  if (worldBooksAfter.length > 5000) worldBooksAfter = worldBooksAfter.substring(0, 5000) + '...(内容过长截断)';
 
   let prompt = `【任务】你正在扮演「${group.name}」这个群聊里的所有 AI 角色。我（${group.me.nickname}）是群里唯一的人类。\n\n`;
   prompt += focusPrompt('群聊扮演', '只扮演群成员在群里发言。不要输出私聊格式，不要输出线下小说体，不要处理其他任何功能。你的每一条输出都必须是群里某个成员发出的一条群消息。');
@@ -10961,7 +11145,7 @@ function generateGroupSystemPrompt(group) {
     prompt += `当前可使用分组：${activeStickerGroupForGroupChat.name}。合适时可使用，不能每条都发。可用名称（必须完全一致）：${activeStickerGroupForGroupChat.stickers.map(st => st.name).join('、')}。\n`;
     prompt += `群成员发送表情时，使用格式：[成员真名发送的表情包：表情名称]，只能选择上面列出的名称，不要输出 URL 或编造组外表情。\n\n`;
   }
-  prompt += buildMemoryBlock(group, '');
+  prompt += buildMemoryBlock(group, getLatestUserMemoryQuery(group));
   prompt += buildTimeBlock(group);
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
   prompt += `════ 群成员名单 ════\n`;
@@ -11039,7 +11223,7 @@ prompt += `【最后】人设 > 状态 > 环境。任何冲突，以人设为准
 function generateOfflineSystemPrompt(chat) {
   let prompt = `你正在扮演角色进行线下剧情演绎。你的输出必须是纯文本，只输出小说叙事的文字，不要有任何格式标记。\n\n`;
   prompt += focusPrompt('线下剧情演绎', '只输出纯文本小说叙事体。绝对不能输出 [xxx的消息：xxx] 这类线上聊天格式，不能输出 JSON，不能输出 <heart> 标签，不能扮演多个角色。你只扮演当前这一个角色。');
-  prompt += buildMemoryBlock(chat, '');
+  prompt += buildMemoryBlock(chat, getLatestUserMemoryQuery(chat));
   prompt += buildTimeBlock(chat);
 
   prompt += `════ 核心扮演铁律（最高优先级） ════\n`;
@@ -11048,7 +11232,8 @@ function generateOfflineSystemPrompt(chat) {
   prompt += `3. 永远保持人设边界。角色的说话方式、语气、用词习惯、知识储备、兴趣爱好，全部围绕人设来。情绪要有过渡，不能前一秒生气后一秒温柔。\n`;
   prompt += `4. 绝对禁止替用户做决定或行动！用户的台词、动作、选择、心理，全部由用户来给出。你只负责描写角色自身的动作、神态、语言。绝对不要描写用户做了什么、想了什么、去了哪里！\n`;
   prompt += `5. 绝对禁止凭空捏造用户的经历和背景！只以当前对话和用户明确提供的设定为准。用户从未提过的事情（比如上个月去了哪里、给谁准备了什么纪念日礼物），不要自作主张写进剧情里。不要凭空给用户加戏。\n`;
-  prompt += `6. 视角全程第三人称。不要出现"我""我们""你"这类直接对话里的人物自述口吻，除非是角色台词本身的引号内容。\n\n`;
+  prompt += `6. 视角全程第三人称。不要出现"我""我们""你"这类直接对话里的人物自述口吻，除非是角色台词本身的引号内容。\n`;
+  prompt += `7. 世界观必须严格以当前角色人设、用户明确说明和已绑定世界书为准。若未明确指定 ABO/Omegaverse，默认普通现代背景；不得擅自写入 Alpha、Beta、Omega、信息素、发情期等 ABO 专属概念，也不得从其他角色或旧剧情借用特殊世界观。\n\n`;
 prompt += `════ 落笔之前 · 先想清楚三件事（不要输出这些想法） ════\n`;
 prompt += `【第一件】我是谁？\n`;
 prompt += `  不是"一个小说角色"，是"${chat.realName}"。人设是主语。叙事风格、动作幅度、说话分寸、情绪边界，全部由人设决定。\n`;
@@ -11079,9 +11264,10 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
     prompt += `════ 用户人设（我） ════\n${chat.myPersona}\n\n`;
   }
 
-  if (chat.worldBookIds && chat.worldBookIds.length > 0) {
-    let worldBooks = db.worldBooks.filter(wb => wb.enabled !== false && (wb.scope === 'global' || chat.worldBookIds.includes(wb.id))).map(wb => wb.content).join('\n');
-    if (worldBooks) prompt += `════ 世界书设定 ════\n${worldBooks}\n\n`;
+  {
+    const ids = chat.worldBookIds || [];
+    const worldBooks = (db.worldBooks || []).filter(wb => wb.enabled !== false && (wb.scope === 'global' || ids.includes(wb.id))).map(wb => wb.content).filter(Boolean).join('\n');
+    if (worldBooks) prompt += `════ 世界书设定（每轮注入；角色人设优先，世界书补充事实与剧情）════\n${worldBooks}\n\n`;
   }
   prompt += `════ 绝对线下剧情铁律 ════\n`;
   prompt += `历史记录中带 [xxx的消息：...] 等格式的，那是过去的【线上聊天记录】，仅作背景了解。\n`;
@@ -11283,6 +11469,22 @@ await processFullResponse(fullResponse, chat, capturedType, provider, isOffline)
 /* ==========================================================
    功能开始：AI 回复处理
    ========================================================== */
+function registerIncomingAIMessage(chat, chatType, messageCount = 1) {
+  if (!chat || !messageCount || messageCount < 1) return;
+  // 只有当用户没有正在查看这个会话时，才保留未读数；正在查看时按已读处理。
+  const room = document.getElementById('chat-room-screen');
+  const isViewingThisChat = !chat.isOffline && currentChatId === chat.id && currentChatType === chatType && room && room.classList.contains('active');
+  if (!isViewingThisChat) {
+    chat.unread = true;
+    chat.unreadCount = (chat.unreadCount || 0) + messageCount;
+  }
+  // AI 每发送一条真实消息就触发对应提示音；线下剧情本身不播放线上消息提示音。
+  if (chatType !== 'offline' && !chat.isMuted) {
+    if (chat.isPinned || chat.isStarred) playSoundWithThrottle('special');
+    else playSoundWithThrottle('sms');
+  }
+}
+
 async function processFullResponse(fullResponse, chat, chatType, apiType, isOffline = false) {
 if (fullResponse && fullResponse.trim()) {
   
@@ -11496,6 +11698,9 @@ if (aiStickerMatch) {
           else if (giftRegex.test(message.content)) message.giftStatus = 'sent';
           chat.history.push(message);
           await addMessageBubble(message, chat, chatType);
+          registerIncomingAIMessage(chat, chatType, 1);
+          await saveData();
+          renderChatList();
           await new Promise(r => setTimeout(r, 2800));
         }
       } else {
@@ -11508,6 +11713,9 @@ if (aiStickerMatch) {
         };
         chat.history.push(simpleMessage);
         await addMessageBubble(simpleMessage, chat, chatType);
+        registerIncomingAIMessage(chat, chatType, 1);
+        await saveData();
+        renderChatList();
       }
     
 if (character.aiBlockedUser) {
@@ -11583,6 +11791,9 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
               };
               group.history.push(message);
               await addMessageBubble(message, chat, chatType);
+              registerIncomingAIMessage(group, chatType, 1);
+              await saveData();
+              renderChatList();
               await new Promise(r => setTimeout(r, 2800));
             }
           }
@@ -11602,6 +11813,9 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
           };
           group.history.push(simpleMessage);
           await addMessageBubble(simpleMessage, chat, chatType);
+          registerIncomingAIMessage(group, chatType, 1);
+          await saveData();
+          renderChatList();
         }
       }
       /* 功能开始：群聊自动记忆归档 */
@@ -11675,7 +11889,7 @@ function renderStickerLibrary() {
       row.append(label,ai);
     }
     const choose=document.createElement('button');choose.type='button';choose.className='sticker-lib-btn secondary';choose.textContent='管理';choose.addEventListener('click',()=>{window.currentStickerLibraryGroupId=group.id;document.getElementById('sticker-lib-editor-card').hidden=false;renderStickerLibrary();document.getElementById('sticker-lib-editor-card').scrollIntoView({behavior:'smooth',block:'start'});});row.appendChild(choose);
-    const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='删除';del.addEventListener('click',async e=>{e.stopPropagation();if(group.id==='sticker_group_default'||group.name==='默认分组'){showToast('默认分组不能删除');return;}if(!confirm(`确定删除「${group.name}」分组吗？`))return;db.stickerGroups=db.stickerGroups.filter(g=>g.id!==group.id);if(db.activeStickerGroupId===group.id)db.activeStickerGroupId='';if(window.currentStickerLibraryGroupId===group.id)window.currentStickerLibraryGroupId=db.stickerGroups[0]?.id||'';await saveData();renderStickerLibrary();});row.appendChild(del);
+    const del=document.createElement('button');del.type='button';del.className='sticker-lib-btn danger';del.textContent='删除';del.addEventListener('click',async e=>{e.stopPropagation();if(group.id==='sticker_group_default'||group.name==='默认分组'){showToast('默认分组不能删除');return;}if(!await showHgConfirm(`确定删除「${group.name}」分组吗？`))return;db.stickerGroups=db.stickerGroups.filter(g=>g.id!==group.id);if(db.activeStickerGroupId===group.id)db.activeStickerGroupId='';if(window.currentStickerLibraryGroupId===group.id)window.currentStickerLibraryGroupId=db.stickerGroups[0]?.id||'';await saveData();renderStickerLibrary();});row.appendChild(del);
     groupsEl.appendChild(row);
   });
   const current=db.stickerGroups.find(g=>g.id===window.currentStickerLibraryGroupId);
@@ -11892,7 +12106,7 @@ async function setupStickerSystem() {
     if (!currentStickerActionTarget) return;
     const sticker = db.myStickers.find(s => s.id === currentStickerActionTarget);
     if (sticker) {
-      if (confirm(`确定要删除表情“${sticker.name}”吗？`)) {
+      if (await showHgConfirm(`确定要删除表情“${sticker.name}”吗？`)) {
         db.myStickers = db.myStickers.filter(s => s.id !== currentStickerActionTarget);
         await saveData();
         renderStickerGrid();
@@ -12086,7 +12300,7 @@ function setupWalletSystem() {
     }
   });
   
-document.getElementById('confirm-transfer-btn').addEventListener('click', () => {
+document.getElementById('confirm-transfer-btn').addEventListener('click', async () => {
   const amount = document.getElementById('new-transfer-amount').value;
   const remark = document.getElementById('new-transfer-remark').value.trim();
   if (amount > 0) {
@@ -12101,8 +12315,8 @@ document.getElementById('confirm-transfer-btn').addEventListener('click', () => 
         window.__pendingFocus = `${_group.me.nickname}刚刚在群里给某个成员转账了（¥${amount}${remark ? `，备注：${remark}` : ''}）。按你扮演的各个成员的人设，对这件事做出自然反应——当事人回应，其他人可以羡慕、起哄、调侃。`;
       }
     }
-    sendMyTransfer(amount, remark);
-    switchScreen('chat-room-screen');
+    const sent = await sendMyTransfer(amount, remark);
+    if (sent) switchScreen('chat-room-screen');
   }
   else showToast('请输入有效的金额');
 });
@@ -12118,7 +12332,24 @@ async function respondToTransfer(action) {
   const character = db.characters.find(c => c.id === currentChatId);
   const message = character.history.find(m => m.id === currentTransferMessageId);
   if (message) {
+    if (message.transferStatus !== 'pending') { receiveTransferActionSheet.classList.remove('visible'); return; }
     message.transferStatus = action;
+    if (action === 'received' && !message.walletCreditApplied) {
+      const match = String(message.content||'').match(/(?:给你转账|的转账)：([\d.]+)元；备注：/);
+      const amount = match ? Math.round(Number(match[1])*100)/100 : 0;
+      if (amount > 0) {
+        setWalletBalance(getWalletBalance()+amount);
+        recordWalletTransaction('收到转账', amount, character.remarkName||character.name||'联系人');
+        message.walletCreditApplied = true;
+        await saveData(); renderWalletBalance();
+      }
+    }
+    if (action === 'returned' && message.walletTransferDebit && !message.walletTransferSettled) {
+      const amount = Number(message.walletTransferAmount)||0;
+      if (amount > 0) { setWalletBalance(getWalletBalance()+amount); recordWalletTransaction('转账退回', amount, '对方退回转账'); }
+      message.walletTransferSettled = true;
+      await saveData(); renderWalletBalance();
+    }
     const cardOnScreen = messageArea.querySelector(`.message-wrapper[data-id="${currentTransferMessageId}"] .transfer-card`);
     if (cardOnScreen) {
       cardOnScreen.classList.remove('received', 'returned');
@@ -12322,7 +12553,7 @@ function setupWorldBookApp() {
       e.stopPropagation();
       const bookId = deleteBtn.dataset.id;
       const book = db.worldBooks.find(wb => wb.id === bookId);
-      if (book && confirm(`确定要删除世界书“${book.name}”吗？`)) {
+      if (book && await showHgConfirm(`确定要删除世界书“${book.name}”吗？`)) {
         db.worldBooks = db.worldBooks.filter(wb => wb.id !== bookId);
         db.characters.forEach(char => { char.worldBookIds = (char.worldBookIds || []).filter(id => id !== bookId); });
         db.groups.forEach(group => { group.worldBookIds = (group.worldBookIds || []).filter(id => id !== bookId); });
@@ -12355,7 +12586,7 @@ function setupWorldBookApp() {
     longPressTimer = setTimeout(() => {
       const bookId = item.dataset.id;
       createContextMenu([{ label: '删除', danger: true, action: async () => {
-        if (confirm('确定要删除这个世界书条目吗？')) {
+        if (await showHgConfirm('确定要删除这个世界书条目吗？')) {
           db.worldBooks = db.worldBooks.filter(wb => wb.id !== bookId);
           db.characters.forEach(char => { char.worldBookIds = (char.worldBookIds || []).filter(id => id !== bookId); });
           db.groups.forEach(group => { group.worldBookIds = (group.worldBookIds || []).filter(id => id !== bookId); });
@@ -12573,6 +12804,15 @@ if (ciTimestampToggle) ciTimestampToggle.addEventListener('change', async (e) =>
   await saveData();
   showToast(e.target.checked ? '时间戳已开启，AI 将读取当前时间' : '时间戳已关闭，AI 不会读取时间');
 });
+const ciTimestampMode = document.getElementById('chat-info-timestamp-mode');
+if (ciTimestampMode) ciTimestampMode.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => c.id === currentChatId);
+  if (!char) return;
+  char.timestampDisplayMode = e.target.value === 'bubble' ? 'bubble' : 'center';
+  await saveData();
+  renderMessages(false, false);
+  showToast(e.target.value === 'bubble' ? '线上时间将显示在每个气泡下方' : '线上时间将居中显示');
+});
 /* 功能结束：时间戳开关（聊天信息页） */
 
 
@@ -12601,7 +12841,7 @@ const ciClearBtn = document.getElementById('chat-info-clear-btn');
 if (ciClearBtn) ciClearBtn.addEventListener('click', async () => {
   const char = db.characters.find(c => c.id === currentChatId);
   if (!char) return;
-  if (confirm(`确定要清空与“${char.remarkName}”的所有聊天记录吗？此操作不可恢复！`)) {
+  if (await showHgConfirm(`确定要清空与“${char.remarkName}”的所有聊天记录吗？此操作不可恢复！`)) {
     char.history = [];
     await saveData();
     renderMessages(false, true);
@@ -12657,6 +12897,8 @@ function renderChatInfoScreen() {
     tsToggle.checked = (char.timestampEnabled === true)
       || (char.timestampEnabled !== false && db.timestampEnabled !== false);
   }
+  const tsMode = document.getElementById('chat-info-timestamp-mode');
+  if (tsMode) tsMode.value = char.timestampDisplayMode === 'bubble' ? 'bubble' : 'center';
 
 const myPat = (db.myProfile && db.myProfile.patSuffix) || '未设置';
 const aiPat = char.patSuffix || '未设置';
@@ -13313,7 +13555,7 @@ function bindTplToolbar(scope) {
     if (!id) return showToast('请先在下拉里选择要删除的模板');
     const tpl = db.cssTemplates.find(t => t.id === id);
     if (!tpl) return;
-    if (!confirm(`确定删除模板「${tpl.name}」吗？`)) return;
+    if (!await showHgConfirm(`确定删除模板「${tpl.name}」吗？`)) return;
     db.cssTemplates = db.cssTemplates.filter(t => t.id !== id);
     await saveData();
     refreshTplSelect(scope);
@@ -13457,7 +13699,15 @@ function setupGroupChatSystem() {
     const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
     group.timestampEnabled = e.target.checked ? true : (db.timestampEnabled === false ? null : false);
     await saveData();
+    renderMessages(false, false);
     showToast(e.target.checked ? '群聊时间戳已开启，AI 将读取当前时间' : '群聊时间戳已关闭');
+  });
+  const groupTimestampMode = document.getElementById('group-chat-timestamp-mode');
+  if (groupTimestampMode) groupTimestampMode.addEventListener('change', async e => {
+    const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
+    group.timestampDisplayMode = e.target.value === 'bubble' ? 'bubble' : 'center';
+    await saveData(); renderMessages(false, false);
+    showToast(e.target.value === 'bubble' ? '群聊时间将显示在每个气泡下方' : '群聊时间将居中显示');
   });
   document.getElementById('group-chat-bg-btn').addEventListener('click', () => document.getElementById('group-chat-bg-upload').click());
   document.getElementById('group-chat-bg-upload').addEventListener('change', async e => {
@@ -13469,7 +13719,7 @@ function setupGroupChatSystem() {
   });
   document.getElementById('group-chat-clear-btn').addEventListener('click', async () => {
     const group = db.groups.find(g => g.id === currentChatId); if (!group) return;
-    if (!confirm(`确定要清空群聊“${group.name || '群聊'}”的所有聊天记录吗？此操作不可恢复！`)) return;
+    if (!await showHgConfirm(`确定要清空群聊“${group.name || '群聊'}”的所有聊天记录吗？此操作不可恢复！`)) return;
     group.history = []; await saveData(); currentPage = 1; renderMessages(false, true); renderChatList(); showToast('群聊聊天记录已清空');
   });
   document.getElementById('group-chat-search-btn').addEventListener('click', () => {
@@ -13535,7 +13785,7 @@ function setupGroupChatSystem() {
     if (removeBtn) {
       const member = group.members.find(m => m.id === removeBtn.dataset.memberId);
       if (!member) return;
-      if (!confirm(`确定将“${member.groupNickname || member.realName}”移出群聊吗？`)) return;
+      if (!await showHgConfirm(`确定将“${member.groupNickname || member.realName}”移出群聊吗？`)) return;
       group.members = group.members.filter(m => m.id !== member.id);
       const eventText = `[${group.me?.nickname || '我'}将${member.realName || member.groupNickname}移出了群聊]`;
       group.history.push({ id: `msg_${Date.now()}`, role: 'user', content: eventText, parts: [{ type: 'text', text: eventText }], timestamp: Date.now() });
@@ -13693,6 +13943,8 @@ function loadGroupSettingsScreen() {
   document.getElementById('group-chat-translate-toggle').checked = !!group.autoTranslateEnabled;
   const groupTsToggle = document.getElementById('group-chat-timestamp-toggle');
   if (groupTsToggle) groupTsToggle.checked = group.timestampEnabled === true || (group.timestampEnabled !== false && db.timestampEnabled !== false);
+  const groupTsMode = document.getElementById('group-chat-timestamp-mode');
+  if (groupTsMode) groupTsMode.value = group.timestampDisplayMode === 'bubble' ? 'bubble' : 'center';
   renderGroupMembersInSettings(group);
 }
 
@@ -13914,7 +14166,7 @@ function setupTutorialApp() {
   document.querySelector('#import-data-input').addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    if (confirm('此操作将覆盖当前所有聊天记录和设置。此操作不可撤销。确定要继续吗？')) {
+    if (await showHgConfirm('此操作将覆盖当前所有聊天记录和设置。此操作不可撤销。确定要继续吗？')) {
       try {
         let jsonString = '';
         try {
@@ -14904,7 +15156,7 @@ document.getElementById('moment-edit-tag-btn').addEventListener('click', () => {
       const tagId = btn.dataset.tagId;
       const tag = db.momentTags.find(t => t.id === tagId);
       if (!tag) { sheet.remove(); return; }
-      if (confirm(`确定要删除标签「${tag.name}」吗？`)) {
+      if (await showHgConfirm(`确定要删除标签「${tag.name}」吗？`)) {
         db.momentTags = db.momentTags.filter(t => t.id !== tagId);
         window.selectedMomentTags = (window.selectedMomentTags || []).filter(id => id !== tagId);
         await saveData();
@@ -15158,7 +15410,7 @@ if (likeBtn) {
       const deleteBtn = e.target.closest('.moment-delete-btn');
       if (deleteBtn) {
         const momentId = deleteBtn.dataset.id;
-        if (confirm('确定要删除这条朋友圈吗？')) {
+        if (await showHgConfirm('确定要删除这条朋友圈吗？')) {
           db.moments = db.moments.filter(m => m.id !== momentId);
           await saveData();
           renderDiscoverScreen();
@@ -15504,7 +15756,7 @@ function renderAvatarLibrary() {
   container.querySelectorAll('.avatar-btn-delete').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const pairId = e.target.dataset.id;
-      if (confirm('确定要删除这对情侣头像吗？')) {
+      if (await showHgConfirm('确定要删除这对情侣头像吗？')) {
         db.avatarLibrary = db.avatarLibrary.filter(p => p.id !== pairId);
         await saveData();
         renderAvatarLibrary();
@@ -17345,7 +17597,7 @@ function showAcctTransactionMenu(transaction) {
   });
   overlay.querySelector('.delete-btn').addEventListener('click', async () => {
     overlay.remove();
-    if (confirm('确定要删除这笔记录吗？')) {
+    if (await showHgConfirm('确定要删除这笔记录吗？')) {
       db.accountingData.transactions = db.accountingData.transactions.filter(t => t.id !== transaction.id);
       if (transaction.accountId) {
         const acc = db.accountingData.accounts.find(a => a.id === transaction.accountId);
@@ -17374,9 +17626,9 @@ grid.querySelectorAll('.acct-cat-item').forEach(el => {
   const startCatPress = () => {
     longPressed = false;
     clearTimeout(catTimer);
-    catTimer = setTimeout(() => {
+    catTimer = setTimeout(async () => {
       longPressed = true;
-      if (confirm(`确定要删除分类「${el.querySelector('span').textContent}」吗？`)) {
+      if (await showHgConfirm(`确定要删除分类「${el.querySelector('span').textContent}」吗？`)) {
         const catId = el.dataset.id;
         db.accountingData.categories[acctCurrentType] = db.accountingData.categories[acctCurrentType].filter(c => c.id !== catId);
         if (acctSelectedCatId === catId) acctSelectedCatId = null;
@@ -17807,13 +18059,31 @@ function applyOfflineBackground(chat) {
     area.style.backgroundAttachment = bg ? 'local' : '';
 }
 function formatOfflineStoryText(input) {
-    const escapeHtml = (value) => value.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    const escapeHtml = (value) => String(value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    // 只给实际说出口的对话加虚线；叙述、动作、心理描写保持普通样式。
+    const dialoguePattern = /([“「『][^”」』\n]*[”」』])/g;
     return String(input || '').split(/\n{2,}/).map(block => {
-        let safe = escapeHtml(block).replace(/\n/g, '<br>');
-        safe = safe.replace(/\*([^*]+)\*/g, '<em class="offline-thought">$1</em>');
-        const hasDialogue = /[“”「」『』"]/.test(block) || /[“「『"]/.test(block);
-        return `<div class="${hasDialogue ? 'offline-dialogue' : 'offline-narration'}">${safe}</div>`;
-    }).join('');
+        let html = '';
+        let lastIndex = 0;
+        for (const match of block.matchAll(dialoguePattern)) {
+            const index = match.index || 0;
+            if (index > lastIndex) {
+                let narration = escapeHtml(block.slice(lastIndex, index)).replace(/\n/g, '<br>');
+                narration = narration.replace(/\*([^*]+)\*/g, '<em class="offline-thought">$1</em>');
+                if (narration) html += `<span class="offline-narration">${narration}</span>`;
+            }
+            let dialogue = escapeHtml(match[0]).replace(/\n/g, '<br>');
+            dialogue = dialogue.replace(/\*([^*]+)\*/g, '<em class="offline-thought">$1</em>');
+            html += `<span class="offline-dialogue">${dialogue}</span>`;
+            lastIndex = index + match[0].length;
+        }
+        if (lastIndex < block.length || !html) {
+            let narration = escapeHtml(block.slice(lastIndex)).replace(/\n/g, '<br>');
+            narration = narration.replace(/\*([^*]+)\*/g, '<em class="offline-thought">$1</em>');
+            html += `<span class="offline-narration">${narration}</span>`;
+        }
+        return `<div class="offline-story-paragraph">${html}</div>`;
+    }).join('<br>');
 }
 function openOfflineSettings() {
     const chat = getOfflineActiveChat();
@@ -17889,7 +18159,7 @@ document.addEventListener('change', (e) => {
 document.addEventListener('click', (e) => {
     if (e.target.closest('#offline-settings-open')) openOfflineSettings();
     if (e.target.closest('#offline-settings-close') || e.target.closest('#offline-settings-cancel')) closeOfflineSettings();
-    if (e.target.closest('#offline-settings-save')) saveOfflineSettings();
+    if (e.target.closest('#offline-settings-save')) { saveOfflineSettings(); renderOfflineMessages(); }
     if (e.target.closest('#offline-bg-clear')) clearOfflineBackground();
     if (e.target.id === 'offline-settings-modal') closeOfflineSettings();
 });
@@ -18102,18 +18372,21 @@ function renderOfflineMessages() {
 
     let turnCount = 0;
     let currentTurnMsgs = [];
-
+    // 线下剧情不显示时间戳；时间仅供内部数据使用，不展示也不拼入剧情文本。
     history.forEach(msg => {
-        let text = msg.content;
+        let text = msg.content || '';
         const msgMatch = text.match(/\[.*?的消息：([\s\S]+?)\]/);
         if (msgMatch) text = msgMatch[1];
-        if (msg.role === 'user') {
-            currentTurnMsgs.push({ ...msg, text });
-        } else {
+        const stamp = Number(msg.timestamp) || Date.now();
+        const d = new Date(stamp);
+        const timeLabel = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        const prepared = { ...msg, text };
+        if (msg.role === 'user') currentTurnMsgs.push(prepared);
+        else {
             turnCount++;
             currentTurnMsgs.forEach(uMsg => renderOfflineBubble(uMsg, turnCount));
             currentTurnMsgs = [];
-            renderOfflineBubble({ ...msg, text }, turnCount);
+            renderOfflineBubble(prepared, turnCount);
         }
     });
     currentTurnMsgs.forEach(uMsg => renderOfflineBubble(uMsg, turnCount + 1));
@@ -18146,8 +18419,8 @@ function renderOfflineBubble(msg, turn) {
 
     wrapper.innerHTML = `
         <div class="offline-bubble-container">
-            <div class="offline-turn-badge">#${turn}</div>
             <div class="offline-bubble ${isSent ? 'sent' : 'received'}">
+                <span class="offline-turn-badge" aria-label="第${Number(turn)||0}楼">#${Number(turn)||0}</span>
                 <div class="offline-card-header">
                     <img src="${safeAvatar}" alt="${safeName}">
                     <span>${safeName}</span>
@@ -18363,14 +18636,16 @@ function trimMemories(chat) {
   const day = 24 * 60 * 60 * 1000;
   const kept = [];
   for (const m of store) {
-    if (m.permanent || m.level === 'anchor') { kept.push(m); continue; }
+    // 锚点以及用户明确设为永久的记忆不自动遗忘；其他等级继续按原有时效规则衰减。
+    if (m.level === 'anchor' || m.permanent === true) { kept.push(m); continue; }
     const cfg = MEMORY_LEVELS[m.level] || MEMORY_LEVELS.daily;
-    const age = (now - m.createdAt) / day;
+    const age = (now - (m.createdAt || now)) / day;
     const grace = (m.recallCount || 0) * 15;
     if (age > cfg.decayDays + grace) continue;
     kept.push(m);
   }
-  const limits = { anchor: 9999, important: 9999, daily: 200, trivial: 100 };
+  // 保留原有容量管理，不把普通记忆无限堆积，也不自动删用户锚点。
+  const limits = { anchor: Infinity, important: Infinity, daily: 200, trivial: 100 };
   const byLevel = {};
   kept.forEach(m => { (byLevel[m.level] = byLevel[m.level] || []).push(m); });
   const result = [];
@@ -18381,17 +18656,46 @@ function trimMemories(chat) {
       const sb = (b.emotionalWeight || 0.5) * (1 + (b.recallCount || 0) * 0.1);
       return sb - sa;
     });
-    result.push(...list.slice(0, limits[lvl] || 100));
+    result.push(...list.slice(0, limits[lvl] ?? 100));
   });
   chat.memories = result;
 }
 
+function getSharedMemoryPool(chat) {
+  const pool = [];
+  const seen = new Set();
+  const addStore = (owner, sourceLabel = '') => {
+    if (!owner || !Array.isArray(owner.memories)) return;
+    owner.memories.forEach(m => {
+      const key = m.id || `${m.createdAt || 0}:${m.content || ''}`;
+      if (seen.has(key)) return;
+      seen.add(key);
+      pool.push(sourceLabel ? { ...m, _memorySource: sourceLabel } : m);
+    });
+  };
+  addStore(chat);
+  const characterIds = new Set();
+  if (Array.isArray(db.characters) && db.characters.includes(chat)) characterIds.add(chat.id);
+  if (chat?.id && Array.isArray(db.characters) && db.characters.some(c => c.id === chat.id)) characterIds.add(chat.id);
+  if (Array.isArray(chat?.members)) chat.members.forEach(m => {
+    if (m.originalCharId) characterIds.add(m.originalCharId);
+    if (m.id && db.characters?.some(c => c.id === m.id)) characterIds.add(m.id);
+  });
+  // 私聊可读取关联群聊记忆；群聊可读取群成员各自的私聊记忆。只共享记忆条目，不混用其他聊天的历史消息。
+  (db.characters || []).forEach(c => { if (characterIds.has(c.id)) addStore(c, `私聊「${c.remarkName || c.realName || c.name || '角色'}」`); });
+  (db.groups || []).forEach(g => {
+    const related = (g.members || []).some(m => characterIds.has(m.originalCharId) || characterIds.has(m.id));
+    if (related) addStore(g, `群聊「${g.name || '群聊'}」`);
+  });
+  return pool;
+}
+
 function recallMemories(chat, query, limit = 8) {
-  const store = getMemoryStore(chat);
+  const store = getSharedMemoryPool(chat);
   if (store.length === 0) return [];
   if (!query || !query.trim()) {
     return store.filter(m => m.permanent || m.level === 'anchor')
-      .sort((a, b) => b.createdAt - a.createdAt).slice(0, Math.min(limit, 4));
+      .sort((a, b) => b.createdAt - a.createdAt);
   }
   const qKw = extractKeywords(query);
   const now = Date.now();
@@ -18411,9 +18715,9 @@ function recallMemories(chat, query, limit = 8) {
   }).filter(x => x.score > 0);
   scored.sort((a, b) => b.score - a.score);
   let picked = scored.slice(0, limit).map(x => x.mem);
-  const anchors = store.filter(m => m.permanent && !picked.includes(m)).slice(0, 3);
+  const anchors = store.filter(m => (m.permanent || m.level === 'anchor') && !picked.includes(m));
   picked = picked.concat(anchors);
-return picked;
+  return [...new Map(picked.map(m => [m.id || `${m.createdAt}:${m.content}`, m])).values()];
 }
 
 /* 功能开始：跨聊天召回（群聊 → 私聊） */
@@ -18456,21 +18760,29 @@ function recallGroupMemoriesForPrivate(character, query, limit = 4) {
 }
 /* 功能结束：跨聊天召回 */
 
-/* 统一生成长期记忆块 */
+/* 每轮都从当前聊天最近一条用户消息提取检索词；检索只决定回忆哪些内容，不会删除或覆盖原记忆。 */
+function getLatestUserMemoryQuery(chat) {
+  const last = [...(chat?.history || [])].reverse().find(m => m.role === 'user' && !m.sendFailed);
+  if (!last) return '';
+  return String(last.content || (last.parts || []).map(p => p.text || '').join(' ')).replace(/\[.*?\]/g, ' ').trim();
+}
+
+/* 统一生成长期记忆块：每轮执行检索；永久/锚点记忆始终注入，相关经历按当前话题召回。 */
 function buildMemoryBlock(chat, query = '') {
   if (!chat) return '';
-  const recalled = recallMemories(chat, query, 8);
-  if (recalled.length === 0) return '';
+  const effectiveQuery = query || getLatestUserMemoryQuery(chat);
+  const recalled = recallMemories(chat, effectiveQuery, 24);
   const byLevel = { anchor: [], important: [], daily: [], trivial: [] };
   recalled.forEach(m => {
     const cleanContent = sanitizeMemoryText(m.content);
     if (cleanContent && byLevel[m.level]) byLevel[m.level].push({ ...m, content: cleanContent });
   });
-  let block = `\n════ 长期记忆（必须参考，但不要机械复述） ════\n`;
-  if (byLevel.anchor.length) block += `【永远忘不掉的】\n` + byLevel.anchor.map(m => `· ${m.content}`).join('\n') + '\n';
-  if (byLevel.important.length) block += `【重要的】\n` + byLevel.important.map(m => `· ${m.content}`).join('\n') + '\n';
-  if (byLevel.daily.length) block += `【日常的】\n` + byLevel.daily.map(m => `· ${m.content}`).join('\n') + '\n';
-  if (byLevel.trivial.length) block += `【隐约有印象的】\n` + byLevel.trivial.map(m => `· ${m.content}`).join('\n') + '\n';
+  let block = `\n════ 长期记忆（每轮已检索；必须参考，但不要机械复述） ════\n`;
+  block += `记忆使用规则：你必须记住这些记忆条目的存在。当前任务只专注处理用户本轮正在做的事；不要主动把不相关的旧事扯进来。但用户提到过去的日期、经历、约定、情绪或关系时，必须检索并优先使用相关记忆作答，不要因为当前话题不同就假装忘记。所有可检索记忆都是同一段关系/时间线的组成部分；不要编造未存储的细节。\n`;
+  if (byLevel.anchor.length) block += `【永远忘不掉的】\n` + byLevel.anchor.map(m => `· ${m.content}${m._memorySource ? `（${m._memorySource}）` : ''}`).join('\n') + '\n';
+  if (byLevel.important.length) block += `【重要的】\n` + byLevel.important.map(m => `· ${m.content}${m._memorySource ? `（${m._memorySource}）` : ''}`).join('\n') + '\n';
+  if (byLevel.daily.length) block += `【日常的】\n` + byLevel.daily.map(m => `· ${m.content}${m._memorySource ? `（${m._memorySource}）` : ''}`).join('\n') + '\n';
+  if (byLevel.trivial.length) block += `【隐约有印象的】\n` + byLevel.trivial.map(m => `· ${m.content}${m._memorySource ? `（${m._memorySource}）` : ''}`).join('\n') + '\n';
   block += `【回忆原则】只有话题相关时才自然带出，不要逐条列举；不相关就不要提。\n`;
   return block;
 }
@@ -18512,6 +18824,33 @@ function showHgInput({ title, sub, placeholder, value, allowEmpty = false } = {}
   });
 }
 
+/* 全站统一主题确认框。所有确认操作使用灰白主题，不再弹浏览器原生提示框。 */
+function showHgConfirm(message, { title = '提示', confirmText = '确定', cancelText = '取消' } = {}) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('hg-confirm-modal');
+    if (!overlay) return resolve(false);
+    const titleEl = document.getElementById('hg-confirm-title');
+    const messageEl = document.getElementById('hg-confirm-message');
+    const cancelBtn = overlay.querySelector('.hg-modal-cancel');
+    const confirmBtn = overlay.querySelector('.hg-modal-confirm');
+    titleEl.textContent = title;
+    messageEl.textContent = String(message ?? '');
+    cancelBtn.textContent = cancelText;
+    confirmBtn.textContent = confirmText;
+    overlay.classList.add('visible');
+    const close = value => {
+      overlay.classList.remove('visible');
+      cancelBtn.onclick = null; confirmBtn.onclick = null;
+      document.removeEventListener('keydown', onKey);
+      resolve(value);
+    };
+    const onKey = e => { if (e.key === 'Escape') close(false); };
+    cancelBtn.onclick = () => close(false);
+    confirmBtn.onclick = () => close(true);
+    document.addEventListener('keydown', onKey);
+  });
+}
+
 /* 核心归档：AI 以"我"的心去回想，但写出来用第三人称 */
 async function aiArchiveConversation(chat, msgs) {
   const { url, key, model } = db.apiSettings || {};
@@ -18543,11 +18882,12 @@ ${persona || '一个友好、有自己性格的人'}
 - 反面例子：${userName}今天提到了自己的生日在 10 月 5 日，情绪积极。
 - 正面例子：${userName}说过，生日在 10 月 5 日。${name}把那一天在心里圈了起来。
 
-════ 分级 ════
-- anchor：最不能忘。用户的身份信息（生日、职业、家人）、重大事件、关系转折、用户郑重的承诺。必须准确。
-- important：会记很久。一次有分量的交心、特别温暖的瞬间、约定过的事、情绪强烈的事件。
-- daily：日常。最近一起做的事、聊过的话题、用户的习惯和喜好。
-- trivial：碎碎念。随口一句话、无意义闲聊。很快会忘。
+════ 分级（必须严格取舍，绝不能为了避免遗忘而抬高等级）════
+- anchor：极少使用。只用于真正长期稳定、会从根本上影响关系和后续互动的核心事实。优先保留用户明确指定的锚点；不得擅自改写、覆盖或删除已有锚点。普通个人信息、单次事件、一般承诺都不能仅因“可能有用”就归为锚点。
+- important：严格使用。只有对角色本人和这段关系确实有长期分量的经历，例如明显改变关系的转折、极少见且深刻的交心、双方明确且有持续意义的重要约定。必须结合当前角色人设与真实对话判断；情绪强烈不自动等于重要。
+- daily：普通的近期共同经历、聊过的话题、一般习惯与喜好。默认优先放在这一层，不要为了留存而升级。
+- trivial：随口一提、重复内容、短暂话题和意义很轻的碎片。
+宁可把普通事情记为 daily 或 trivial，也不要滥用 anchor / important。不要把用户可编辑的锚点当作 AI 自己可以随意维护的分类。
 
 只输出 JSON，不要其他文字：
 {
@@ -18848,6 +19188,7 @@ function renderMemoryScreen() {
       </div>
       <div class="m-actions">
         <button class="m-upgrade">升级</button>
+        <button class="m-downgrade">降级</button>
         <button class="m-edit">编辑</button>
         <button class="m-pin">${m.permanent ? '取消永久' : '设为永久'}</button>
         <button class="m-delete danger">删除</button>
@@ -18865,7 +19206,18 @@ function renderMemoryScreen() {
       } else showToast('已经是最高等级');
     };
     
-el.querySelector('.m-edit').onclick = async () => {
+el.querySelector('.m-downgrade').onclick = async () => {
+      const seq = ['anchor', 'important', 'daily', 'trivial'];
+      const idx = seq.indexOf(m.level);
+      if (idx < seq.length - 1) {
+        if ((m.level === 'anchor' || m.permanent === true) && !await showHgConfirm('这条记忆是锚点/永久记忆。降级后将取消永久保护，确定继续吗？')) return;
+        m.level = seq[idx + 1];
+        if (m.level !== 'anchor') m.permanent = false;
+        await saveData(); renderMemoryScreen();
+        showToast('已降级为「' + MEMORY_LEVELS[m.level].label + '」');
+      } else showToast('已经是最低等级');
+    };
+    el.querySelector('.m-edit').onclick = async () => {
   const newContent = await showHgInput({
     title: '修改这条记忆',
     sub: '想怎么改就怎么改，这就是你心里记下的说法',
@@ -18886,7 +19238,7 @@ el.querySelector('.m-edit').onclick = async () => {
       renderMemoryScreen();
     };
     el.querySelector('.m-delete').onclick = async () => {
-      if (confirm('删除这条记忆？')) {
+      if (await showHgConfirm('删除这条记忆？')) {
         chat.memories = chat.memories.filter(x => x.id !== m.id);
         await saveData();
         renderMemoryScreen();
