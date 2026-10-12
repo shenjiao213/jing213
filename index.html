@@ -625,6 +625,18 @@ body {
 .message-wrapper.received .voice-bubble { background-color: #ffffff; color: #000000; border-bottom-left-radius: 5px; }
 .voice-bubble .play-icon { width: 18px; height: 18px; flex-shrink: 0; }
 .voice-bubble .duration { font-size: 13px; margin: 0 8px; white-space: nowrap; }
+.voice-bubble.voice-is-loading { min-width: 145px; justify-content: flex-start; gap: 8px; }
+.voice-loading-spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: voiceSpin .7s linear infinite; flex-shrink: 0; }
+.voice-bubble.voice-is-playing { min-width: 150px; gap: 8px; box-shadow: 0 0 0 2px rgba(0,0,0,.07); }
+.voice-wave { display: inline-flex; align-items: center; gap: 3px; height: 22px; margin: 0 3px; }
+.voice-wave i { display: block; width: 3px; height: 6px; border-radius: 3px; background: currentColor; animation: voiceWave .65s ease-in-out infinite alternate; }
+.voice-wave i:nth-child(2) { animation-delay: .12s; height: 12px; }
+.voice-wave i:nth-child(3) { animation-delay: .24s; height: 18px; }
+.voice-wave i:nth-child(4) { animation-delay: .36s; height: 10px; }
+.voice-wave i:nth-child(5) { animation-delay: .48s; }
+@keyframes voiceWave { from { transform: scaleY(.45); opacity: .65; } to { transform: scaleY(1); opacity: 1; } }
+@keyframes voiceSpin { to { transform: rotate(360deg); } }
+
 .message-wrapper.sent .play-icon { transform: scaleX(-1); }
 .voice-transcript {
   font-size: 14px; color: #555;
@@ -2908,6 +2920,13 @@ input:checked + .slider:before { transform: translateX(22px); }
 .acct-calendar-day.today .solar-date { color:#fff; }
 @media (max-width:360px) { #decision-view-coin .dec-coin { width:132px; height:132px; } }
 </style>
+
+<style id="custom-feature-charcoal-only">
+/* 仅统一自定义功能区域的操作按钮；微信原生界面颜色（包括资料页、发消息/音视频、服务页、三个点菜单）保持 index.html 原样。 */
+#world-book-screen .btn-primary, #edit-world-book-screen .btn-primary, #edit-world-book-screen .dec-btn.primary, #offline-screen .send-btn, #offline-screen .offline-text-btn.primary, #offline-screen .offline-settings-save, #sound-settings-screen .btn-primary, #voice-settings-screen .voice-save, #couple-avatar-screen .btn-primary, #emoji-management-screen .btn-primary, #customize-screen .btn-primary { background:#555555 !important; background-image:none !important; color:#fff !important; border-color:#555555 !important; }
+#world-book-screen .btn-primary:active, #edit-world-book-screen .btn-primary:active, #offline-screen .send-btn:active, #sound-settings-screen .btn-primary:active, #voice-settings-screen .voice-save:active, #couple-avatar-screen .btn-primary:active, #emoji-management-screen .btn-primary:active, #customize-screen .btn-primary:active { background:#444444 !important; border-color:#444444 !important; }
+</style>
+
 </head>
 <body>
 <div class="phone-screen">
@@ -3173,6 +3192,10 @@ input:checked + .slider:before { transform: translateX(22px); }
     <ul class="list-container">
       <li class="settings-list-item" id="go-to-api-settings-btn">
         <div class="item-details"><div class="item-name">API 设置</div></div>
+        <div class="item-arrow">›</div>
+      </li>
+      <li class="settings-list-item" id="go-to-voice-settings-btn">
+        <div class="item-details"><div class="item-name">声音设置</div><div style="font-size:12px;color:#999;margin-top:4px">MiniMax 官方语音接入与角色音色</div></div>
         <div class="item-arrow">›</div>
       </li>
       <li class="settings-list-item" id="go-to-tutorial-btn">
@@ -5577,6 +5600,11 @@ input:checked + .slider:before { transform: translateX(22px); }
         <input type="text" id="edit-profile-remark" placeholder="你对Ta的称呼" required style="padding: 10px;">
       </div>
       <div class="form-group" style="margin-bottom: 15px;">
+        <label for="edit-profile-voice-id" style="margin-bottom:5px">角色音色 ID</label>
+        <input type="text" id="edit-profile-voice-id" placeholder="留空则使用声音设置里的默认音色" style="padding:10px;">
+        <div style="font-size:11px;color:#999;margin-top:5px">可填写 MiniMax 系统音色或自定义音色 ID</div>
+      </div>
+      <div class="form-group" style="margin-bottom: 15px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
           <label for="edit-profile-persona" style="margin-bottom: 0;">角色人设</label>
           <input type="file" id="edit-profile-persona-file" accept=".txt,.docx" style="display:none;">
@@ -6217,6 +6245,54 @@ function cropImageForCouple(imageUrl, callback) {
    功能开始：动态注入 HTML（API / 壁纸 / 字体 / 音效 / 自定义 / 教程）
    ========================================================== */
 document.getElementById('api-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">API 设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="api-form"><div class="form-group"><label for="api-provider">API 服务商</label><select id="api-provider" name="provider"><option value="newapi">NewAPI (自定义)</option><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option></select></div><div class="form-group"><label for="api-url">API 地址（后缀不用添加/v1）</label><input type="url" id="api-url" name="url" placeholder="选择服务商可自动填写" required></div><div class="form-group"><label for="api-key">密钥 (Key)</label><input type="password" id="api-key" name="key" placeholder="请输入你的API密钥" required></div><button type="button" class="btn btn-secondary" id="fetch-models-btn"><span class="btn-text">点击拉取模型</span><div class="spinner"></div></button><div class="form-group"><label for="api-model">选择模型</label><select id="api-model" name="model" required><option value="">请先拉取模型列表</option></select></div><button type="submit" class="btn btn-primary" id="save-btn"><span class="btn-text">保 存</span><div class="spinner"></div></button></form></main>`;
+
+document.getElementById('voice-settings-screen') || (()=>{const d=document.createElement('div');d.id='voice-settings-screen';d.className='screen';const host=document.getElementById('api-settings-screen')?.parentElement || document.querySelector('.phone-screen') || document.body;host.appendChild(d);return d;})();
+document.getElementById('voice-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="settings-menu-screen">‹</button><div class="title-container"><h1 class="title">声音设置</h1></div><div class="placeholder"></div></header>
+<main class="content voice-settings-page" style="padding:18px 16px 32px;background:#f5f5f5;min-height:100%;box-sizing:border-box">
+  <style>
+    .voice-settings-page .voice-hero{padding:20px;border-radius:22px;background:linear-gradient(145deg,#fff 0%,#f1f1f1 100%);border:1px solid #e5e5e5;box-shadow:0 8px 24px rgba(40,40,35,.045);margin-bottom:14px}
+    .voice-settings-page .voice-eyebrow{font-size:10px;letter-spacing:2px;color:#888888;font-weight:600}
+    .voice-settings-page .voice-title{font-size:21px;letter-spacing:.3px;font-weight:650;color:#333333;margin:8px 0 6px}
+    .voice-settings-page .voice-subtitle{font-size:12px;color:#888888;line-height:1.7}
+    .voice-settings-page .voice-status{display:inline-flex;align-items:center;gap:6px;margin-top:14px;padding:6px 10px;border-radius:20px;background:#eeeeee;color:#555555;font-size:11px}
+    .voice-settings-page .voice-dot{width:6px;height:6px;border-radius:50%;background:#888888;display:inline-block}
+    .voice-settings-page .voice-panel{background:rgba(255,255,255,.92);border:1px solid #e5e5e5;border-radius:20px;padding:18px 16px;margin-bottom:12px;box-shadow:0 5px 18px rgba(40,40,35,.025)}
+    .voice-settings-page .voice-panel-title{font-size:13px;letter-spacing:.5px;color:#333333;font-weight:650;margin-bottom:4px}
+    .voice-settings-page .voice-panel-desc{font-size:11px;line-height:1.6;color:#888888;margin-bottom:16px}
+    .voice-settings-page .voice-field{margin:0 0 15px}
+    .voice-settings-page .voice-field:last-child{margin-bottom:0}
+    .voice-settings-page .voice-field label{display:block;font-size:12px;color:#666666;margin-bottom:7px}
+    .voice-settings-page .voice-field input,.voice-settings-page .voice-field select{box-sizing:border-box;width:100%;height:43px;border:1px solid #e2e2e2;border-radius:12px;background:#f7f7f7;padding:0 12px;color:#454640;font-size:13px;outline:none}
+    .voice-settings-page .voice-field input:focus,.voice-settings-page .voice-field select:focus{border-color:#bdbdbd;background:#fff}
+    .voice-settings-page .voice-switch-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .voice-settings-page .voice-switch{position:relative;width:42px;height:24px;flex:0 0 auto}
+    .voice-settings-page .voice-switch input{opacity:0;width:0;height:0;position:absolute}
+    .voice-settings-page .voice-switch span{position:absolute;inset:0;border-radius:20px;background:#dddddd;transition:.2s;cursor:pointer}
+    .voice-settings-page .voice-switch span:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:white;box-shadow:0 1px 4px #00000018;transition:.2s}
+    .voice-settings-page .voice-switch input:checked+span{background:#666666}
+    .voice-settings-page .voice-switch input:checked+span:before{transform:translateX(18px)}
+    .voice-settings-page .voice-actions{display:flex;gap:10px;margin-top:4px}
+    .voice-settings-page .voice-actions button{flex:1;min-height:44px;border-radius:13px;font-size:13px}
+    .voice-settings-page .voice-test{background:#fff!important;border:1px solid #dddddd!important;color:#666666!important}
+    .voice-settings-page .voice-save{background:#555555!important;color:#fff!important;border:0!important}
+    .voice-settings-page .voice-footnote{font-size:10px;color:#888888;line-height:1.8;text-align:center;padding:8px 12px}
+    .voice-settings-page .voice-platform{font-size:10px;color:#888888;text-decoration:none;display:inline-block;margin-top:10px}
+  </style>
+  <section class="voice-hero"><div class="voice-eyebrow">VOICE · PERSONAL SETTINGS</div><div class="voice-title">让每个角色拥有自己的声音</div><div class="voice-subtitle">连接 MiniMax 官方语音合成服务，在聊天中直接生成并播放角色语音。</div><div class="voice-status"><i class="voice-dot"></i> 官方接口 · MiniMax</div></section>
+  <form id="voice-settings-form">
+    <section class="voice-panel"><div class="voice-switch-row"><div><div class="voice-panel-title">启用聊天语音</div><div class="voice-panel-desc" style="margin-bottom:0">开启后，AI 好友发送语音消息时，可直接播放对应的合成语音。</div></div><label class="voice-switch"><input type="checkbox" id="voice-enabled"><span></span></label></div></section>
+    <section class="voice-panel"><div class="voice-panel-title">官方服务连接</div><div class="voice-panel-desc">使用官方版接口，不需要跳转到第三方语音页面。填写开放平台提供的连接信息即可。</div>
+      <div class="voice-field"><label for="voice-api-key">API Key</label><input id="voice-api-key" type="password" autocomplete="off" placeholder="请粘贴 MiniMax API Key"></div>
+      <div class="voice-field"><label for="voice-group-id">Group ID / 账户 ID</label><input id="voice-group-id" type="text" placeholder="如你的账号需要 Group ID，请填写"></div>
+      <div class="voice-field"><label for="voice-model">语音模型</label><select id="voice-model"><option value="speech-2.8-turbo">官方默认 · Speech 2.8 Turbo</option><option value="speech-2.8-hd">Speech 2.8 HD · 高音质</option><option value="speech-2.6-turbo">Speech 2.6 Turbo</option><option value="speech-2.6-hd">Speech 2.6 HD</option></select></div>
+      <div class="voice-field"><label for="voice-default-id">默认音色 ID</label><input id="voice-default-id" type="text" placeholder="填写默认音色 ID" value="female-shaonv"></div>
+      <div style="font-size:10px;color:#888888;line-height:1.8">不同好友可以在好友资料编辑页单独设置音色 ID；未单独设置时使用这里的默认音色。</div>
+      <a class="voice-platform" href="https://platform.minimaxi.com/" target="_blank" rel="noopener">MiniMax 开放平台（获取 API Key / ID）↗</a>
+    </section>
+    <div class="voice-actions"><button type="button" id="test-voice-api" class="voice-test">试听 / 测试连接</button><button type="submit" class="voice-save">保存设置</button></div>
+  </form>
+  <div class="voice-footnote">密钥保存在当前应用的本地数据中。生成语音需要联网，并可能消耗账户额度。此功能仅用于应用内的角色语音播放。</div>
+</main>`;
 
 document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
 
@@ -7438,6 +7514,7 @@ function openEditProfileModal(char) {
   document.getElementById('edit-profile-name').value = char.realName || '';
   document.getElementById('edit-profile-remark').value = char.remarkName || '';
   document.getElementById('edit-profile-persona').value = char.persona || '';
+  const voiceIdInput = document.getElementById('edit-profile-voice-id'); if (voiceIdInput) voiceIdInput.value = char.voiceId || '';
   document.getElementById('edit-profile-avatar-preview').src = char.avatar || 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg';
   tempEditProfileWorldBooks = char.worldBookIds || [];
   const countSpan = document.getElementById('edit-profile-wb-count');
@@ -7482,6 +7559,7 @@ function setupEditProfileModal() {
     character.realName = document.getElementById('edit-profile-name').value.trim() || character.realName;
     character.remarkName = document.getElementById('edit-profile-remark').value.trim() || character.remarkName;
     character.persona = document.getElementById('edit-profile-persona').value.trim();
+    const voiceIdInput = document.getElementById('edit-profile-voice-id'); if (voiceIdInput) character.voiceId = voiceIdInput.value.trim();
     character.avatar = avatarPreview.src;
     character.worldBookIds = tempEditProfileWorldBooks;
     await saveData();
@@ -10175,7 +10253,58 @@ function renderMessages(isLoadMore = false, forceScrollToBottom = false) {
         fragment.appendChild(timeEl);
       }
       const bubble = createMessageBubbleElement(msg);
-      if (bubble) fragment.appendChild(bubble);
+      if (bubble) {
+        // 仅给 AI 发来的语音消息接入合成语音。
+        const incomingVoiceMatch = msg.role !== 'user' && String(msg.content || '').match(/\[(?:.+?)的语音：([\s\S]+?)\]/);
+        if (incomingVoiceMatch && (db.voiceSettings || {}).enabled && (db.voiceSettings || {}).key) {
+          const voiceText = incomingVoiceMatch[1].trim();
+          const voiceBubble = bubble.querySelector('.voice-bubble');
+          if (voiceBubble && voiceText) {
+            voiceBubble.style.cursor = 'pointer';
+            voiceBubble.title = '点击播放语音';
+            voiceBubble.setAttribute('role', 'button');
+            voiceBubble.setAttribute('aria-label', '播放语音消息');
+            voiceBubble.onclick = async () => {
+              // 再次点击正在播放的气泡：暂停/继续；生成阶段不重复发请求。
+              if (voiceBubble._miniMaxAudio) {
+                const existingAudio = voiceBubble._miniMaxAudio;
+                if (!existingAudio.paused) { existingAudio.pause(); voiceBubble.classList.remove('voice-is-playing'); voiceBubble.dataset.paused = '1'; return; }
+                try { await existingAudio.play(); voiceBubble.classList.add('voice-is-playing'); delete voiceBubble.dataset.paused; }
+                catch (err) { showToast('无法继续播放：' + (err.message || '请检查浏览器音频权限')); }
+                return;
+              }
+              if (voiceBubble.dataset.playing === '1') return;
+              voiceBubble.dataset.playing = '1';
+              const oldContent = voiceBubble.innerHTML;
+              voiceBubble.classList.add('voice-is-loading');
+              voiceBubble.innerHTML = '<span class="voice-loading-spinner"></span><span style="font-size:12px">正在合成语音…</span>';
+              let audioUrl = '';
+              try {
+                const char = currentChatType === 'private' ? db.characters.find(c => c.id === currentChatId) : null;
+                audioUrl = await generateMiniMaxAudio(voiceText, char?.voiceId || db.voiceSettings.voiceId);
+                const audio = new Audio();
+                audio.preload = 'auto';
+                audio.src = audioUrl;
+                voiceBubble._miniMaxAudio = audio;
+                voiceBubble.classList.remove('voice-is-loading');
+                voiceBubble.classList.add('voice-is-playing');
+                voiceBubble.innerHTML = '<svg class="play-icon voice-playing-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg><span class="voice-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span><span class="duration">播放中</span>';
+                audio.onended = () => { URL.revokeObjectURL(audioUrl); voiceBubble._miniMaxAudio = null; voiceBubble.classList.remove('voice-is-playing','voice-is-loading'); voiceBubble.innerHTML = oldContent; delete voiceBubble.dataset.playing; delete voiceBubble.dataset.paused; };
+                audio.onerror = () => { URL.revokeObjectURL(audioUrl); voiceBubble._miniMaxAudio = null; voiceBubble.classList.remove('voice-is-playing','voice-is-loading'); voiceBubble.innerHTML = oldContent; delete voiceBubble.dataset.playing; showToast('音频已生成，但浏览器解码/播放失败，请检查音频格式或重新测试连接'); };
+                await audio.play();
+              } catch (err) {
+                if (audioUrl) URL.revokeObjectURL(audioUrl);
+                voiceBubble._miniMaxAudio = null;
+                voiceBubble.classList.remove('voice-is-playing','voice-is-loading');
+                voiceBubble.innerHTML = oldContent;
+                delete voiceBubble.dataset.playing;
+                showToast('语音生成/播放失败：' + (err.message || '请检查 API Key、音色 ID、模型和网络')); 
+              }
+            };
+          }
+        }
+        fragment.appendChild(bubble);
+      }
       prevRenderedMsg = msg;
     } catch (error) { console.error("渲染单条消息时出错，已跳过该消息：", msg, error); }
   });
@@ -12770,7 +12899,34 @@ if (e) {
 /* ==========================================================
    功能开始：API 设置
    ========================================================== */
+async function generateMiniMaxAudio(text, voiceId, testOnly=false) {
+  const cfg = db.voiceSettings || {};
+  const key = (document.getElementById('voice-api-key')?.value || cfg.key || '').trim();
+  const model = document.getElementById('voice-model')?.value || cfg.model || 'speech-2.8-turbo';
+  if (!key) throw new Error('未配置 API Key');
+  const response = await fetch('https://api.minimaxi.com/v1/t2a_v2', { method:'POST', headers:{'Authorization':'Bearer '+key,'Content-Type':'application/json'}, body:JSON.stringify({model, text:String(text||'').slice(0,9000), stream:false, voice_setting:{voice_id:voiceId || cfg.voiceId || 'female-shaonv', speed:1, vol:1, pitch:0}, audio_setting:{sample_rate:32000, bitrate:128000, format:'mp3', channel:1}, output_format:'hex'}) });
+  const data = await response.json().catch(()=>({}));
+  if (!response.ok || (data.base_resp && data.base_resp.status_code !== 0) || !data.data?.audio) throw new Error(data.base_resp?.status_msg || ('HTTP '+response.status));
+  const hex=data.data.audio;
+  if (typeof hex !== 'string' || hex.length < 4 || hex.length % 2 !== 0 || !/^[0-9a-f]+$/i.test(hex)) throw new Error('接口返回的音频数据不是有效 HEX，请检查模型与接口返回格式'); const bytes=new Uint8Array(hex.length/2); for(let i=0;i<bytes.length;i++) bytes[i]=parseInt(hex.substr(i*2,2),16);
+  return URL.createObjectURL(new Blob([bytes],{type:'audio/mpeg'}));
+}
+
 function setupApiSettingsApp() {
+  const voiceForm = document.getElementById('voice-settings-form');
+  if (voiceForm) {
+    const voiceSettings = db.voiceSettings || {};
+    document.getElementById('voice-enabled').checked = !!voiceSettings.enabled;
+    document.getElementById('voice-api-key').value = voiceSettings.key || '';
+    document.getElementById('voice-group-id').value = voiceSettings.groupId || '';
+    document.getElementById('voice-default-id').value = voiceSettings.voiceId || 'female-shaonv';
+    document.getElementById('voice-model').value = voiceSettings.model || 'speech-2.8-turbo';
+    const openVoiceSettingsBtn = document.getElementById('go-to-voice-settings-btn');
+    if (openVoiceSettingsBtn) openVoiceSettingsBtn.onclick = () => switchScreen('voice-settings-screen');
+    voiceForm.addEventListener('submit', async ev => { ev.preventDefault(); db.voiceSettings = { enabled: document.getElementById('voice-enabled').checked, key: document.getElementById('voice-api-key').value.trim(), groupId: document.getElementById('voice-group-id').value.trim(), voiceId: document.getElementById('voice-default-id').value.trim() || 'female-shaonv', model: document.getElementById('voice-model').value }; await saveData(); showToast('语音设置已保存'); });
+    document.getElementById('test-voice-api').onclick = async () => { const key = document.getElementById('voice-api-key').value.trim(); if (!key) return showToast('请先填写 MiniMax API Key'); const btn = document.getElementById('test-voice-api'); btn.disabled = true; btn.textContent = '合成并试听…'; let url = ''; try { url = await generateMiniMaxAudio('你好，这是 MiniMax 语音试听。如果你能听到这句话，说明语音合成和播放都正常。', document.getElementById('voice-default-id').value.trim() || 'female-shaonv', false); const testAudio = new Audio(url); testAudio.onended = () => URL.revokeObjectURL(url); testAudio.onerror = () => { URL.revokeObjectURL(url); showToast('接口返回音频，但当前浏览器无法播放'); }; await testAudio.play(); showToast('已开始试听：请确认能听到声音'); } catch(err) { if (url) URL.revokeObjectURL(url); showToast('试听失败：' + (err.message || '请检查密钥、音色 ID、网络或浏览器音频权限')); } finally { btn.disabled = false; btn.textContent = '测试连接'; } };
+  }
+
   const e = document.getElementById('api-form'),
     t = document.getElementById('fetch-models-btn'),
     a = document.getElementById('api-model'),
