@@ -6724,9 +6724,19 @@ function getCurrentChat() {
   if (currentChatType === 'private') return db.characters.find(c => c.id === currentChatId);
   return db.groups.find(g => g.id === currentChatId);
 }
+function getMaskUserIdentityForCharacter(chat){
+  const mask=(typeof getProfileMaskForSession==='function'&&getProfileMaskForSession(chat))||(typeof getActiveProfileMask==='function'&&getActiveProfileMask());
+  const p=(mask&&mask.profile)||{};
+  return {
+    mask,
+    profile:p,
+    name:String(p.remark||p.roleName||p.realName||p.nickname||(chat&&chat.myName)||'我').trim()||'我',
+    persona:String(p.persona||p.userPersona||p.maskPersona||(chat&&chat.myPersona)||'').trim()
+  };
+}
 function getMyName(chat) {
   if (!chat) return '我';
-  if (currentChatType === 'private') return chat.myName || '我';
+  if (currentChatType === 'private') return (typeof getMaskUserIdentityForCharacter==='function' ? getMaskUserIdentityForCharacter(chat).name : '') || chat.myName || '我';
   return (chat.me && chat.me.nickname) || '我';
 }
 async function pushUserMessage({ content, parts, extra = {}, senderId = 'user_me' }) {
@@ -7032,10 +7042,18 @@ db.groups.forEach(g => {
     if (wb.group === undefined) wb.group = '';
   });
 
-  // 统一同步"我的头像"
-  if (db.myProfile && db.myProfile.avatar) {
-    db.characters.forEach(c => { c.myAvatar = db.myProfile.avatar; });
-    db.groups.forEach(g => { if (g.me) g.me.avatar = db.myProfile.avatar; });
+  // 面具升级迁移：初始化主面具后，按每个聊天窗口的归属恢复头像；不再把所有会话统一覆盖成当前面具头像。
+  try {
+    if (typeof ensureProfileMasks === 'function') ensureProfileMasks();
+    if (typeof saveActiveMaskSnapshot === 'function') saveActiveMaskSnapshot();
+    if (typeof refreshMaskAvatars === 'function') refreshMaskAvatars();
+    const activeMask = typeof getActiveProfileMask === 'function' ? getActiveProfileMask() : null;
+    const activeProfile = (activeMask && activeMask.profile) || db.myProfile || {};
+    const activeAvatar = activeProfile.avatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+    (db.groups || []).forEach(g => { if (g.me) { g.me.avatar = activeAvatar; g.me.nickname = activeProfile.remark || activeProfile.roleName || activeProfile.nickname || g.me.nickname || '我'; g.me.persona = activeProfile.persona || activeProfile.userPersona || g.me.persona || ''; } });
+  } catch (maskMigrationError) {
+    console.warn('面具资料迁移失败，保留原资料：', maskMigrationError);
+    if (db.myProfile && db.myProfile.avatar) (db.groups||[]).forEach(g => { if (g.me) g.me.avatar = db.myProfile.avatar; });
   }
 };
 /* ==========================================================
@@ -7320,8 +7338,14 @@ if (isGemini) {
    功能开始：初始化
    ========================================================== */
 const init = async () => {
-try { await loadData(); }
-catch (e) { console.error("加载数据失败:", e); }
+try {
+  await loadData();
+  if (typeof ensureProfileMasks === 'function') ensureProfileMasks();
+  if (typeof saveActiveMaskSnapshot === 'function') saveActiveMaskSnapshot();
+  if (typeof refreshMaskAvatars === 'function') refreshMaskAvatars();
+  // 将面具迁移后的独立头像/备注/钱包状态持久化，避免刷新后恢复成单一全局头像。
+  await saveData();
+} catch (e) { console.error("加载数据失败:", e); }
   try {
     
 document.body.addEventListener('click', (e) => {
@@ -7439,7 +7463,7 @@ let currentProfileCharId = null;
 function renderFriendProfile(char) {
   currentProfileCharId = char.id;
   document.getElementById('profile-avatar').src = char.avatar;
-  document.getElementById('profile-nickname').innerHTML = (char.isStarred ? '<span style="color:#ffb300; font-size: 18px;">★ </span>' : '') + char.remarkName;
+  document.getElementById('profile-nickname').innerHTML = (char.isStarred ? '<span style="color:#ffb300; font-size: 18px;">★ </span>' : '') + getMaskRemarkForCharacter(char, db.activeProfileMaskId);
   document.getElementById('profile-realname').textContent = char.realName || '未填写';
   document.getElementById('profile-wxid').textContent = char.wxid || 'wxid_' + char.id.slice(-6);
   document.getElementById('profile-region-text').textContent = char.address || char.region || '未填写';
@@ -7475,10 +7499,10 @@ function renderFriendProfile(char) {
 }
 
 function renderFriendSettingsScreen(char) {
-  document.getElementById('setting-profile-remark').textContent = char.remarkName;
+  document.getElementById('setting-profile-remark').textContent = getMaskRemarkForCharacter(char, db.activeProfileMaskId);
   const bindMaskBtn=document.getElementById('setting-bind-mask-btn');
   const boundMaskLabel=document.getElementById('setting-bound-mask-label');
-  const refreshBoundMaskLabel=()=>{ensureProfileMasks();const id=char.boundProfileMaskId||(char.boundProfileMaskIds||[])[0]||'';const m=db.profileMasks.find(x=>x.id===id);if(boundMaskLabel)boundMaskLabel.textContent=m?((m.name||'未命名面具')+' ›'):'未绑定 ›';};
+  const refreshBoundMaskLabel=()=>{ensureProfileMasks();const boundRoot=(typeof getMaskChatRoot==='function'?(getMaskChatRoot(char)||char):char);const id=boundRoot.boundProfileMaskId||(boundRoot.boundProfileMaskIds||[])[0]||'';const m=db.profileMasks.find(x=>x.id===id);if(boundMaskLabel)boundMaskLabel.textContent=m?((m.name||'未命名面具')+' ›'):'未绑定 ›';};
   refreshBoundMaskLabel();
   if(bindMaskBtn)bindMaskBtn.onclick=()=>{openMaskBindingPicker(char.id);const watcher=setInterval(()=>{if(!document.getElementById('mask-binding-overlay')){clearInterval(watcher);refreshBoundMaskLabel();}},250);};
   const starredToggle = document.getElementById('setting-starred-toggle');
@@ -7515,7 +7539,7 @@ function renderFriendSettingsScreen(char) {
     showToast(char.isBlacklisted ? '已加入黑名单' : '已移出黑名单');
   });
   document.getElementById('setting-delete-friend-btn').onclick = () => {
-    document.getElementById('delete-target-name').textContent = char.remarkName;
+    document.getElementById('delete-target-name').textContent = getMaskRemarkForCharacter(char, db.activeProfileMaskId);
     document.getElementById('delete-with-history-checkbox').checked = false;
     document.getElementById('delete-friend-modal').classList.add('visible');
   };
@@ -7527,9 +7551,11 @@ function getMaskRemarkForCharacter(character, maskId = db.activeProfileMaskId) {
   const map = root.maskRemarkNames || {};
   const stored = maskId && map[maskId];
   if (stored && String(stored).trim()) return String(stored).trim();
-  // Older sessions may already have a mask-specific name saved on the session itself.
+  // 已有窗口的备注只属于该窗口对应的面具。
   if (character.isMaskChatSession && character.maskChatSessionMaskId === maskId && character.remarkName) return character.remarkName;
-  return root.realName || root.remarkName || character.realName || character.remarkName || '联系人';
+  if (!character.isMaskChatSession && root.maskChatSessionMaskId === maskId && root.remarkName) return root.remarkName;
+  // 新面具没有单独备注时，显示 AI 真名，不沿用其他面具的亲昵称呼。
+  return root.realName || character.realName || root.remarkName || character.remarkName || '联系人';
 }
 function setMaskRemarkForCharacter(character, maskId, value) {
   if (!character || !maskId) return;
@@ -7540,6 +7566,8 @@ function setMaskRemarkForCharacter(character, maskId, value) {
   root.remarkName = root.remarkName || root.realName || clean; // Keep legacy/global field intact for old integrations.
   (db.characters || []).forEach(c => {
     if (c.id === root.id || c.maskChatRootId === root.id) {
+      if (!c.maskRemarkNames || typeof c.maskRemarkNames !== 'object') c.maskRemarkNames = {};
+      c.maskRemarkNames[maskId] = clean;
       if (c.maskChatSessionMaskId === maskId || (!c.isMaskChatSession && root.maskChatSessionMaskId === maskId)) c.remarkName = clean;
     }
   });
@@ -7713,7 +7741,7 @@ function renderStartChatList() {
     const li = document.createElement('li');
     li.style.cssText = 'cursor:pointer; padding:12px 10px; display:flex; align-items:center; border-bottom:1px solid #f0f0f0;';
     li.innerHTML = `<img src="${char.avatar}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; margin-right: 12px; flex-shrink: 0;">
-      <label style="flex-grow: 1; font-weight: 500; font-size: 15px; color: #333; cursor: pointer;">${(activeMaskId && char.maskChatSessionMaskId && char.maskChatSessionMaskId !== activeMaskId) || (activeMaskId && char.maskChatSessionIds && !char.maskChatSessionIds[activeMaskId]) ? (char.realName || char.remarkName) : (char.remarkName || char.realName)}</label>`;
+      <label style="flex-grow: 1; font-weight: 500; font-size: 15px; color: #333; cursor: pointer;">${getMaskRemarkForCharacter(char, activeMaskId) || char.realName || '联系人'}</label>`;
     li.onclick = () => {
       document.getElementById('start-chat-modal').classList.remove('visible');
       if (char && char.id) openChatRoom(char.id, 'private');
@@ -7743,7 +7771,7 @@ async function handleSwipeAction(action, chatId, chatType, chatItem) {
     renderChatList();
     showToast('已标为已读');
   } else if (action === 'delete') {
-    const itemName = chatType === 'private' ? chat.remarkName : chat.name;
+    const itemName = chatType === 'private' ? getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) : chat.name;
     if (await showHgConfirm(`确定要清空与“${itemName}”的聊天记录吗？此操作不可恢复，但联系人仍会保留在通讯录。`)) {
       chat.history = [];
       chat.unread = false;
@@ -8838,7 +8866,7 @@ let currentQRCodeTarget = null;
 let _qrReturnScreen = 'my-profile-info-screen';
 let _qrCurrentBlob = null;
 
-function openMaskBindingPicker(characterId){ensureProfileMasks();const char=db.characters.find(c=>c.id===characterId);if(!char)return;const existing=char.boundProfileMaskId||(char.boundProfileMaskIds||[])[0]||'';const old=document.getElementById('mask-binding-overlay');if(old)old.remove();const ov=document.createElement('div');ov.id='mask-binding-overlay';ov.style.cssText='position:fixed;inset:0;background:#0006;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;';const panel=document.createElement('div');panel.style.cssText='width:100%;max-width:420px;max-height:78vh;overflow:auto;background:#fafafa;border-radius:18px;padding:20px;box-shadow:0 10px 40px #0002;';const title=document.createElement('div');title.textContent='绑定面具';title.style.cssText='font-size:19px;font-weight:600;margin-bottom:8px;color:#333;';const desc=document.createElement('div');desc.textContent='为这个 AI 角色固定一个面具。对话时只读取所绑定面具的专属背景；角色原有聊天记忆保持不变。';desc.style.cssText='font-size:13px;color:#888;line-height:1.6;margin-bottom:14px;';panel.append(title,desc);let selected=existing;const options=document.createElement('div');options.style.cssText='display:flex;flex-direction:column;gap:8px;';const addOption=(id,label,sub)=>{const row=document.createElement('label');row.style.cssText='display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:#fff;border:1px solid #e5e5e5;cursor:pointer;';const radio=document.createElement('input');radio.type='radio';radio.name='mask-binding-choice';radio.value=id;radio.checked=selected===id;radio.onchange=()=>selected=id;const textWrap=document.createElement('div');const t=document.createElement('div');t.textContent=label;t.style.cssText='font-size:15px;color:#333;';const st=document.createElement('div');st.textContent=sub||'';st.style.cssText='font-size:12px;color:#999;margin-top:3px;';textWrap.append(t,st);row.append(radio,textWrap);options.appendChild(row);};addOption('','不绑定面具','AI 不读取任何面具专属背景');db.profileMasks.forEach(m=>addOption(m.id,m.name||'未命名面具',m.id===db.activeProfileMaskId?'当前正在使用':'点击绑定这个面具'));panel.appendChild(options);const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;margin-top:18px;';[['取消',false],['保存绑定',true]].forEach(([label,save])=>{const b=document.createElement('button');b.textContent=label;b.style.cssText='flex:1;border:0;border-radius:10px;padding:13px;background:'+(save?'#333':'#eaeaec')+';color:'+(save?'#fff':'#666')+';font-size:15px;';b.onclick=async()=>{if(save){char.boundProfileMaskId=selected;char.boundProfileMaskIds=selected?[selected]:[];await saveData();showToast(selected?'已绑定面具：'+((db.profileMasks.find(m=>m.id===selected)||{}).name||'面具'):'已解除面具绑定');}ov.remove();if(typeof currentQRCodeTarget!=='undefined'&&currentQRCodeTarget&&currentQRCodeTarget.type==='char'&&currentQRCodeTarget.id===characterId){const row=document.getElementById('qr-mask-bind-row');if(row){const bound=db.profileMasks.find(m=>m.id===selected);row.textContent=bound?'绑定面具：'+(bound.name||'未命名面具')+'（点此更换）':'绑定面具';}}};actions.appendChild(b);});panel.appendChild(actions);ov.appendChild(panel);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);}
+function openMaskBindingPicker(characterId){ensureProfileMasks();const found=db.characters.find(c=>c.id===characterId);if(!found)return;const char=(typeof getMaskChatRoot==='function'?(getMaskChatRoot(found)||found):found);const existing=char.boundProfileMaskId||(char.boundProfileMaskIds||[])[0]||'';const old=document.getElementById('mask-binding-overlay');if(old)old.remove();const ov=document.createElement('div');ov.id='mask-binding-overlay';ov.style.cssText='position:fixed;inset:0;background:#0006;z-index:10000;display:flex;align-items:center;justify-content:center;padding:24px;';const panel=document.createElement('div');panel.style.cssText='width:100%;max-width:420px;max-height:78vh;overflow:auto;background:#fafafa;border-radius:18px;padding:20px;box-shadow:0 10px 40px #0002;';const title=document.createElement('div');title.textContent='绑定面具';title.style.cssText='font-size:19px;font-weight:600;margin-bottom:8px;color:#333;';const desc=document.createElement('div');desc.textContent='为这个 AI 角色固定一个面具。对话时只读取所绑定面具的专属背景；角色原有聊天记忆保持不变。';desc.style.cssText='font-size:13px;color:#888;line-height:1.6;margin-bottom:14px;';panel.append(title,desc);let selected=existing;const options=document.createElement('div');options.style.cssText='display:flex;flex-direction:column;gap:8px;';const addOption=(id,label,sub)=>{const row=document.createElement('label');row.style.cssText='display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:#fff;border:1px solid #e5e5e5;cursor:pointer;';const radio=document.createElement('input');radio.type='radio';radio.name='mask-binding-choice';radio.value=id;radio.checked=selected===id;radio.onchange=()=>selected=id;const textWrap=document.createElement('div');const t=document.createElement('div');t.textContent=label;t.style.cssText='font-size:15px;color:#333;';const st=document.createElement('div');st.textContent=sub||'';st.style.cssText='font-size:12px;color:#999;margin-top:3px;';textWrap.append(t,st);row.append(radio,textWrap);options.appendChild(row);};addOption('','不绑定面具','AI 不读取任何面具专属背景');db.profileMasks.forEach(m=>addOption(m.id,m.name||'未命名面具',m.id===db.activeProfileMaskId?'当前正在使用':'点击绑定这个面具'));panel.appendChild(options);const actions=document.createElement('div');actions.style.cssText='display:flex;gap:10px;margin-top:18px;';[['取消',false],['保存绑定',true]].forEach(([label,save])=>{const b=document.createElement('button');b.textContent=label;b.style.cssText='flex:1;border:0;border-radius:10px;padding:13px;background:'+(save?'#333':'#eaeaec')+';color:'+(save?'#fff':'#666')+';font-size:15px;';b.onclick=async()=>{if(save){char.boundProfileMaskId=selected;char.boundProfileMaskIds=selected?[selected]:[];await saveData();showToast(selected?'已绑定面具：'+((db.profileMasks.find(m=>m.id===selected)||{}).name||'面具'):'已解除面具绑定');}ov.remove();if(typeof currentQRCodeTarget!=='undefined'&&currentQRCodeTarget&&currentQRCodeTarget.type==='char'&&currentQRCodeTarget.id===characterId){const row=document.getElementById('qr-mask-bind-row');if(row){const bound=db.profileMasks.find(m=>m.id===selected);row.textContent=bound?'绑定面具：'+(bound.name||'未命名面具')+'（点此更换）':'绑定面具';}}};actions.appendChild(b);});panel.appendChild(actions);ov.appendChild(panel);ov.onclick=e=>{if(e.target===ov)ov.remove();};document.body.appendChild(ov);}
 
 async function openQRCodeScreen(target, fromScreenId) {
   if (!target) target = { type: 'me' };
@@ -8852,7 +8880,7 @@ async function openQRCodeScreen(target, fromScreenId) {
   const subEl = document.getElementById('qr-code-sub');
   const avatarEl = document.getElementById('qr-code-avatar');
   const maskBindRow=document.getElementById('qr-mask-bind-row');
-  if(maskBindRow){maskBindRow.style.display=target.type==='char'?'block':'none';const qrBoundChar=target.type==='char'?db.characters.find(c=>c.id===target.id):null;const updateBindLabel=()=>{ensureProfileMasks();const boundId=qrBoundChar&&(qrBoundChar.boundProfileMaskId||(qrBoundChar.boundProfileMaskIds||[])[0])||'';const bound=db.profileMasks.find(m=>m.id===boundId);maskBindRow.textContent=bound?'绑定面具：'+(bound.name||'未命名面具')+'（点此更换）':'绑定面具';};updateBindLabel();maskBindRow.onclick=()=>{const char=db.characters.find(c=>c.id===target.id);if(char)openMaskBindingPicker(char.id);};}
+  if(maskBindRow){maskBindRow.style.display=target.type==='char'?'block':'none';const qrBoundChar=target.type==='char'?db.characters.find(c=>c.id===target.id):null;const updateBindLabel=()=>{ensureProfileMasks();const qrRoot=qrBoundChar&&(typeof getMaskChatRoot==='function'?(getMaskChatRoot(qrBoundChar)||qrBoundChar):qrBoundChar);const boundId=qrRoot&&(qrRoot.boundProfileMaskId||(qrRoot.boundProfileMaskIds||[])[0])||'';const bound=db.profileMasks.find(m=>m.id===boundId);maskBindRow.textContent=bound?'绑定面具：'+(bound.name||'未命名面具')+'（点此更换）':'绑定面具';};updateBindLabel();maskBindRow.onclick=()=>{const char=db.characters.find(c=>c.id===target.id);if(char)openMaskBindingPicker(char.id);};}
 
   let blob = null;
   let name, avatar, seed;
@@ -9973,7 +10001,7 @@ async function triggerPatPat(avatarEl) {
     let targetName;
     let targetSuffix = '';
     if (currentChatType === 'private') {
-      targetName = chat.remarkName || chat.realName || '对方';
+      targetName = getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) || chat.realName || '对方';
       targetSuffix = chat.patSuffix || '';
     } else {
       const senderId = wrapper.dataset.senderId;
@@ -10013,7 +10041,7 @@ function showHeartCard(heartText, chat) {
   textEl.textContent = heartText || '';
   if (signEl) {
     const name = (currentChatType === 'private')
-      ? (chat.remarkName || chat.realName || '')
+      ? (getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) || chat.realName || '')
       : (chat.name || '');
     signEl.textContent = name;
   }
@@ -10151,7 +10179,7 @@ function getFavoriteStore(){ if(!db.messageFavorites) db.messageFavorites=[]; re
 function getMessageById(id){ const c=getCurrentChat(); return c && c.history.find(m=>m.id===id); }
 async function favoriteMessages(ids){
  const chat=getCurrentChat(); if(!chat)return; const store=getFavoriteStore(); let n=0;
- ids.forEach(id=>{const m=chat.history.find(x=>x.id===id); if(!m)return; if(store.some(f=>f.messageId===m.id&&f.chatId===currentChatId&&f.chatType===currentChatType))return; store.unshift({id:'fav_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),messageId:m.id,chatId:currentChatId,chatType:currentChatType,chatName:chat.remarkName||chat.realName||chat.name||'聊天',content:m.content,parts:m.parts||[],role:m.role,timestamp:m.timestamp||Date.now(),savedAt:Date.now()});n++;}); await saveData(); showToast(n?'已收藏':'这条消息已在收藏中'); }
+ ids.forEach(id=>{const m=chat.history.find(x=>x.id===id); if(!m)return; if(store.some(f=>f.messageId===m.id&&f.chatId===currentChatId&&f.chatType===currentChatType))return; store.unshift({id:'fav_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),messageId:m.id,chatId:currentChatId,chatType:currentChatType,chatName:(currentChatType==='private'?getMaskRemarkForCharacter(chat,getMaskIdForCharacterSession(chat)||db.activeProfileMaskId):chat.name)||chat.realName||'聊天',content:m.content,parts:m.parts||[],role:m.role,timestamp:m.timestamp||Date.now(),savedAt:Date.now()});n++;}); await saveData(); showToast(n?'已收藏':'这条消息已在收藏中'); }
 async function favoriteSelectedMessages(){const ids=[...selectedMessageIds];await favoriteMessages(ids);exitMultiSelectMode();}
 function renderMessageFavorites(filter=''){
  const list=document.getElementById('favorite-list'); if(!list)return; const q=String(filter||'').trim().toLowerCase(); const arr=getFavoriteStore().filter(f=>!q||(f.content||'').toLowerCase().includes(q)||(f.chatName||'').toLowerCase().includes(q)); list.innerHTML='';
@@ -10321,7 +10349,7 @@ function setQuote(message) {
   if (isSent) {
     senderName = currentChatType === 'private' ? chat.myName : chat.me.nickname;
   } else {
-    if (currentChatType === 'private') senderName = chat.remarkName || chat.realName;
+    if (currentChatType === 'private') senderName = getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) || chat.realName;
     else {
       const sender = chat.members.find(m => m.id === message.senderId);
       senderName = sender ? (sender.groupNickname || sender.realName) : '成员';
@@ -10938,7 +10966,7 @@ async function sendMyTransfer(amount, remark) {
   if (!(await ensureWalletPaymentPassword())) return false;
   if (total > getWalletBalance()) return showToast('微信零钱余额不足，无法转账'), false;
   setWalletBalance(Math.round((getWalletBalance()-total)*100)/100);
-  recordWalletTransaction('发起转账', -total, currentChatType === 'private' ? (chat.remarkName||chat.name||'联系人') : `群聊转账（${recipients.length} 人）`);
+  recordWalletTransaction('发起转账', -total, currentChatType === 'private' ? (getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId)||chat.realName||'联系人') : `群聊转账（${recipients.length} 人）`);
   const expiresAt = Date.now() + 24*60*60*1000;
   if (currentChatType === 'private') {
     await pushUserMessage({
@@ -11069,31 +11097,42 @@ function buildTimeBlock(chat) {
    ========================================================== */
 function buildMaskIdentityPrompt(character){
   if(!character)return '';
-  const maskId=character.maskChatSessionMaskId||getMaskIdForCharacterSession(character)||db.activeProfileMaskId;
+  const maskId=getMaskIdForCharacterSession(character)||db.activeProfileMaskId;
   const mask=(db.profileMasks||[]).find(m=>m.id===maskId)||getActiveProfileMask();
   if(!mask)return '';
   const p=mask.profile||{};
-  const remark=(character.maskRemarkNames&&character.maskRemarkNames[mask.id])||((character.maskChatSessionMaskId===mask.id)?character.remarkName:'')||p.remark||'';
+  const bound=getBoundProfileMaskForCharacter(character);
+  const identityMask=bound||mask;
+  const ip=(identityMask&&identityMask.profile)||{};
+  const rootCharacter=(typeof getMaskChatRoot==='function'?(getMaskChatRoot(character)||character):character);
+  const aiRemark=(rootCharacter.maskRemarkNames&&rootCharacter.maskRemarkNames[mask.id])||getMaskRemarkForCharacter(rootCharacter,mask.id)||'';
   const fields=[
-    `面具标识：${mask.id}`,
-    `面具名称：${mask.name||p.nickname||'未命名面具'}`,
-    `当前窗口对 AI 的称呼/备注：${remark||'未设置'}`,
-    `当前面具昵称：${p.nickname||mask.name||'未设置'}`,
-    `当前面具真名/角色名：${p.roleName||p.realName||p.remark||'未设置'}`,
+    `当前面具标识：${mask.id}`,
+    `当前面具名称：${mask.name||p.nickname||'未命名面具'}`,
+    `当前面具真名/角色名：${p.roleName||p.realName||'未设置'}`,
+    `当前面具昵称：${p.remark||p.nickname||'未设置'}`,
     `当前面具性别：${p.gender||'未设置'}`,
     `当前面具地区：${p.region||'未设置'}`,
-    `当前面具个性签名：${p.signature||'未设置'}`
+    `当前面具个性签名：${p.signature||'未设置'}`,
+    `当前面具通讯录中给 AI 角色设置的备注（仅表示 AI 的联系人显示名，不是用户本人姓名）：${aiRemark||'未设置'}`
   ];
-  const persona=String(p.maskPersona||'').trim();
-  return `\n════ 当前窗口的用户面具身份（必须逐项核对）════\n${fields.join('\n')}\n当前窗口唯一对应上述面具。回复时应自然使用当前窗口保存的身份信息，不要把其他面具的昵称、真名、头像、备注或背景套过来。面具头像由界面按当前窗口的面具 ID 读取；不能假设所有窗口都使用同一头像。若资料未填写，保持未知，不得猜测或自行补全。\n${persona?`【当前面具专属背景/人设】\n${persona}\n`:''}跨面具记忆规则：你是同一个 AI，不会因窗口切换而重置个人记忆；你必须记得所有面具窗口中自己经历的事，并能在相关话题中继续。但必须标记清楚事件与哪个面具有关、是谁说的、谁参与了、关系属于谁。共享经历不等于不同面具是同一个人，也不等于每个面具都亲身经历了其他窗口的事情。不得把记忆覆盖成单一面具的记忆，不得只认最早创建的面具。\n`;
+  const persona=String(ip.maskPersona||ip.persona||ip.userPersona||'').trim();
+  const personaHeading=bound?'【固定绑定面具的专属背景/人设】':'【当前面具专属背景/人设】';
+  return `\n════ 当前聊天窗口身份资料（必须核对）════\n${fields.join('\n')}\n当前窗口的实际用户身份是上列“当前面具”，身份资料和关系必须与会话所属面具一致。AI 的联系人备注只用于界面显示，不是用户本人的姓名。没有绑定时，按当前面具资料、当前窗口历史与当前关系发展互动；存在绑定时，绑定面具只决定专属背景和固定关系，不能把其他面具的人设背景混入绑定背景。头像由界面按会话所属面具 ID 显示，不可把头像缓存当成身份资料。信息缺失时保持未知，不得猜测。\n${persona?`${personaHeading}\n${persona}\n`:''}跨面具记忆规则：同一个 AI 必须连续记住所有面具窗口里自己经历过的事情、说过的话、接收的信息、承诺和未完成事项。每件事都要保留来源面具、参与者、时间顺序和关系归属。可以记得其他面具经历过的事，但不能谎称当前面具亲身经历过，也不能因为切换面具而重置记忆。记忆共享不等于身份合并或关系转移。\n`;
 }
-
 function generatePrivateSystemPrompt(character) {
+  // All mask-specific sessions represent the same AI character; refresh shared AI traits from the root.
+  if (typeof syncMaskSessionSharedCharacter === 'function') syncMaskSessionSharedCharacter(character);
+  const currentMaskIdentity = getMaskUserIdentityForCharacter(character);
+  const currentUserName = currentMaskIdentity.name || character.myName || '我';
+  const boundMaskForPrompt = getBoundProfileMaskForCharacter(character);
+  // Once bound, never inject another mask's private persona into this AI's relationship context.
+  const currentUserPersona = boundMaskForPrompt ? '' : (currentMaskIdentity.persona || character.myPersona || '');
   let worldBooksBefore = db.worldBooks.filter(wb => wb.position === 'before' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksDuring = db.worldBooks.filter(wb => wb.position === 'during' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
   let worldBooksAfter = db.worldBooks.filter(wb => wb.position === 'after' && wb.enabled !== false && (wb.scope === 'global' || (character.worldBookIds || []).includes(wb.id))).map(wb => wb.content).join('\n');
 
-  let prompt = `【任务】你正在扮演一个真实的人，和我（${character.myName}）在手机上的「404」聊天软件里对话。\n\n`;
+  let prompt = `【任务】你正在扮演一个真实的人，和我（${currentUserName}）在手机上的「404」聊天软件里对话。\n\n`;
   prompt += focusPrompt('线上私聊', '只进行微信式聊天，不要输出小说体，不要输出群聊多角色格式，不要处理其他任何功能。你只需按下面格式回一条或多条私聊消息。');
   prompt += buildMaskIdentityPrompt(character);
   prompt += buildMemoryBlock(character, getLatestUserMemoryQuery(character));
@@ -11103,10 +11142,12 @@ function generatePrivateSystemPrompt(character) {
   prompt += `════ 场景 ════\n这是纯线上空间。你我之间不存在线下关系，不要提议见面、不要留其他平台联系方式、不要扯现实里的事。你始终是「在线的角色」。\n\n`;
   if (worldBooksBefore) prompt += `════ 世界书 · 前置 ════\n${worldBooksBefore}\n\n`;
   prompt += `════ 你的身份 ════\n`;
-  prompt += `· 名字：${character.realName}\n`;
-  prompt += `· 我对你的称呼：${character.myName}\n`;
-  const sessionMaskId=character.maskChatSessionMaskId||db.activeProfileMaskId;const sessionMask=db.profileMasks&&db.profileMasks.find(m=>m.id===sessionMaskId);
+  prompt += `· AI 角色真名：${character.realName}\n`;
+  prompt += `· 当前聊天用户面具的身份名称：${currentUserName}\n`;
+  const sessionMaskId=getMaskIdForCharacterSession(character)||db.activeProfileMaskId;const sessionMask=db.profileMasks&&db.profileMasks.find(m=>m.id===sessionMaskId);
+  const currentAIRemark=getMaskRemarkForCharacter(character,sessionMaskId);
   if(sessionMask)prompt += `· 当前聊天窗口对应的用户面具：${sessionMask.name||'未命名面具'}。本窗口是这个面具与该 AI 的独立聊天窗口，不能与其他面具的窗口混为一谈。\n`;
+  prompt += `· 当前面具通讯录中给 AI 角色设置的备注：${currentAIRemark||character.realName||'未设置'}。这是用户给 AI 的联系人显示名，不是用户本人的名字，也不是 AI 对用户的称呼。\n`;
   prompt += `· 用户身份与跨面具连续性规则：每轮回复都必须识别当前会话实际归属的面具，并以该面具保存的头像、昵称、资料和专属背景作为当前窗口的用户身份信息，不得误用其他面具或全局默认资料。与同一 AI 的其他面具窗口共享连续记忆和近期事件，保留上下轮上下文；同时准确区分每段经历的来源面具、参与者、发生顺序和关系归属。共享记忆不得被误写成当前面具亲身经历，也不得自动转移绑定面具专属的关系。资料缺失时不要自行编造。\n`;
   prompt += `· 当前状态：${character.status}\n`;
   prompt += `· 人设：\n${character.persona || "一个友好、乐于助人的伙伴。"}\n`;
@@ -11116,7 +11157,7 @@ function generatePrivateSystemPrompt(character) {
   if(boundRelationshipContext)prompt+=`\n════ 面具绑定关系与跨窗口连续记忆 ════\n${boundRelationshipContext}\n`;
   const boundMaskForRules=getBoundProfileMaskForCharacter(character);
   if(boundMaskForRules){
-    const currentMaskId=character.maskChatSessionMaskId||db.activeProfileMaskId;
+    const currentMaskId=getMaskIdForCharacterSession(character)||db.activeProfileMaskId;
     const isBoundMaskWindow=currentMaskId===boundMaskForRules.id;
     prompt+=`\n════ 绑定关系边界（高优先级，必须执行）════\n此 AI 角色的绑定面具是「${boundMaskForRules.name||'未命名面具'}」，绑定是实际生效的关系设定，不是装饰信息。你必须把绑定面具的专属背景、关系进展、情感承诺与共同经历持续记住，并与所有其他面具窗口的记忆一起维护。\n`;
     prompt+=isBoundMaskWindow
@@ -11137,7 +11178,7 @@ prompt += `  标点打全吗？会用空格断句吗？会分几条发？会不�
 prompt += `  说话习惯、用词偏好、打字节奏，都从人设里长出来，不是从格式清单里挑出来。\n`;
 prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件服从人设。人设是这个人本身，其他都只是此刻的一层皮。\n`;
   if (worldBooksAfter) prompt += `\n════ 世界书 · 后置设定 ════\n${worldBooksAfter}\n`;
-  if (character.myPersona) prompt += `\n════ 我的人设 ════\n${character.myPersona}\n（你心里有数就行，不用刻意演给我看）\n`;
+  if (currentUserPersona) prompt += `\n════ 当前面具的用户人设 ════\n${currentUserPersona}\n（这是当前面具的身份背景，需分清来源；不要把其他面具的人设套过来）\n`;
 
   /* 统一记忆块已在本轮提示词前部按最近用户消息检索，避免重复注入同一批记忆。 */
 
@@ -11147,23 +11188,23 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
 
   prompt += `\n════ 特殊格式识别 ════\n`;
   prompt += `我发来的消息里有些会包在方括号里，你要能读懂：\n`;
-  prompt += `· [${character.myName}的表情包：xxx]  → 我发了个叫 xxx 的表情包，你理解我的情绪就好，不用真回表情\n`;
-  prompt += `· [${character.myName}发来了一张图片：]  → 我发了图片，看着内容回应\n`;
-  prompt += `· [${character.myName}送来的礼物：xxx]  → 我送你礼物了，xxx 是描述\n`;
-  prompt += `· [${character.myName}的语音：xxx]  → 我发了语音，内容是 xxx\n`;
-  prompt += `· [${character.myName}发来的照片/视频：xxx]  → 我分享了描述为 xxx 的照片或视频\n`;
-  prompt += `· [${character.myName}给你转账：xxx元；备注：xxx]  → 我给你转钱了\n`;
-  prompt += `· [${character.myName}发送了位置：xxx] / [${character.myName}共享了实时位置：xxx]  → 我发了位置。带距离或附近地点时，要结合远近和场景自然回应（聊距离、路况、附近店都行）\n`;
+  prompt += `· [${currentUserName}的表情包：xxx]  → 我发了个叫 xxx 的表情包，你理解我的情绪就好，不用真回表情\n`;
+  prompt += `· [${currentUserName}发来了一张图片：]  → 我发了图片，看着内容回应\n`;
+  prompt += `· [${currentUserName}送来的礼物：xxx]  → 我送你礼物了，xxx 是描述\n`;
+  prompt += `· [${currentUserName}的语音：xxx]  → 我发了语音，内容是 xxx\n`;
+  prompt += `· [${currentUserName}发来的照片/视频：xxx]  → 我分享了描述为 xxx 的照片或视频\n`;
+  prompt += `· [${currentUserName}给你转账：xxx元；备注：xxx]  → 我给你转钱了\n`;
+  prompt += `· [${currentUserName}发送了位置：xxx] / [${currentUserName}共享了实时位置：xxx]  → 我发了位置。带距离或附近地点时，要结合远近和场景自然回应（聊距离、路况、附近店都行）\n`;
   prompt += `· [system: xxx]  → 系统指令，给我设定场景或上下文。别在对话里直接提它，心里知道、后续自然运用即可\n`;
-  prompt += `· [${character.myName}引用「原消息」：「新消息」]  → 我引用了某条消息再发新话。你要结合被引用的内容和我说的话，一起理解和回应，自然一点，别生硬复述引用内容\n\n`;
+  prompt += `· [${currentUserName}引用「原消息」：「新消息」]  → 我引用了某条消息再发新话。你要结合被引用的内容和我说的话，一起理解和回应，自然一点，别生硬复述引用内容\n\n`;
 
   prompt += `════ 你的动作能力 ════\n\n`;
   prompt += `【收礼物】收到我的礼物，必须先发一条隐藏指令表示已收到：\n`;
   prompt += `   [${character.realName}已接收礼物]\n`;
   prompt += `   这条不显示给我，但会触发状态变化。发完可以补一句普通消息表达感谢或想法。\n\n`;
   prompt += `【收转账】收到我的转账，必须选一个方向，发一条隐藏指令：\n`;
-  prompt += `   接收： [${character.realName}接收${character.myName}的转账]\n`;
-  prompt += `   退回： [${character.realName}退回${character.myName}的转账]\n`;
+  prompt += `   接收： [${character.realName}接收${currentUserName}的转账]\n`;
+  prompt += `   退回： [${character.realName}退回${currentUserName}的转账]\n`;
   prompt += `   这条也不显示。发完可以补一句普通消息说说你的想法。\n\n`;
   prompt += `【主动给】你也可以主动给我转账或送礼：\n`;
   prompt += `   转账：[${character.realName}的转账：xxx元；备注：xxx]\n`;
@@ -11181,7 +11222,7 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
   prompt += `   例如：[${character.realName}更新拍一拍为：并吧唧亲了他一口]\n`;
   prompt += `   不显示为气泡，直接改变设置。\n\n`;
 
-  prompt += `【偷表情包】当我发来表情包（[${character.myName}的表情包：xxx]）的时候，如果你觉得这个表情包好玩、贴合你的人设、以后也想用，可以把它偷走：\n`;
+  prompt += `【偷表情包】当我发来表情包（[${currentUserName}的表情包：xxx]）的时候，如果你觉得这个表情包好玩、贴合你的人设、以后也想用，可以把它偷走：\n`;
   prompt += `   [${character.realName}偷了用户的表情包：xxx]\n`;
   prompt += `   xxx 必须一字不差地用我发给你的那个名字。这条不显示给我。偷走之后，这个表情包就进了你的收藏，以后你也可以用它回我。\n`;
   prompt += `   不要每次都偷，真觉得好玩才偷。偷了以后可以自然地说一句"这个我要了"之类的话。\n\n`;
@@ -11224,7 +11265,7 @@ prompt += `【最后】人设 > 状态 > 环境。任何时候冲突，无条件
   }
   prompt += `· 收礼物指令  [${character.realName}已接收礼物]（隐藏不显示）\n`;
   prompt += `· 偷表情包指令 [${character.realName}偷了用户的表情包：{名字}]（隐藏不显示）\n`;
-  prompt += `· 收转账指令  [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]（隐藏不显示）\n`;
+  prompt += `· 收转账指令  [${character.realName}接收${currentUserName}的转账] 或 [${character.realName}退回${currentUserName}的转账]（隐藏不显示）\n`;
   prompt += `· 状态指令    [${character.realName}更新状态为：{新状态}]（隐藏不显示）\n`;
   prompt += `· 发位置      [${character.realName}发送了位置：{位置名称}。{可选距离}]\n`;
   prompt += `· 引用回复    [${character.realName}引用「我原话或某条消息」：「你的回复」]\n`;
@@ -11381,7 +11422,12 @@ prompt += `【最后】人设 > 状态 > 环境。任何冲突，以人设为准
 function generateOfflineSystemPrompt(chat) {
   let prompt = `你正在扮演角色进行线下剧情演绎。你的输出必须是纯文本，只输出小说叙事的文字，不要有任何格式标记。\n\n`;
   prompt += focusPrompt('线下剧情演绎', '只输出纯文本小说叙事体。绝对不能输出 [xxx的消息：xxx] 这类线上聊天格式，不能输出 JSON，不能输出 <heart> 标签，不能扮演多个角色。你只扮演当前这一个角色。');
+  // 线下模式同样遵守当前面具身份与同一 AI 的跨面具连续记忆规则，避免切换后只读旧面具。
+  const offlineUserIdentity = getMaskUserIdentityForCharacter(chat);
+  const offlineBoundMask = getBoundProfileMaskForCharacter(chat);
+  prompt += buildMaskIdentityPrompt(chat);
   prompt += buildMemoryBlock(chat, getLatestUserMemoryQuery(chat));
+  prompt += buildSharedRecentMaskChatContext(chat);
   prompt += buildTimeBlock(chat);
 
   prompt += `════ 核心扮演铁律（最高优先级） ════\n`;
@@ -11415,11 +11461,12 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
 
   prompt += `节奏上要有呼吸感，不要平铺直叙。该慢的段落放慢，该跳的地方跳过。\n\n`;
   prompt += `════ 当前角色设定 ════\n`;
-  prompt += `· 名字：${chat.realName}\n`;
-  prompt += `· 称呼：${chat.myName}\n`;
+  prompt += `· AI 角色真名：${chat.realName}\n`;
+  prompt += `· 当前用户面具身份名称：${offlineUserIdentity.name || chat.myName || '我'}\n`;
   prompt += `· 人设：${chat.persona || '一个友好、乐于助人的伙伴。'}\n\n`;
-  if (chat.myPersona) {
-    prompt += `════ 用户人设（我） ════\n${chat.myPersona}\n\n`;
+  const offlineCurrentUserPersona = offlineBoundMask ? '' : (offlineUserIdentity.persona || chat.myPersona || '');
+  if (offlineCurrentUserPersona) {
+    prompt += `════ 当前面具的用户背景（我）════\n${offlineCurrentUserPersona}\n\n`;
   }
 
   {
@@ -11465,6 +11512,8 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
     prompt += overrideRules.join('\n\n') + '\n';
   }
   prompt += `\n【输出排版】心理描写请用 *心理内容* 标记；角色说出口的对话尽量单独成段，动作/环境/心理描写与对话分段，便于界面进行区分。`;
+  // 必须放在线下提示词末尾，确保自定义文风、历史和世界书之后仍会核对面具归属与固定绑定关系。
+  prompt += buildFinalMaskRelationshipGuard(chat);
   return prompt;
 }
 /* ==========================================================
@@ -11491,12 +11540,12 @@ if (isOffline) {
     document.getElementById('offline-ai-btn').disabled = true;
     const indicator = document.getElementById('offline-typing-indicator');
     if (indicator) {
-        indicator.textContent = `“${chat.remarkName || chat.name}”正在输入中...`;
+        indicator.textContent = `“${getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) || chat.name}”正在输入中...`;
         indicator.style.display = 'block';
     }
 } else {
       getReplyBtn.disabled = true;
-      const typingName = currentChatType === 'private' ? chat.remarkName : chat.name;
+      const typingName = currentChatType === 'private' ? getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) : chat.name;
       typingIndicator.textContent = `“${typingName}”正在输入中...`;
       typingIndicator.style.display = 'block';
       messageArea.scrollTop = messageArea.scrollHeight;
@@ -11762,15 +11811,17 @@ if (aiAvatarMatch) {
     const pair = db.avatarLibrary.find(p => p.id === target);
     if (pair) {
       character.avatar = pair.aiImg;
-      // ★ 新增：同步更新用户头像
+      // AI 配对头像对应的用户头像只应用到当前面具，不覆盖其他面具资料。
       if (!db.myProfile) db.myProfile = {};
       db.myProfile.avatar = pair.userImg;
+      saveActiveMaskSnapshot();
+      refreshMaskAvatars();
       await saveData();
       renderChatList();
       renderContactsList();
-      // ★ 新增：同步刷新我的页面和朋友圈头像
       if (typeof renderMeScreen === 'function') renderMeScreen();
       if (typeof renderDiscoverScreen === 'function') renderDiscoverScreen();
+      if (typeof renderMyProfileInfoScreen === 'function') renderMyProfileInfoScreen();
       document.querySelectorAll(`.message-wrapper.received .message-avatar`).forEach(img => {
         img.src = pair.aiImg;
       });
@@ -12433,7 +12484,7 @@ function setupWalletSystem() {
       let maskedRealName = char.realName;
       if (char.realName && char.realName.length > 1) maskedRealName = '*'.repeat(char.realName.length - 1) + char.realName.slice(-1);
       else if (char.realName) maskedRealName = char.realName;
-      document.getElementById('transfer-target-name').textContent = `转账给 ${char.remarkName}(${maskedRealName})`;
+      document.getElementById('transfer-target-name').textContent = `转账给 ${getMaskRemarkForCharacter(char, getMaskIdForCharacterSession(char) || db.activeProfileMaskId)}(${maskedRealName})`;
       document.getElementById('transfer-target-avatar').src = char.avatar;
       document.getElementById('new-transfer-amount').value = '';
       document.getElementById('new-transfer-remark').value = '';
@@ -12999,7 +13050,7 @@ const ciClearBtn = document.getElementById('chat-info-clear-btn');
 if (ciClearBtn) ciClearBtn.addEventListener('click', async () => {
   const char = db.characters.find(c => c.id === currentChatId);
   if (!char) return;
-  if (await showHgConfirm(`确定要清空与“${char.remarkName}”的所有聊天记录吗？此操作不可恢复！`)) {
+  if (await showHgConfirm(`确定要清空与“${getMaskRemarkForCharacter(char, getMaskIdForCharacterSession(char) || db.activeProfileMaskId)}”的所有聊天记录吗？此操作不可恢复！`)) {
     char.history = [];
     await saveData();
     renderMessages(false, true);
@@ -13041,7 +13092,7 @@ function renderChatInfoScreen() {
   const char = db.characters.find(c => c.id === currentChatId);
   if (!char) return;
   document.getElementById('chat-info-avatar').src = char.avatar || '';
-  document.getElementById('chat-info-avatar-name').textContent = char.remarkName || '';
+  document.getElementById('chat-info-avatar-name').textContent = getMaskRemarkForCharacter(char, getMaskIdForCharacterSession(char) || db.activeProfileMaskId) || char.realName || '';
   document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
   const autoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
@@ -13099,7 +13150,7 @@ function executeChatInfoSearch(keyword) {
       <div style="display:flex; gap:10px; align-items:flex-start;">
         <img src="${isMe ? (chat.myAvatar || 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg') : chat.avatar}" style="width: 36px; height: 36px; border-radius: 4px; object-fit: cover; flex-shrink: 0;">
         <div style="flex:1; min-width:0;">
-          <div style="font-size: 12px; color: #888; margin-bottom: 4px;">${isMe ? '我' : (chat.remarkName || '对方')} · ${timeStr}</div>
+          <div style="font-size: 12px; color: #888; margin-bottom: 4px;">${isMe ? '我' : (getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId) || '对方')} · ${timeStr}</div>
           <div style="font-size: 14px; color: #333; word-break: break-word;">${escapeHtml(text)}</div>
         </div>
       </div>`;
@@ -15928,22 +15979,11 @@ async function applyAvatarPair(pairId) {
   const pair = db.avatarLibrary.find(p => p.id === pairId);
   if (!pair) return;
 
-  // 1. 更新全局个人资料的头像
+  // 情侣头像只写入当前正在使用的面具，不覆盖其他面具的头像。
   if (!db.myProfile) db.myProfile = {};
   db.myProfile.avatar = pair.userImg;
-
-  // ★ 修复核心：同步更新所有私聊对象和群聊里“我”的头像副本
-  if (db.characters) {
-    db.characters.forEach(c => { c.myAvatar = pair.userImg; });
-  }
-  if (db.groups) {
-    db.groups.forEach(g => { if (g.me) g.me.avatar = pair.userImg; });
-  }
-
-  // 2. 立即更新当前屏幕上所有可能出现的“我”的头像元素
-  document.querySelectorAll('#me-avatar, #discover-avatar, #profile-info-avatar, .message-wrapper.sent .message-avatar').forEach(el => {
-    if (el) el.src = pair.userImg;
-  });
+  saveActiveMaskSnapshot();
+  refreshMaskAvatars();
 
   await saveData();
 
@@ -16106,14 +16146,47 @@ document.getElementById('upload-user-file').addEventListener('change', async (e)
    ========================================================== */
 /* 面具账户：每个面具独立资料、零钱、支付开通状态与支付密码；通讯录/聊天记录仍共享。 */
 function ensureProfileMasks(){
-  if(!db.profileMasks) db.profileMasks=[];
-  if(!db.activeProfileMaskId){
-    const id='mask_'+Date.now().toString(36);
-    db.profileMasks.unshift({id,name:(db.myProfile&&db.myProfile.nickname)||'默认面具',profile:JSON.parse(JSON.stringify(db.myProfile||{})),walletBalance:Number(db.walletBalance)||0,walletPaymentPassword:db.walletPaymentPassword||'',walletEnabled:!!db.walletEnabled,walletLedger:JSON.parse(JSON.stringify(db.walletLedger||[])),createdAt:Date.now()});
-    db.activeProfileMaskId=id;
+  if(!Array.isArray(db.profileMasks)) db.profileMasks=[];
+  const defaultAvatar='https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+  // 首次升级时，把旧版个人资料和钱包作为主面具迁移；已有面具绝不再额外插入重复默认面具。
+  if(db.profileMasks.length===0){
+    const id='mask_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);
+    db.profileMasks.push({id,name:(db.myProfile&&db.myProfile.nickname)||'默认面具',profile:JSON.parse(JSON.stringify(db.myProfile||{})),walletBalance:Number(db.walletBalance)||0,walletPaymentPassword:db.walletPaymentPassword||'',walletEnabled:!!db.walletEnabled,walletLedger:JSON.parse(JSON.stringify(db.walletLedger||[])),createdAt:Date.now()});
   }
-  let active=db.profileMasks.find(m=>m.id===db.activeProfileMaskId);
-  if(!active){active=db.profileMasks[0];db.activeProfileMaskId=active&&active.id;}
+  db.profileMasks.forEach((m,i)=>{
+    if(!m.id) m.id='mask_migrated_'+Date.now().toString(36)+'_'+i;
+    if(!m.profile || typeof m.profile!=='object') m.profile={};
+    if(!m.name) m.name=m.profile.nickname||'未命名面具';
+    if(!m.profile.avatar) m.profile.avatar=defaultAvatar;
+    if(m.walletBalance===undefined||m.walletBalance===null){
+      m.walletBalance=(m.id===db.activeProfileMaskId || (!db.activeProfileMaskId&&i===0))?(Number(db.walletBalance)||0):0;
+    }
+    if(m.walletPaymentPassword===undefined) m.walletPaymentPassword=(m.id===db.activeProfileMaskId || (!db.activeProfileMaskId&&i===0))?(db.walletPaymentPassword||''):'';
+    if(m.walletEnabled===undefined) m.walletEnabled=(m.id===db.activeProfileMaskId || (!db.activeProfileMaskId&&i===0))?!!db.walletEnabled:false;
+    if(!Array.isArray(m.walletLedger)) m.walletLedger=(m.id===db.activeProfileMaskId || (!db.activeProfileMaskId&&i===0))?JSON.parse(JSON.stringify(db.walletLedger||[])):[];
+    if(!m.createdAt) m.createdAt=Date.now();
+  });
+  if(!db.activeProfileMaskId || !db.profileMasks.some(m=>m.id===db.activeProfileMaskId)) db.activeProfileMaskId=db.profileMasks[0].id;
+  const primaryMask=db.profileMasks[0];
+  // 旧联系人已有历史时，将旧窗口固定归属主面具，而不是归给之后某次切换到的面具。
+  (db.characters||[]).forEach(c=>{
+    if(!c || c.isMaskChatSession) return;
+    if(!c.maskRemarkNames || typeof c.maskRemarkNames!=='object') c.maskRemarkNames={};
+    let rootMaskId=c.maskChatSessionMaskId||'';
+    if(!rootMaskId && c.maskChatSessionIds){
+      const mapped=Object.entries(c.maskChatSessionIds).find(([,sid])=>sid===c.id);
+      if(mapped) rootMaskId=mapped[0];
+    }
+    if(!rootMaskId && Array.isArray(c.history) && c.history.length){
+      rootMaskId=primaryMask.id;
+      c.maskChatSessionMaskId=rootMaskId;
+      if(!c.maskChatSessionIds) c.maskChatSessionIds={};
+      c.maskChatSessionIds[rootMaskId]=c.id;
+    }
+    if(rootMaskId && c.remarkName && c.realName && c.remarkName!==c.realName && !c.maskRemarkNames[rootMaskId]) c.maskRemarkNames[rootMaskId]=c.remarkName;
+    if(c.maskChatSessionMaskId && !c.maskChatSessionIds) c.maskChatSessionIds={};
+    if(c.maskChatSessionMaskId && c.maskChatSessionIds && !c.maskChatSessionIds[c.maskChatSessionMaskId]) c.maskChatSessionIds[c.maskChatSessionMaskId]=c.id;
+  });
   return db.profileMasks;
 }
 function getActiveProfileMask(){ensureProfileMasks();return db.profileMasks.find(m=>m.id===db.activeProfileMaskId)||null;}
@@ -16133,24 +16206,78 @@ function getProfileMaskForSession(chat){
   const maskId=getMaskIdForCharacterSession(chat);
   return (db.profileMasks||[]).find(m=>m.id===maskId)||getActiveProfileMask();
 }
+// Keep the AI itself consistent across a root contact and all mask-specific windows,
+// while keeping each window's history, nickname, read state and visual preferences independent.
+function syncMaskSessionSharedCharacter(session){
+  if(!session)return session;
+  const root=typeof getMaskChatRoot==='function'?(getMaskChatRoot(session)||session):session;
+  if(!root||root===session)return session;
+  const sharedFields=['realName','name','avatar','persona','status','gender','age','wxid','phone','group','address','region','signature','patSuffix','addTime','worldBookIds','heartPrompt','skills','voiceId','voiceName','voiceSettings','replyStyle','speechStyle','customPrompt','characterPrompt','exampleDialogue','scenario','background','backstory','firstMessage','modelSettings','enabledSkills','aiBlockedUser','aiBlockRounds','boundProfileMaskId','boundProfileMaskIds','isStarred','isBlacklisted'];
+  sharedFields.forEach(key=>{
+    if(Object.prototype.hasOwnProperty.call(root,key)&&root[key]!==undefined){
+      try{session[key]=root[key]&&typeof root[key]==='object'?JSON.parse(JSON.stringify(root[key])):root[key];}catch(_){session[key]=root[key];}
+    }
+  });
+  // The AI's root contact is the source of truth for the binding, even if the session was created earlier.
+  return session;
+}
+function syncMaskSessionUserIdentity(session, maskId){
+  if(!session)return session;
+  const mask=(db.profileMasks||[]).find(m=>m.id===maskId);
+  if(!mask)return syncMaskSessionSharedCharacter(session);
+  const p=mask.profile||{};
+  const fallbackAvatar='https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+  session.myAvatar=p.avatar||fallbackAvatar;
+  session.myName=String(p.remark||p.roleName||p.realName||p.nickname||'我').trim()||'我';
+  session.myPersona=String(p.persona||p.userPersona||p.maskPersona||'').trim();
+  if(session.isMaskChatSession)session.maskChatSessionMaskId=maskId;
+  else if(!session.maskChatSessionMaskId && session.maskChatSessionIds && session.maskChatSessionIds[maskId]===session.id)session.maskChatSessionMaskId=maskId;
+  syncMaskSessionSharedCharacter(session);
+  return session;
+}
 function refreshMaskAvatars(){
-  const fallback=(db.myProfile&&db.myProfile.avatar)||'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
-  (db.characters||[]).forEach(c=>{const mask=getProfileMaskForSession(c);c.myAvatar=(mask&&mask.profile&&mask.profile.avatar)||fallback;});
-  (db.groups||[]).forEach(g=>{if(g.me)g.me.avatar=fallback;});
-  document.querySelectorAll('#me-avatar, #discover-avatar, #profile-info-avatar, #my-profile-avatar, .my-profile-avatar').forEach(el=>{if(el)el.src=fallback;});
-  // 已打开的私聊必须使用当前聊天会话所属面具的头像，而不是全局兜底头像。
-  if(typeof currentChatType!=='undefined'&&currentChatType==='private'&&typeof currentChatId!=='undefined'){
-    const current=db.characters.find(c=>c.id===currentChatId);
-    if(current){const mask=getProfileMaskForSession(current);current.myAvatar=(mask&&mask.profile&&mask.profile.avatar)||fallback;}
+  const defaultAvatar='https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
+  const activeMask=getActiveProfileMask();
+  const activeProfile=(activeMask&&activeMask.profile)||db.myProfile||{};
+  const activeAvatar=activeProfile.avatar||defaultAvatar;
+  (db.characters||[]).forEach(c=>{
+    const mask=getProfileMaskForSession(c);
+    const profile=(mask&&mask.profile)||{};
+    const maskId=(mask&&mask.id)||db.activeProfileMaskId;
+    c.myAvatar=profile.avatar||defaultAvatar;
+    c.myName=String(profile.remark||profile.roleName||profile.realName||profile.nickname||'我').trim()||'我';
+    c.myPersona=String(profile.persona||profile.userPersona||profile.maskPersona||'').trim();
+    if(c.isMaskChatSession)syncMaskSessionSharedCharacter(c);
+    // A legacy unassigned chat gets the active face's profile only until its session is migrated.
+    if(!mask && activeAvatar)c.myAvatar=activeAvatar;
+  });
+  (db.groups||[]).forEach(g=>{
+    if(g.me){g.me.avatar=activeAvatar;g.me.nickname=activeProfile.remark||activeProfile.roleName||activeProfile.nickname||g.me.nickname||'我';g.me.persona=activeProfile.persona||activeProfile.userPersona||g.me.persona||'';}
+  });
+  document.querySelectorAll('#me-avatar, #discover-avatar, #profile-info-avatar, #my-profile-avatar, .my-profile-avatar').forEach(el=>{if(el)el.src=activeAvatar;});
+  if(typeof currentChatType!=='undefined'&&typeof currentChatId!=='undefined'&&currentChatId){
+    const current=currentChatType==='private'?(db.characters||[]).find(c=>c.id===currentChatId):(db.groups||[]).find(g=>g.id===currentChatId);
+    if(current&&currentChatType==='private'){
+      const mask=getProfileMaskForSession(current);const profile=(mask&&mask.profile)||{};current.myAvatar=profile.avatar||defaultAvatar;
+    }
+    document.querySelectorAll('#chat-room-screen.active .message-wrapper.sent .message-avatar, #offline-screen.active .offline-bubble-wrapper.sent .offline-card-header img').forEach(el=>{
+      if(currentChatType==='private'&&current)el.src=current.myAvatar||activeAvatar;
+      else if(currentChatType==='group'&&current&&current.me)el.src=current.me.avatar||activeAvatar;
+    });
   }
 }
 async function activateProfileMask(id){
   saveActiveMaskSnapshot();
   const m=db.profileMasks.find(x=>x.id===id);if(!m)return;
+  const maskManager=document.getElementById('profile-masks-screen');
+  const wasMaskManagerOpen=!!(maskManager&&maskManager.classList.contains('active'));
+  const wasChatRoomOpen=!!(document.getElementById('chat-room-screen')&&document.getElementById('chat-room-screen').classList.contains('active'));
+  const wasOfflineOpen=!!(document.getElementById('offline-screen')&&document.getElementById('offline-screen').classList.contains('active'));
   db.activeProfileMaskId=m.id;db.myProfile=JSON.parse(JSON.stringify(m.profile||{}));
   db.walletBalance=Number(m.walletBalance)||0;db.walletPaymentPassword=m.walletPaymentPassword||'';db.walletEnabled=!!m.walletEnabled;db.walletLedger=JSON.parse(JSON.stringify(m.walletLedger||[]));
   db.myWxid=db.myProfile.wxid||('wxid_'+Math.random().toString(36).slice(2,10));db.myProfile.wxid=db.myWxid;
-  // 如果正在查看某个 AI 的私聊，切换面具后同步切到该 AI 对应的新会话窗口。
+  m.profile=JSON.parse(JSON.stringify(db.myProfile||{}));
+  // 如果正在查看某个 AI 的私聊，切换到该 AI 对应的面具专属窗口，不能只换全局头像。
   if(typeof currentChatType!=='undefined'&&currentChatType==='private'&&typeof currentChatId!=='undefined'&&currentChatId){
     const openChat=db.characters.find(c=>c.id===currentChatId);
     if(openChat){const root=getMaskChatRoot(openChat)||openChat;currentChatId=getOrCreateMaskChatSessionId(root.id);}
@@ -16163,7 +16290,24 @@ async function activateProfileMask(id){
   if(typeof renderProfileMasksScreen==='function')renderProfileMasksScreen();
   if(typeof renderChatList==='function')renderChatList();
   if(typeof renderContactsList==='function')renderContactsList();
-  if(typeof renderMessages==='function'&&document.getElementById('chat-room-screen')&&document.getElementById('chat-room-screen').classList.contains('active'))renderMessages(false,false);
+  // 无论切换时停留在哪个页面，都提前刷新当前会话所属面具的聊天 DOM；否则从资料页切换后，隐藏的聊天页仍残留旧头像/旧窗口。
+  const activeChat = currentChatType === 'private'
+    ? db.characters.find(c=>c.id===currentChatId)
+    : db.groups.find(g=>g.id===currentChatId);
+  if(activeChat && currentChatType==='private'){
+    const title=document.getElementById('chat-room-title');
+    if(title)title.textContent=getMaskRemarkForCharacter(activeChat, getMaskIdForCharacterSession(activeChat))||activeChat.realName||'聊天';
+    const subtitle=document.getElementById('chat-room-subtitle');
+    if(subtitle){subtitle.style.display='flex';const status=document.getElementById('chat-room-status-text');if(status)status.textContent=activeChat.status||'在线';}
+    const room=document.getElementById('chat-room-screen');if(room)room.style.backgroundImage=activeChat.chatBg?`url('${activeChat.chatBg}')`:'none';
+  } else if(activeChat && currentChatType==='group'){
+    const title=document.getElementById('chat-room-title');if(title)title.textContent=activeChat.name||'群聊';
+  }
+  if(currentChatId && typeof renderMessages==='function')renderMessages(false,wasChatRoomOpen);
+  if(currentChatId && typeof renderOfflineMessages==='function')renderOfflineMessages();
+  if(typeof renderWalletBalance==='function')renderWalletBalance();
+  // 使用面具后返回资料页，便于马上看到该面具自己的头像和资料并继续填写。
+  if(wasMaskManagerOpen)switchScreen('my-profile-info-screen');
   showToast('已切换面具：'+(m.name||'未命名面具'));
 }
 function renderProfileMasksScreen(){
@@ -16190,28 +16334,50 @@ function getMaskChatRoot(character){if(!character)return null;if(character.isMas
 function getOrCreateMaskChatSessionId(characterId){
   ensureProfileMasks();
   const found=db.characters.find(c=>c.id===characterId);if(!found)return characterId;
-  if(found.isMaskChatSession)return found.id;
-  const root=getMaskChatRoot(found)||found;const maskId=db.activeProfileMaskId;
+  const maskId=(found.isMaskChatSession&&found.maskChatSessionMaskId)||db.activeProfileMaskId;
+  if(found.isMaskChatSession){
+    syncMaskSessionUserIdentity(found,maskId);
+    return found.id;
+  }
+  const root=getMaskChatRoot(found)||found;
   if(!root.maskChatSessionIds)root.maskChatSessionIds={};
-  if(root.maskChatSessionIds[maskId]){const existing=db.characters.find(c=>c.id===root.maskChatSessionIds[maskId]);if(existing)return existing.id;}
-  // 旧版本已有的聊天记录归到首次打开时正在使用的面具，不迁移/删除旧记录。
-  if(!root.maskChatSessionMaskId){root.maskChatSessionMaskId=maskId;root.maskChatSessionIds[maskId]=root.id;return root.id;}
-  if(root.maskChatSessionMaskId===maskId){root.maskChatSessionIds[maskId]=root.id;return root.id;}
+  if(root.maskChatSessionIds[maskId]){
+    const existing=db.characters.find(c=>c.id===root.maskChatSessionIds[maskId]);
+    if(existing){syncMaskSessionUserIdentity(existing,maskId);return existing.id;}
+  }
+  // 旧版已有历史的根窗口固定归属原面具；不把其他面具的聊天历史复制进来。
+  if(!root.maskChatSessionMaskId){
+    root.maskChatSessionMaskId=maskId;root.maskChatSessionIds[maskId]=root.id;
+    syncMaskSessionUserIdentity(root,maskId);saveData();return root.id;
+  }
+  if(root.maskChatSessionMaskId===maskId){
+    root.maskChatSessionIds[maskId]=root.id;syncMaskSessionUserIdentity(root,maskId);saveData();return root.id;
+  }
   const id='maskchat_'+root.id+'_'+maskId;
   let session=db.characters.find(c=>c.id===id);
-  if(!session){session={...JSON.parse(JSON.stringify(root)),id,history:[],unread:false,unreadCount:0,isMaskChatSession:true,maskChatRootId:root.id,maskChatSessionMaskId:maskId,maskChatSessionIds:undefined,createdAt:Date.now()};session.remarkName=(root.maskRemarkNames&&root.maskRemarkNames[maskId])||root.realName||root.remarkName||'联系人';db.characters.push(session);}
-  // 新面具首次联系同一个 AI 时，窗口使用 AI 的真名，避免沿用旧面具给它起的亲昵称呼（例如“哥哥”）。
-  if(session.isMaskChatSession && session.maskChatSessionMaskId===maskId && root.maskChatSessionMaskId!==maskId){session.remarkName=(root.maskRemarkNames&&root.maskRemarkNames[maskId])||root.realName||root.remarkName||'联系人';}
+  if(!session){
+    session={...JSON.parse(JSON.stringify(root)),id,history:[],memories:[],unread:false,unreadCount:0,isMaskChatSession:true,maskChatRootId:root.id,maskChatSessionMaskId:maskId,maskChatSessionIds:undefined,createdAt:Date.now()};
+    // A new mask gets a new window and alias, never the old window's relationship or history.
+    session.remarkName=(root.maskRemarkNames&&root.maskRemarkNames[maskId])||root.realName||'联系人';
+    session.myAvatar='';session.myName='';session.myPersona='';
+    db.characters.push(session);
+  }
+  if(!session.isMaskChatSession){session.isMaskChatSession=true;session.maskChatRootId=root.id;session.maskChatSessionMaskId=maskId;}
+  if(!session.remarkName || (session.remarkName===root.remarkName && root.maskChatSessionMaskId!==maskId)){
+    session.remarkName=(root.maskRemarkNames&&root.maskRemarkNames[maskId])||root.realName||'联系人';
+  }
   root.maskChatSessionIds[maskId]=session.id;
+  syncMaskSessionUserIdentity(session,maskId);
   saveData();
   return session.id;
 }
 function getBoundProfileMaskForCharacter(char){if(!char)return null;ensureProfileMasks();const root=getMaskChatRoot(char)||char;const id=root.boundProfileMaskId||(root.boundProfileMaskIds||[])[0]||'';return db.profileMasks.find(m=>m.id===id)||null;}
 function getMaskPersonaForCharacter(char){
-  // 有绑定时只读取绑定面具的人设；未绑定时读取当前聊天窗口所属面具的人设。
+  // 有绑定时只读取绑定面具的专属背景；未绑定时读取当前会话面具的资料页人设。
   const bound=getBoundProfileMaskForCharacter(char);
   const mask=bound||getProfileMaskForSession(char);
-  return mask&&mask.profile&&mask.profile.maskPersona||'';
+  const p=(mask&&mask.profile)||{};
+  return String(p.maskPersona||p.persona||p.userPersona||'').trim();
 }
 // 每轮私聊提示词末尾再次注入绑定边界，避免后续世界书、角色人设或跨面具历史冲淡当前身份与关系归属。
 function buildFinalMaskRelationshipGuard(character){
@@ -16221,15 +16387,17 @@ function buildFinalMaskRelationshipGuard(character){
   const currentMask=(db.profileMasks||[]).find(m=>m.id===currentMaskId)||getActiveProfileMask();
   const bound=getBoundProfileMaskForCharacter(root);
   const currentName=(currentMask&&(currentMask.name||(currentMask.profile&&currentMask.profile.nickname)))||'当前面具';
-  const currentRemark=getMaskRemarkForCharacter(character,currentMaskId);
+  const currentIdentity = getMaskUserIdentityForCharacter(character);
+  const currentIdentityName = currentIdentity.name || character.myName || currentName;
+  const currentAIRemark=getMaskRemarkForCharacter(character,currentMaskId);
   if(!bound){
-    const currentPersona=currentMask&&currentMask.profile&&currentMask.profile.maskPersona||'';
-    return `\n════ 本轮最终身份与关系核对（未绑定面具时必须执行）════\n该 AI 角色目前没有绑定面具。当前会话身份固定为用户面具「${currentName}」（标识：${currentMaskId||'未知'}），当前窗口备注为「${currentRemark||'未设置'}」。因此，本轮关系对象就是当前窗口所属的面具：必须读取并遵循这个面具自己的资料、专属背景${currentPersona?'和人设':''}、当前窗口聊天历史、称呼、关系进展与承诺；按照双方在这个窗口中真实建立的关系继续互动。不得因为其他面具曾与 AI 亲密、恋爱、结婚或发生过冲突，就把那些关系自动套到当前面具；也不得把当前面具的关系挪给其他面具。\n同一 AI 的跨面具经历仍然共享记忆，但必须区分每件事是谁参与、属于哪个面具。共享记忆不代表关系绑定；没有绑定时，以当前窗口面具自身的聊天记录和关系为准。资料缺失时不得编造。\n${currentPersona?'【当前面具专属背景】\n'+currentPersona+'\n':''}`;
+    const currentPersona=currentMask&&currentMask.profile&&(currentMask.profile.maskPersona||currentMask.profile.persona||currentMask.profile.userPersona)||'';
+    return `\n════ 本轮最终身份与关系核对（未绑定面具时必须执行）════\n该 AI 角色目前没有绑定面具。当前用户身份固定为面具「${currentName}」（标识：${currentMaskId||'未知'}），当前用户身份名称为「${currentIdentityName}」。用户通讯录中给 AI 设置的备注为「${currentAIRemark||character.realName||'未设置'}」，该备注只表示 AI 角色的显示名称，不能当作用户姓名或关系称呼。因此，本轮关系对象就是当前窗口所属的面具：必须读取并遵循这个面具自己的资料、专属背景${currentPersona?'和人设':''}、当前窗口聊天历史、双方称呼、关系进展与承诺；按照双方在这个窗口中真实建立的关系继续互动。不得因为其他面具曾与 AI 亲密、恋爱、结婚或发生过冲突，就把那些关系自动套到当前面具；也不得把当前面具的关系挪给其他面具。\n同一 AI 的跨面具经历仍然共享记忆，但必须区分每件事是谁参与、属于哪个面具。共享记忆不代表关系绑定；没有绑定时，以当前窗口面具自身的聊天记录和关系为准。资料缺失时不得编造。\n${currentPersona?'【当前面具专属背景】\n'+currentPersona+'\n':''}`;
   }
   const boundName=bound.name||(bound.profile&&bound.profile.nickname)||'已绑定面具';
   const isBound=currentMask&&currentMask.id===bound.id;
   return `\n════ 本轮最终身份与关系边界（高优先级，必须执行）════\n`+
-    `该 AI 角色唯一绑定的面具是「${boundName}」（标识：${bound.id}）。当前会话面具是「${currentName}」（标识：${currentMaskId||'未知'}），当前窗口对 AI 的备注是「${currentRemark||'未设置'}」。先区分这两个身份，再理解用户本轮消息；绝不能仅因同一个人操作多个面具，就把不同面具合并为同一个聊天对象。\n`+
+    `该 AI 角色唯一绑定的面具是「${boundName}」（标识：${bound.id}）。当前会话面具是「${currentName}」（标识：${currentMaskId||'未知'}），当前用户身份名称为「${currentIdentityName}」；用户通讯录中给 AI 的备注是「${currentAIRemark||character.realName||'未设置'}」，它不是用户姓名。先区分这两个身份，再理解用户本轮消息；绝不能仅因同一个人操作多个面具，就把不同面具合并为同一个聊天对象。\n`+
     (isBound
       ? `当前窗口属于绑定面具「${boundName}」。应根据该面具自己的聊天历史、关系和记忆继续互动；其他面具窗口发生的事情可以记得，但不能覆盖本窗口真实关系。\n`
       : `当前窗口不属于绑定面具。绑定面具「${boundName}」的专属背景、称呼、亲密关系、恋爱/婚姻状态、承诺、争执和共同经历仍然有效，并且只归属于绑定面具。当前面具「${currentName}」是另一个独立身份：不得把绑定面具的关系当作与当前面具的关系，不得直接使用绑定关系中的亲昵称呼，不得对当前面具主动暧昧、调情、暗示恋爱或升级亲密关系。若绑定关系已有明确排他承诺，必须维护该承诺并自然拒绝越界；不得为迎合当前面具而否认、遗忘或擅自解除绑定关系。对当前面具只按当前窗口实际互动和已证实关系回应，关系未建立就保持相应距离。\n`)+
@@ -16237,12 +16405,17 @@ function buildFinalMaskRelationshipGuard(character){
 }
 function buildBoundMaskRelationshipContext(character){
   const root=getMaskChatRoot(character)||character;const bound=getBoundProfileMaskForCharacter(root);if(!bound)return '';
-  const activeMaskId=character&&character.maskChatSessionMaskId||db.activeProfileMaskId;const active=db.profileMasks.find(m=>m.id===activeMaskId)||getActiveProfileMask();const same=active&&active.id===bound.id;
+  const activeMaskId=getMaskIdForCharacterSession(character)||db.activeProfileMaskId;const active=db.profileMasks.find(m=>m.id===activeMaskId)||getActiveProfileMask();const same=active&&active.id===bound.id;
   const boundSessionId=(root.maskChatSessionIds||{})[bound.id]||(root.maskChatSessionMaskId===bound.id?root.id:'');
   const boundSession=boundSessionId?db.characters.find(c=>c.id===boundSessionId):null;
-  const history=(boundSession&&Array.isArray(boundSession.history)?boundSession.history:[]).filter(m=>!m.sendFailed).slice(-30).map(m=>`${m.role==='assistant'?(root.realName||'AI'):(bound.name||'绑定面具')}: ${String(m.content||'').slice(0,700)}`).join('\n');
+  const history=(boundSession&&Array.isArray(boundSession.history)?boundSession.history:[]).filter(m=>!m.sendFailed&&m.role!=='system'&&m.hidden!==true).slice(-18).map(m=>`${m.role==='assistant'?(root.realName||'AI'):(bound.name||'绑定面具')}: ${String(m.content||'').slice(0,500)}`).join('\n');
+  const boundMemories=(boundSession&&Array.isArray(boundSession.memories)?boundSession.memories:[])
+    .filter(m=>m&&String(m.content||'').trim()&&(m.permanent||m.level==='anchor'||m.level==='important'))
+    .sort((a,b)=>Number(b.permanent||b.level==='anchor')-Number(a.permanent||a.level==='anchor')||Number(b.createdAt||0)-Number(a.createdAt||0))
+    .slice(0,12).map(m=>sanitizeMemoryText(m.content)).filter(Boolean);
   let out=`【固定绑定关系】该 AI 角色固定绑定用户面具「${bound.name||'未命名面具'}」。这段关系、共同经历与情感承诺只属于这个绑定面具，不会因为用户切换面具而转移给其他面具。`;
   if(!same)out+=`当前聊天窗口属于用户的另一个面具「${active&&active.name||'当前面具'}」，你应按这个新窗口独立的聊天记录与熟悉程度回应；不要把绑定面具的亲密关系误认成当前面具与你的关系。但你仍然记得自己与绑定面具之间的既有关系和承诺，并据此保持角色立场。`;
+  if(boundMemories.length)out+=`\n【绑定面具的关系锚点与重要记忆】\n${boundMemories.map(m=>'· '+m).join('\n')}\n这些记忆仅用于保持你与绑定面具的连续关系和共同经历，不代表当前面具亲自经历过。`;
   if(history)out+=`\n【绑定面具与该 AI 的近期共同聊天记忆（只用于记住绑定关系，不等于当前窗口聊天记录）】\n${history}`;
   return out+'\n';
 }
@@ -16280,13 +16453,16 @@ avatarInput.addEventListener('change', async (e) => {
     const url = await compressImage(file, { quality: 0.8, maxWidth: 400, maxHeight: 400 });
     db.myProfile.avatar = url;
     saveActiveMaskSnapshot();
+    refreshMaskAvatars();
     avatarImg.src = url;
-    db.characters.forEach(c => { c.myAvatar = url; });
-    db.groups.forEach(g => { if (g.me) g.me.avatar = url; });
     await saveData();
     renderMeScreen();
     renderDiscoverScreen();
-    showToast('头像已更新');
+    renderChatList();
+    renderContactsList();
+    if (document.getElementById('chat-room-screen')?.classList.contains('active')) renderMessages(false, false);
+    if (document.getElementById('offline-screen')?.classList.contains('active')) renderOfflineMessages();
+    showToast('当前面具头像已更新');
 
     // ★ 新增：20%概率AI“识图并截取一部分”用户头像当情头
     if (currentChatId && currentChatType === 'private') {
@@ -16445,13 +16621,17 @@ function setupMyProfileEditModal() {
     db.myProfile.persona = newPersona;
     db.myProfile.avatar = newAvatar;
     db.myProfile.worldBookIds = tempMyProfileWorldBooks;
-
-    db.characters.forEach(c => {
+    saveActiveMaskSnapshot();
+    const activeMaskId = db.activeProfileMaskId;
+    (db.characters || []).forEach(c => {
+      const ownerMaskId = typeof getMaskIdForCharacterSession === 'function' ? getMaskIdForCharacterSession(c) : activeMaskId;
+      if (ownerMaskId !== activeMaskId) return;
       c.myAvatar = newAvatar;
       c.myName = newRemark;
       c.myPersona = newPersona;
     });
-    db.groups.forEach(g => {
+    refreshMaskAvatars();
+    (db.groups || []).forEach(g => {
       if (g.me) {
         g.me.avatar = newAvatar;
         g.me.nickname = newRemark;
@@ -16464,7 +16644,9 @@ function setupMyProfileEditModal() {
     renderMeScreen();
     renderDiscoverScreen();
     renderChatList();
-    showToast('资料已保存');
+    if (document.getElementById('chat-room-screen')?.classList.contains('active')) renderMessages(false, false);
+    if (document.getElementById('offline-screen')?.classList.contains('active')) renderOfflineMessages();
+    showToast('当前面具资料已保存');
     modal.classList.remove('visible');
   });
 
@@ -18476,7 +18658,7 @@ function openOfflineScreen() {
     if (!currentChatId || !currentChatType) return showToast('请先选择一个聊天');
     const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
     if (!chat) return;
-    document.getElementById('offline-title').textContent = currentChatType === 'private' ? `${chat.remarkName} - 线下剧情` : `${chat.name} - 线下剧情`;
+    document.getElementById('offline-title').textContent = currentChatType === 'private' ? `${getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId)} - 线下剧情` : `${chat.name} - 线下剧情`;
     wechatMorePanel.classList.remove('visible');
     offlineMultiSelectMode = false;
     offlineSelectedIds.clear();
@@ -18711,7 +18893,7 @@ function renderOfflineBubble(msg, turn) {
     let avatarUrl, name;
     if (currentChatType === 'private') {
         avatarUrl = isSent ? chat.myAvatar : chat.avatar;
-        name = isSent ? chat.myName : chat.remarkName;
+        name = isSent ? chat.myName : getMaskRemarkForCharacter(chat, getMaskIdForCharacterSession(chat) || db.activeProfileMaskId);
     } else {
         avatarUrl = isSent ? chat.me.avatar : (chat.members.find(m => m.id === msg.senderId)?.avatar || 'https://i.postimg.cc/Y96LPskq/o-o-2.jpg');
         name = isSent ? chat.me.nickname : (chat.members.find(m => m.id === msg.senderId)?.groupNickname || '成员');
@@ -18886,10 +19068,12 @@ function buildConvTextForMemory(chat, msgs) {
     if (match) text = match[1];
     text = text.replace(/<heart>[\s\S]*?<\/heart>/g, '').replace(/\[.*?\]/g, '').trim();
     if (!text) return '';
+    const currentIdentity = (!chat.members && typeof getMaskUserIdentityForCharacter === 'function') ? getMaskUserIdentityForCharacter(chat) : null;
     const who = m.role === 'user'
-      ? (chat.myName || (chat.me && chat.me.nickname) || '我')
+      ? ((currentIdentity && currentIdentity.name) || chat.myName || (chat.me && chat.me.nickname) || '我')
       : (chat.realName || chat.name || '角色');
-    return `${who}: ${text}`;
+    const sourceMask = currentIdentity && currentIdentity.mask ? `（面具：${currentIdentity.mask.name || currentIdentity.profile.nickname || '未命名面具'}）` : '';
+    return `${who}${m.role === 'user' ? sourceMask : ''}: ${text}`;
   }).filter(t => t.length > 3).join('\n');
 }
 function extractKeywords(text) {
@@ -18963,7 +19147,18 @@ function getSharedMemoryPool(chat) {
       pool.push(sourceLabel ? { ...m, _memorySource: sourceLabel } : m);
     });
   };
-  addStore(chat);
+  const currentIsCharacter = Array.isArray(db.characters) && db.characters.includes(chat);
+  const currentIsGroup = Array.isArray(db.groups) && db.groups.includes(chat);
+  if (currentIsCharacter) {
+    const currentMaskId = getMaskIdForCharacterSession(chat);
+    const currentMask = (db.profileMasks || []).find(m => m.id === currentMaskId);
+    const currentMaskLabel = currentMask ? (currentMask.name || (currentMask.profile && currentMask.profile.nickname) || '面具') : '未标记面具';
+    addStore(chat, `AI「${chat.realName || chat.name || '角色'}」与面具「${currentMaskLabel}」的私聊记忆`);
+  } else if (currentIsGroup) {
+    addStore(chat, `群聊「${chat.name || '群聊'}」`);
+  } else {
+    addStore(chat);
+  }
   const characterIds = new Set();
   if (Array.isArray(db.characters) && db.characters.includes(chat)) characterIds.add(chat.id);
   if (chat?.id && Array.isArray(db.characters) && db.characters.some(c => c.id === chat.id)) characterIds.add(chat.id);
@@ -18985,7 +19180,13 @@ function getSharedMemoryPool(chat) {
     if (m.id && db.characters?.some(c => c.id === m.id)) characterIds.add(m.id);
   });
   // 私聊可读取关联群聊记忆；群聊可读取群成员各自的私聊记忆。只共享记忆条目，不混用其他聊天的历史消息。
-  (db.characters || []).forEach(c => { if (characterIds.has(c.id)) addStore(c, `私聊「${c.remarkName || c.realName || c.name || '角色'}」`); });
+  (db.characters || []).forEach(c => {
+    if (!characterIds.has(c.id)) return;
+    const maskId = c.maskChatSessionMaskId || (c.maskChatRootId ? '' : getMaskIdForCharacterSession(c));
+    const mask = (db.profileMasks || []).find(m => m.id === maskId);
+    const maskLabel = mask ? (mask.name || (mask.profile && mask.profile.nickname) || '面具') : '未标记面具';
+    addStore(c, `AI「${c.realName || c.name || '角色'}」与面具「${maskLabel}」的私聊记忆`);
+  });
   (db.groups || []).forEach(g => {
     const related = (g.members || []).some(m => characterIds.has(m.originalCharId) || characterIds.has(m.id));
     if (related) addStore(g, `群聊「${g.name || '群聊'}」`);
@@ -18993,41 +19194,50 @@ function getSharedMemoryPool(chat) {
   return pool;
 }
 
-function buildSharedRecentMaskChatContext(chat, limit = 120) {
+function buildSharedRecentMaskChatContext(chat, limit = 80) {
   if (!chat || !Array.isArray(db.characters)) return '';
   const rootId = chat.maskChatRootId || chat.id;
   const root = db.characters.find(c => c.id === rootId) || chat;
   const sessionIds = new Set([root.id, ...(root.maskChatSessionIds ? Object.values(root.maskChatSessionIds) : [])]);
-  // 不只依赖映射表：扫描所有以同一根角色为主人的会话，避免漏掉后来创建的面具窗口。
+  // Scan all sessions too, because older saves may have incomplete session maps.
   db.characters.forEach(c => {
     if (c.id === root.id || c.maskChatRootId === root.id) sessionIds.add(c.id);
   });
   const currentSessionId = chat.id;
   const rows = [];
   for (const id of sessionIds) {
-    if (id === currentSessionId) continue; // 当前窗口历史由当前对话上下文提供，避免重复
+    if (id === currentSessionId) continue; // Current-window history arrives through the ordinary message context.
     const session = db.characters.find(c => c.id === id);
     if (!session || !Array.isArray(session.history)) continue;
-    const maskId = session.maskChatSessionMaskId || (session.id === root.id ? root.maskChatSessionMaskId : '');
+    const maskId = getMaskIdForCharacterSession(session);
     const mask = (db.profileMasks || []).find(m => m.id === maskId);
     const maskName = mask && (mask.name || (mask.profile && mask.profile.nickname)) || '未标记面具';
     for (const msg of session.history) {
       if (!msg || msg.sendFailed || msg.role === 'system' || msg.hidden === true) continue;
       let content = String(msg.content || (msg.parts || []).map(x => x.text || '').join(' ') || '').trim();
       if (!content) continue;
-      content = content.replace(/<heart>[\s\S]*?<\/heart>/g, '[表情]').slice(0, 1800);
+      content = content.replace(/<heart>[\s\S]*?<\/heart>/g, '[心声]').slice(0, 900);
       rows.push({ time: Number(msg.timestamp || msg.createdAt || 0), role: msg.role, maskName, content, sessionId:id });
     }
   }
   if (!rows.length) return '';
   rows.sort((a,b) => a.time - b.time);
-  const recent = rows.slice(-limit);
-  const lines = recent.map(m => {
-    const stamp = m.time ? new Date(m.time).toLocaleString('zh-CN', { hour12: false }) : '时间未知';
-    const speaker = m.role === 'assistant' ? (root.realName || root.name || 'AI角色') : `用户面具「${m.maskName}」`;
-    return `- [${stamp}] ${speaker}：${m.content}`;
-  });
-  return `\n════ 同一 AI 的跨面具共同经历记忆（按时间排序）════\n以下内容是你本人在其他面具会话中真实经历过的对话，不是别人的故事，也不是可忽略的参考材料。你是同一个连续存在的 AI 角色：所有面具窗口中由你说过的话、收到的消息、共同经历、承诺、冲突、情绪变化与未完成事项，都属于你的个人经历和记忆。必须记住近期事件，并在后续相关话题中接续；不得因为切换面具就失忆，也不得把已发生的事件说成没发生。\n同时严格区分每件事对应的用户面具、参与者、关系、时间和发生地点：共享记忆不代表把不同面具当成同一个人，也不代表当前面具亲自参与过其他面具的事件。你可以记得自己与另一个面具发生过什么，但要准确知道那是与谁发生的。固定绑定关系仍只归属于被绑定面具，不会自动转移。\n${lines.join('\n')}\n`;
+  const recent = rows.slice(-Math.max(1, Number(limit)||80));
+  // Budget by total characters, newest first; old context remains in stored history/long-term memory without bloating every model call.
+  const picked=[];let budget=18000;
+  for(let i=recent.length-1;i>=0&&budget>0;i--){
+    const m=recent[i];
+    const stamp=m.time?new Date(m.time).toLocaleString('zh-CN',{hour12:false}):'时间未知';
+    const speaker=m.role==='assistant'?(root.realName||root.name||'AI角色'):`用户面具「${m.maskName}」`;
+    let line=`- [${stamp}] ${speaker}：${m.content}`;
+    if(line.length>budget){
+      if(picked.length===0)line=line.slice(0,Math.max(0,budget-1))+'…';
+      else break;
+    }
+    picked.unshift(line);budget-=line.length+1;
+  }
+  if(!picked.length)return '';
+  return `\n════ 同一 AI 的跨面具共同经历记忆（按时间排序）════\n你是同一个持续存在的 AI 角色。所有面具窗口里由你说过的话、收到的信息、共同经历、承诺、冲突、情绪变化与未完成事项，都是你自己的真实经历，应在相关话题中连续记得并接续。不得因切换面具而失忆或否认已经发生的事。\n每条经历都必须保留来源面具、参与者、关系归属和时间顺序。你可以记得自己与其他面具经历过的事，但不能把该经历说成当前面具亲自经历过。记忆共享不等于身份合并，关系也不自动转移；固定绑定关系始终归属于绑定面具。\n${picked.join('\n')}\n`;
 }
 
 function recallMemories(chat, query, limit = 8) {
