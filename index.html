@@ -1135,7 +1135,9 @@ label.btn-primary { color: var(--white-color) !important; }
   box-sizing:border-box; box-shadow:none !important; z-index:120 !important;
   background:#fff; transform:translateX(100%); transition:transform .28s ease;
 }
-#group-settings-sidebar.open { right:auto !important; transform:translateX(0); }
+#group-settings-sidebar.open { right:auto !important; transform:translateX(0); pointer-events:auto !important; visibility:visible !important; }
+/* 关闭状态的群聊设置不接收触摸，避免手机长按输入框时误触到隐藏页面 */
+#group-settings-sidebar:not(.open) { pointer-events:none !important; visibility:hidden !important; }
 #group-settings-sidebar > .header {
   display:grid; grid-template-columns:44px 1fr 44px; align-items:center;
   flex:0 0 auto; min-height:58px; box-sizing:border-box; padding:10px 14px;
@@ -2798,6 +2800,12 @@ input:checked + .slider:before { transform: translateX(22px); }
 #sticker-lib-editor-card[hidden]{display:none!important}
 #sticker-lib-editor-card{margin-top:14px}
 
+
+/* 修复：API 设置页编辑密钥时，聊天/群聊设置属于后台浮层，不能盖到 API 页面上。 */
+body:has(#api-settings-screen.active) #chat-settings-sidebar,
+body:has(#api-settings-screen.active) #group-settings-sidebar {
+  display:none !important; visibility:hidden !important; pointer-events:none !important;
+}
 </style>
 <style id="group-settings-one-size-refinement">
 
@@ -7070,6 +7078,11 @@ window.switchScreen = (targetId, isBack = false) => {
   try {
     const targetScreen = document.getElementById(targetId);
     if (!targetScreen) return;
+    // 先关闭侧边页/浮层，再判断目标页面是否已经激活；否则目标页已激活时会提前 return，
+    // 导致群聊设置侧栏残留在最上层，点 API 等入口看起来仍然停在群聊设置。
+    document.querySelectorAll('.modal-overlay, .action-sheet-overlay, .settings-sidebar').forEach(o => o.classList.remove('visible', 'open'));
+    const groupSidebar = document.getElementById('group-settings-sidebar');
+    if (groupSidebar) groupSidebar.classList.remove('open');
     if (targetScreen.classList.contains('active')) return;
 const currentScreen = document.querySelector('.screen.active');
 if (!isBack && currentScreen) {
@@ -12532,11 +12545,18 @@ function renderWorldBookList() {
    功能开始：私聊设置（侧边栏 + 聊天信息页）
    ========================================================== */
 function setupChatSettings() {
-  chatSettingsBtn.addEventListener('click', () => {
+  chatSettingsBtn.addEventListener('click', (event) => {
+    // 仅在真实聊天页面响应设置按钮。移动端长按输入框弹出系统选词菜单时，
+    // 浏览器偶尔会派发延迟/幽灵点击；不能让它把后台残留的群聊设置重新打开。
+    const chatScreen = document.getElementById('chat-room-screen');
+    if (!chatScreen || !chatScreen.classList.contains('active')) {
+      if (event) { event.preventDefault(); event.stopPropagation(); }
+      return;
+    }
     if (currentChatType === 'private') {
       renderChatInfoScreen();
       switchScreen('chat-info-screen');
-    } else if (currentChatType === 'group') {
+    } else if (currentChatType === 'group' && db.groups.some(g => g.id === currentChatId)) {
       loadGroupSettingsToSidebar();
       groupSettingsSidebar.classList.add('open');
     }
@@ -13024,6 +13044,65 @@ if (messageArea && !messageArea.dataset.minimaxVoiceDelegateReady) {
     }
   });
 }
+
+// 手机端长按 API 密钥会弹出系统“复制/全选/删除”菜单；阻止该手势向应用页面冒泡，
+// 保留输入框自身的原生文本选择，不影响粘贴、复制和删除。
+(function protectApiKeyLongPress() {
+  const selector = '#api-key, #voice-api-key';
+  const isKeyField = target => !!(target && target.closest && target.closest(selector));
+  let longPressUntil = 0;
+  let holdTimer = null;
+
+  // 长按系统菜单可能不派发 contextmenu，因此从 touch/pointer 按下时开始识别。
+  document.addEventListener('touchstart', event => {
+    if (!isKeyField(event.target)) return;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => { longPressUntil = Date.now() + 1800; }, 420);
+  }, { capture: true, passive: true });
+  document.addEventListener('touchend', () => clearTimeout(holdTimer), { capture: true, passive: true });
+  document.addEventListener('touchmove', () => clearTimeout(holdTimer), { capture: true, passive: true });
+  document.addEventListener('pointerdown', event => {
+    if (!isKeyField(event.target)) return;
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(() => { longPressUntil = Date.now() + 1800; }, 420);
+  }, true);
+  document.addEventListener('pointerup', () => clearTimeout(holdTimer), true);
+  document.addEventListener('pointercancel', () => clearTimeout(holdTimer), true);
+
+  // 输入框保留原生选择菜单；事件不向页面级点击处理器传播。
+  document.addEventListener('contextmenu', event => {
+    if (!isKeyField(event.target)) return;
+    longPressUntil = Date.now() + 1800;
+    event.stopPropagation();
+  }, true);
+  ['touchstart', 'touchend', 'touchmove', 'pointerdown', 'pointerup', 'pointercancel'].forEach(type => {
+    document.addEventListener(type, event => {
+      if (isKeyField(event.target)) event.stopPropagation();
+    }, { capture: true, passive: true });
+  });
+  document.addEventListener('click', event => {
+    if (Date.now() >= longPressUntil || isKeyField(event.target)) return;
+    // 系统选择菜单关闭时偶发的幽灵点击不能触发任何底层按钮/页面。
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.stopImmediatePropagation) event.stopImmediatePropagation();
+  }, true);
+
+  // 无论哪个旧逻辑尝试打开侧栏，只要 API 页面正在显示，就立刻关掉后台设置层。
+  const closeSettingsBehindApi = () => {
+    const apiScreen = document.getElementById('api-settings-screen');
+    if (!apiScreen || !apiScreen.classList.contains('active')) return;
+    document.querySelectorAll('#chat-settings-sidebar, #group-settings-sidebar').forEach(sidebar => {
+      sidebar.classList.remove('open', 'visible');
+    });
+  };
+  document.addEventListener('click', closeSettingsBehindApi, true);
+  const apiScreen = document.getElementById('api-settings-screen');
+  if (apiScreen && window.MutationObserver) {
+    new MutationObserver(closeSettingsBehindApi).observe(apiScreen, { attributes: true, attributeFilter: ['class'] });
+  }
+  closeSettingsBehindApi();
+})();
 
 function setupApiSettingsApp() {
   const voiceForm = document.getElementById('voice-settings-form');
@@ -14124,7 +14203,13 @@ const homeScreenHTML = `
   const wbIcon = document.querySelector('#home-screen [data-target="world-book-screen"]');
   if (wbIcon) wbIcon.onclick = (e) => { e.preventDefault(); renderWorldBookList(); switchScreen('world-book-screen'); };
   const apiBtn = document.getElementById('go-to-api-settings-btn');
-  if (apiBtn) apiBtn.onclick = () => switchScreen('api-settings-screen');
+  if (apiBtn) apiBtn.onclick = (e) => {
+    if (e) { e.preventDefault(); e.stopPropagation(); }
+    const groupSidebar = document.getElementById('group-settings-sidebar');
+    if (groupSidebar) groupSidebar.classList.remove('open');
+    document.querySelectorAll('.settings-sidebar').forEach(sidebar => sidebar.classList.remove('open', 'visible'));
+    switchScreen('api-settings-screen');
+  };
   const customizeBtn = document.getElementById('go-to-customize-btn');
   if (customizeBtn) customizeBtn.onclick = () => { renderCustomizeForm(); switchScreen('customize-screen'); };
   const fontBtn = document.getElementById('go-to-font-settings-btn');
