@@ -3110,6 +3110,10 @@ body:has(#api-settings-screen.active) #group-settings-screen {
           <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M20,4H4A2,2 0 0,0 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6A2,2 0 0,0 20,4M20,18H4V6H20V18M6.5,17L10,12.5L12.5,15.5L15.5,11.5L18,14.5L16,17H6.5Z"/></svg></div>
           <span>相册</span>
         </div>
+        <div class="panel-item" id="voice-call-entry-btn" role="button" tabindex="0" aria-label="音视频通话" style="cursor:pointer;touch-action:manipulation;">
+          <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.56 3.58.56.55 0 1 .45 1 1V20c0 .55-.45 1-1 1C10.61 21 3 13.39 3 4c0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.19 2.46.56 3.58a1 1 0 01-.25 1.01l-2.19 2.2z"/></svg></div>
+          <span>通话</span>
+        </div>
         <div class="panel-item" id="location-btn">
           <div class="panel-icon-box"><svg viewBox="0 0 24 24"><path d="M12,2C8.13,2 5,5.13 5,9c0,5.25 7,13 7,13s7,-7.75 7,-13C19,5.13 15.87,2 12,2zM12,11.5c-1.38,0 -2.5,-1.12 -2.5,-2.5s1.12,-2.5 2.5,-2.5 2.5,1.12 2.5,2.5 -1.12,2.5 -2.5,2.5z"/></svg></div>
           <span>位置</span>
@@ -4292,7 +4296,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
         发消息
       </div>
       <div style="width: 100%; height: 1px; background: #eee;"></div>
-      <div style="display: flex; align-items: center; gap: 10px; color: #576B95; font-size: 18px; cursor: pointer; width: 100%; justify-content: center;" onclick="showToast('音视频通话功能暂未开放')">
+      <div id="profile-call-btn" role="button" tabindex="0" style="display: flex; align-items: center; gap: 10px; color: #576B95; font-size: 18px; cursor: pointer; width: 100%; justify-content: center;">
         <svg viewBox="0 0 24 24" style="width:24px;height:24px;fill:currentColor;"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.24 1.02L6.62 10.79z"/></svg>
         音视频通话
       </div>
@@ -6296,7 +6300,7 @@ document.getElementById('wallpaper-screen').innerHTML = `<header class="app-head
 
 document.getElementById('font-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">字体设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="font-settings-form"><div class="form-group"><label for="font-url">字体链接 (ttf, woff, woff2)</label><input type="url" id="font-url" placeholder="https://.../font.ttf" required></div><p style="font-size:12px; color:#888; text-align:center;">示例: https://lf3-static.bytednsdoc.com/obj/eden-cn/jplptk/ljhwZthlaukjlkulzlp/portal/fonts/HarmonyOS_Sans_SC_Regular.woff2</p><button type="submit" class="btn btn-primary">应用字体</button><button type="button" class="btn btn-neutral" id="restore-default-font-btn" style="margin-top: 15px;">恢复默认字体</button></form></main>`;
 
-document.getElementById('sound-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">音效设置</h1></div><div class="placeholder"></div></header><main class="content" style="background: #f7f7f7; padding-bottom: 80px;"><form id="sound-settings-form"><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">短信铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-sms-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">所有新消息的默认提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-sms-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-sms-btn">试听</button><button type="button" class="btn-small-upload" id="reset-sms-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">特别关心</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-special-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">置顶聊天的AI回复提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-special-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-special-btn">试听</button><button type="button" class="btn-small-upload" id="reset-special-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); opacity: 0.6;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">来电铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" disabled><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">(功能暂未开放)</div><input type="text" placeholder="暂未开放" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" disabled></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); opacity: 0.6;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">视频铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" disabled><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">(功能暂未开放)</div><input type="text" placeholder="暂未开放" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" disabled></div><div style="padding: 20px 0;"><button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">保存设置</button></div></form></main>`;
+document.getElementById('sound-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">音效设置</h1></div><div class="placeholder"></div></header><main class="content" style="background: #f7f7f7; padding-bottom: 80px;"><form id="sound-settings-form"><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">短信铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-sms-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">所有新消息的默认提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-sms-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-sms-btn">试听</button><button type="button" class="btn-small-upload" id="reset-sms-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">特别关心</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-special-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">置顶聊天的AI回复提示音</div><div style="display: flex; gap: 10px; align-items: center;"><input type="text" id="sound-special-url" placeholder="输入音频URL" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;"><button type="button" class="btn-small-upload" id="preview-special-btn">试听</button><button type="button" class="btn-small-upload" id="reset-special-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">来电铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" id="sound-call-toggle"><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">角色来电时播放</div><div style="display: flex; gap: 8px; align-items: center;"><input type="url" id="sound-call-url" placeholder="来电铃声链接" style="flex: 1; min-width: 0; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px;"><button type="button" class="btn-small-upload" id="preview-call-btn">试听</button><button type="button" class="btn-small-upload" id="reset-call-btn">重置</button></div></div><div style="background: #fff; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); opacity: 0.6;"><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;"><div style="font-size: 16px; font-weight: 600; color: #333;">视频铃声</div><label class="switch" style="margin: 0;"><input type="checkbox" disabled><span class="slider round"></span></label></div><div style="font-size: 12px; color: #888; margin-bottom: 8px;">(功能暂未开放)</div><input type="text" placeholder="暂未开放" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px;" disabled></div><div style="padding: 20px 0;"><button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px;">保存设置</button></div></form></main>`;
 
 document.getElementById('customize-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">主屏幕自定义</h1></div><div class="placeholder"></div></header><main class="content"><form id="customize-form"></form></main>`;
 
@@ -6334,7 +6338,7 @@ window.db = {
   groups: [],
   pendingFriends: [],
   apiSettings: {},
-  wallpaper: 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg',
+  wallpaper: 'https://imgbed.heliar.top/i/pX_cEqBBfZXtfT4a_Image_1791127884776_623.png',
   myStickers: [],
   stickerGroups: [],
   activeStickerGroupId: '',
@@ -7059,7 +7063,7 @@ if (!db.customCssSettings) {
   if (!db.customCssSettings.offline.perChar || typeof db.customCssSettings.offline.perChar !== 'object') db.customCssSettings.offline.perChar = {};
 }
   if (!db.apiSettings) db.apiSettings = {};
-  if (!db.wallpaper) db.wallpaper = 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg';
+  if (!db.wallpaper || db.wallpaper === 'https://i.postimg.cc/W4Z9R9x4/ins-1.jpg') db.wallpaper = 'https://imgbed.heliar.top/i/pX_cEqBBfZXtfT4a_Image_1791127884776_623.png';
   if (!db.characters) db.characters = [];
   if (!db.groups) db.groups = [];
 
@@ -7103,10 +7107,17 @@ const DEFAULT_SERVICES = [
     db.soundSettings = {
       sms: { enabled: true, url: 'https://imgbed.heliar.top/i/67HY3vWaImcDotWW_%E7%9F%AD%E4%BF%A1.mp3' },
       special: { enabled: true, url: 'https://imgbed.heliar.top/i/KFZHQvayFKnlKkOK_%E9%81%87%E8%A7%81.mp3' },
-      call: { enabled: false, url: '' },
+      call: { enabled: true, url: 'https://imgbed.heliar.top/i/nZIkl3qTrx_BQm5n_%E5%96%9C%E7%BE%8A%E7%BE%8A.mp3' },
       video: { enabled: false, url: '' }
     };
   }
+  // 迁移旧版占位设置：空链接代表旧功能未开放，不是用户主动关闭铃声。
+  if (!db.soundSettings.call) db.soundSettings.call = { enabled: true, url: 'https://imgbed.heliar.top/i/nZIkl3qTrx_BQm5n_%E5%96%9C%E7%BE%8A%E7%BE%8A.mp3' };
+  if (!String(db.soundSettings.call.url || '').trim()) {
+    db.soundSettings.call.url = 'https://imgbed.heliar.top/i/nZIkl3qTrx_BQm5n_%E5%96%9C%E7%BE%8A%E7%BE%8A.mp3';
+    db.soundSettings.call.enabled = true;
+  }
+  if (!db.soundSettings.video) db.soundSettings.video = { enabled: false, url: '' };
   
 if (!db.avatarLibrary) db.avatarLibrary = []; // ★ 初始化情侣头像库
 if (!db.myProfile) {
@@ -7610,6 +7621,17 @@ function renderFriendProfile(char) {
     document.querySelectorAll('.modal-overlay.visible, .action-sheet-overlay.visible').forEach(el => el.classList.remove('visible'));
     openChatRoom(char.id, 'private');
   };
+  const profileCallBtn = document.getElementById('profile-call-btn');
+  if (profileCallBtn) {
+    const launchCallPicker = () => {
+      if (typeof window.openFictionCallPickerForCharacter === 'function') window.openFictionCallPickerForCharacter(char.id);
+      else showToast('通话模块未加载，请刷新页面后重试');
+    };
+    profileCallBtn.onclick = launchCallPicker;
+    profileCallBtn.onkeydown = (event) => {
+      if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); launchCallPicker(); }
+    };
+  }
   document.getElementById('profile-go-to-info').onclick = () => {
     document.querySelectorAll('.modal-overlay.visible, .action-sheet-overlay.visible').forEach(el => el.classList.remove('visible'));
     renderFriendInfoEdit(char);
@@ -9992,8 +10014,19 @@ function setupChatRoom() {
     messageInput.blur();
   });
   wechatMorePanel.addEventListener('click', (e) => {
-    const item = e.target.closest('.panel-item');
-    if (item) wechatMorePanel.classList.remove('visible');
+    const item = e.target && e.target.closest ? e.target.closest('.panel-item') : null;
+    if (!item) return;
+    // 通话入口在既有的“+”面板事件委托中处理，避免动态面板/移动端漏绑子元素 click。
+    if (item.id === 'voice-call-entry-btn') {
+      e.preventDefault();
+      const characterId = currentChatType === 'private' && currentChatId ? String(currentChatId) : null;
+      if (typeof window.openFictionCallPickerForCharacter === 'function') {
+        window.openFictionCallPickerForCharacter(characterId);
+      } else {
+        showToast('通话模块没有加载，请重新打开新版页面');
+      }
+    }
+    wechatMorePanel.classList.remove('visible');
   });
   getReplyBtn.addEventListener('click', () => getAiReply(false));
 
@@ -11818,6 +11851,9 @@ if (window.__pendingFocus) {
     window.__pendingFocus = null;
 }
 /* 功能结束：本次调用临时触发 */
+if (!isOffline && requestChatType === 'private') {
+    systemPrompt += `\n【角色主动语音来电】如果你判断按当前人设、关系与剧情，角色确实会主动给用户打一个语音电话，可以在整条回复末尾单独输出隐藏动作标记 [ACTION:INCOMING_VOICE_CALL]。只有角色主动来电时才输出；仅仅提到电话、用户要求普通回复或剧情并不需要打电话时都不要输出。标记不会显示给用户。不要为了触发功能而破坏人设，也不要每轮都来电。\n`;
+}
     const historySlice = buildBoundedAiHistory(chat.history, chat.maxMemory);
     if (provider === 'gemini') {
       const contents = historySlice.map(msg => {
@@ -11960,7 +11996,16 @@ function registerIncomingAIMessage(chat, chatType, messageCount = 1) {
 
 async function processFullResponse(fullResponse, chat, chatType, apiType, isOffline = false, generationId = activeAiGenerationId) {
 if (generationId !== activeAiGenerationId) return;
+let wantsIncomingVoiceCall = false;
 if (fullResponse && fullResponse.trim()) {
+  // 识别模型主动来电动作标记，移除标记后再进入常规聊天解析，避免把内部指令显示为消息。
+  wantsIncomingVoiceCall = chatType === 'private' && !isOffline && /\[ACTION:INCOMING_VOICE_CALL\]/i.test(fullResponse);
+  if (wantsIncomingVoiceCall) {
+    fullResponse = fullResponse.replace(/\[ACTION:INCOMING_VOICE_CALL\]/ig, '').trim();
+  } else {
+    // 即使动作标记被用于其他会话，也绝不把内部标记显示给用户。
+    fullResponse = fullResponse.replace(/\[ACTION:INCOMING_VOICE_CALL\]/ig, '').trim();
+  }
   
 /* 兜底：如果模型误输出了整段 JSON，抢救成纯文本 */
 const salvaged = salvageJsonAsText(fullResponse);
@@ -12335,6 +12380,10 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
     }
     await saveData();
     renderChatList();
+    if (wantsIncomingVoiceCall && typeof window.showFictionIncomingCall === 'function') {
+      try { await window.showFictionIncomingCall(chat.id); }
+      catch (err) { console.warn('启动角色来电失败:', err); }
+    }
   }
 }
 /* ==========================================================
@@ -12941,13 +12990,20 @@ function setupSoundSettingsApp() {
   const smsUrl = document.getElementById('sound-sms-url');
   const specialToggle = document.getElementById('sound-special-toggle');
   const specialUrl = document.getElementById('sound-special-url');
+  const callToggle = document.getElementById('sound-call-toggle');
+  const callUrl = document.getElementById('sound-call-url');
   const form = document.getElementById('sound-settings-form');
   const defaultSmsUrl = 'https://imgbed.heliar.top/i/67HY3vWaImcDotWW_%E7%9F%AD%E4%BF%A1.mp3';
   const defaultSpecialUrl = 'https://imgbed.heliar.top/i/KFZHQvayFKnlKkOK_%E9%81%87%E8%A7%81.mp3';
-  if (db.soundSettings) {
-    if (db.soundSettings.sms) { smsToggle.checked = db.soundSettings.sms.enabled; smsUrl.value = db.soundSettings.sms.url; }
-    if (db.soundSettings.special) { specialToggle.checked = db.soundSettings.special.enabled; specialUrl.value = db.soundSettings.special.url; }
-  }
+  const defaultCallUrl = 'https://imgbed.heliar.top/i/nZIkl3qTrx_BQm5n_%E5%96%9C%E7%BE%8A%E7%BE%8A.mp3';
+  if (!db.soundSettings) db.soundSettings = {};
+  if (!db.soundSettings.call) db.soundSettings.call = { enabled: true, url: defaultCallUrl, userConfigured: false };
+  // 旧版来电铃声曾被标记为未开放；仅迁移一次，默认启用用户指定的铃声，后续尊重用户主动保存的开关。
+  if (db.soundSettings.call.userConfigured !== true) { db.soundSettings.call.url = db.soundSettings.call.url || defaultCallUrl; db.soundSettings.call.enabled = true; db.soundSettings.call.userConfigured = true; saveData().catch(err => console.warn('迁移默认来电铃声设置失败', err)); }
+  if (!db.soundSettings.call.url) { db.soundSettings.call.url = defaultCallUrl; db.soundSettings.call.enabled = true; }
+  if (db.soundSettings.sms) { smsToggle.checked = !!db.soundSettings.sms.enabled; smsUrl.value = db.soundSettings.sms.url || defaultSmsUrl; }
+  if (db.soundSettings.special) { specialToggle.checked = !!db.soundSettings.special.enabled; specialUrl.value = db.soundSettings.special.url || defaultSpecialUrl; }
+  if (callToggle && callUrl) { callToggle.checked = db.soundSettings.call.enabled !== false; callUrl.value = db.soundSettings.call.url || defaultCallUrl; }
   document.getElementById('preview-sms-btn').onclick = () => {
     if (smsUrl.value.trim()) new Audio(smsUrl.value.trim()).play().catch(() => showToast('链接播放失败'));
     else showToast('请先输入音频链接');
@@ -12958,11 +13014,20 @@ function setupSoundSettingsApp() {
   };
   document.getElementById('reset-sms-btn').onclick = () => { smsUrl.value = defaultSmsUrl; showToast('已重置为默认'); };
   document.getElementById('reset-special-btn').onclick = () => { specialUrl.value = defaultSpecialUrl; showToast('已重置为默认'); };
+  const previewCallBtn = document.getElementById('preview-call-btn');
+  const resetCallBtn = document.getElementById('reset-call-btn');
+  if (previewCallBtn) previewCallBtn.onclick = async () => {
+    const url = (callUrl?.value || '').trim() || defaultCallUrl;
+    try { const audio = new Audio(url); audio.loop = false; await audio.play(); }
+    catch (err) { showToast('铃声播放失败：请检查网络、链接或手机媒体音量'); }
+  };
+  if (resetCallBtn) resetCallBtn.onclick = () => { if (callUrl) callUrl.value = defaultCallUrl; if (callToggle) callToggle.checked = true; showToast('已恢复默认来电铃声'); };
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!db.soundSettings) db.soundSettings = { call: { enabled: false, url: '' }, video: { enabled: false, url: '' } };
     db.soundSettings.sms = { enabled: smsToggle.checked, url: smsUrl.value.trim() || defaultSmsUrl };
     db.soundSettings.special = { enabled: specialToggle.checked, url: specialUrl.value.trim() || defaultSpecialUrl };
+    db.soundSettings.call = { enabled: !!callToggle?.checked, url: (callUrl?.value || '').trim() || defaultCallUrl, userConfigured: true };
     await saveData();
     showToast('音效设置已保存');
     switchScreen('beautify-menu-screen');
@@ -20393,8 +20458,157 @@ function runMemoryDecayOnBoot() {
 /* ==========================================================
    功能开始：启动
    ========================================================== */
+
+// 通话模块在主程序闭包之外运行：通过显式桥接暴露安全的最小接口，避免点击时找不到局部函数或当前聊天状态。
+window.__fictionCallApp = {
+  getContext: () => ({ id: currentChatId, type: currentChatType }),
+  getCharacter: (id) => (db.characters || []).find(c => String(c.id) === String(id)) || null,
+  showToast: (message) => showToast(message),
+  saveData: (...args) => saveData(...args),
+  renderChatList: () => renderChatList(),
+  buildMemoryBlock: (...args) => buildMemoryBlock(...args),
+  addMemory: (...args) => addMemory(...args),
+  generateMiniMaxAudio: (...args) => generateMiniMaxAudio(...args)
+};
 init();
 });
+</script>
+
+<style>
+/* 微信式全屏语音通话：通话中只显示通话界面与当前字幕，不在通话画面堆聊天气泡 */
+#fiction-call-overlay,#fiction-incoming-overlay{position:fixed;inset:0;z-index:10060;display:none;flex-direction:column;overflow:hidden;color:#fff;font-family:inherit;text-align:center;background:radial-gradient(ellipse at 52% 35%,#454545 0%,#272727 48%,#080808 100%);padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+#fiction-call-overlay.visible,#fiction-incoming-overlay.visible{display:flex}
+.fc-topbar{height:64px;flex:0 0 64px;display:grid;grid-template-columns:54px 1fr 54px;align-items:center;padding:0 15px}
+.fc-topbar .fc-top-btn{width:42px;height:42px;border:0;border-radius:50%;background:transparent;color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center}
+.fc-topbar .fc-top-center{font-size:15px;letter-spacing:.5px;color:#ddd;white-space:nowrap}
+.fc-main{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;padding:0 22px 10px}
+.fc-identity{margin:auto 0 0;display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.fc-avatar{width:clamp(58px,17vw,88px);height:clamp(58px,17vw,88px);border-radius:16px;object-fit:cover;background:#444;box-shadow:0 4px 18px #0003}
+.fc-name{font-size:25px;font-weight:500;color:#fff;max-width:80vw;overflow-wrap:anywhere}
+.fc-call-kind{font-size:14px;color:#bdbdbd;letter-spacing:1px}
+.fc-state{font-size:14px;color:#aaa;min-height:20px;margin-top:14px;letter-spacing:.4px}
+.fc-live-duration{font-size:14px;color:#b7b7b7;margin-top:8px;font-variant-numeric:tabular-nums}
+.fc-subtitles{width:min(88vw,520px);min-height:42px;max-height:16vh;overflow:auto;margin:12px auto 0;padding:4px 8px;color:#e1e1e1;line-height:1.6;font-size:14px;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere}
+.fc-subtitles .fc-scene{color:#bababa;font-size:13px}
+.fc-subtitles .fc-spoken-caption{color:#fff;font-size:16px;font-weight:600;margin-top:4px}
+.fc-subtitles:empty{visibility:hidden}
+.fc-controls{display:flex;align-items:flex-start;justify-content:space-around;gap:12px;width:100%;max-width:440px;margin:auto auto 0;padding:12px 10px calc(14px + env(safe-area-inset-bottom))}
+.fc-control{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:0;flex:1;color:#ddd;font-size:13px;letter-spacing:.5px}
+.fc-round{width:clamp(62px,16vw,76px);height:clamp(62px,16vw,76px);border:0;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#111;background:#fff;font-size:20px;box-shadow:0 4px 14px #0003;touch-action:manipulation;flex-shrink:0}.fc-icon-svg{width:27px;height:27px;display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.fc-icon-fill{fill:currentColor;stroke:none}.fc-mic-slash{display:none}.fc-round.toggle-off .fc-mic-slash{display:block}.fc-round.ai-call{background:#f5f5f5;color:#222;border:1px solid #ddd}.fc-round.ai-call:disabled{opacity:.55}
+.fc-round.hang{background:#d94b4b;color:#fff;font-size:34px}
+.fc-round.toggle-off{background:#292929;color:#fff}
+.fc-round.active-listen{background:#e8e8e8;color:#222}
+.fc-round:active{transform:scale(.96)}
+#fc-typing-panel{position:relative;pointer-events:auto;left:auto;right:auto;bottom:auto;z-index:3;display:block;flex:0 0 auto;width:100%;max-width:560px;box-sizing:border-box;margin:10px auto 0;padding:4px 18px 2px;background:transparent;border:0;border-radius:0;box-shadow:none;text-align:center;transform:translateY(6px)}
+#fc-typing-panel.visible{display:block}
+#fc-minimized-pill{position:fixed;left:12px;top:calc(72px + env(safe-area-inset-top));z-index:10062;display:none;align-items:center;gap:9px;padding:10px 14px;border:1px solid #ffffff28;border-radius:24px;background:#202020ed;color:#fff;box-shadow:0 5px 18px #0005;font:inherit;font-size:13px;touch-action:manipulation}
+#fc-minimized-pill.visible{display:flex}
+#fc-minimized-pill .fc-pill-dot{width:8px;height:8px;border-radius:50%;background:#07c160;box-shadow:0 0 0 4px #07c1602c}
+#fc-typing-panel .fc-type-row{display:flex;gap:7px;align-items:center;width:100%;box-sizing:border-box;padding:5px;background:#292929;border:1px solid #4a4a4a;border-radius:24px}
+#fc-send{flex:0 0 auto;min-width:54px;padding:9px 13px;touch-action:manipulation;cursor:pointer}#fc-send:disabled{opacity:.55}#fc-text-input{flex:1;min-width:0;width:0;border:0;outline:0;border-radius:20px;padding:10px 14px;background:#363636;color:#fff;font:inherit;font-size:15px;min-height:20px;box-sizing:border-box}#fc-text-input::placeholder{color:#aaa}#fc-text-input:focus{box-shadow:0 0 0 1px #777}
+.fc-small-btn{border:0;border-radius:10px;padding:11px 12px;background:#f4f4f4;color:#222;font:inherit;font-size:13px;white-space:nowrap}
+.fc-small-btn.green{background:#f4f4f4;color:#222;font-weight:500;padding:8px 12px;border-radius:18px;font-size:12px}.fc-small-btn:disabled{opacity:.55}
+#fc-typing-panel .fc-type-tools{display:flex;gap:8px;margin-top:8px;justify-content:center}
+#fc-typing-panel .fc-type-hint{font-size:11px;color:#aaa;margin-top:7px}
+#fc-incoming-status{font-size:15px;color:#c7c7c7;letter-spacing:1px;margin-top:32px}
+#fiction-incoming-overlay .fc-controls{max-width:390px}
+.fc-picker{position:fixed;inset:0;background:#0008;z-index:10070;display:none;align-items:flex-end;justify-content:center;pointer-events:auto;padding-bottom:env(safe-area-inset-bottom)}
+.fc-picker.visible{display:flex!important}
+.fc-picker-card{background:#f6f6f6;border-radius:18px 18px 0 0;width:100%;max-width:520px;padding:14px 16px 20px;color:#222}
+.fc-picker-card .fc-picker-title{font-size:14px;color:#888;text-align:center;padding:4px 0 10px}
+.fc-picker-card button{display:block;width:100%;padding:16px;border:0;border-radius:12px;background:#fff;margin:8px 0;font-size:16px;color:#222;touch-action:manipulation}.fc-picker-card button.fc-mode-choice{display:flex;align-items:center;justify-content:flex-start;gap:13px;text-align:left}.fc-mode-icon{width:22px;height:22px;flex:0 0 22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;color:#333}
+.fc-picker-card button:active{background:#e8e8e8}
+.fc-picker-card button.cancel{background:transparent;color:#888}
+@media(max-height:650px){.fc-avatar{width:56px;height:56px}.fc-identity{gap:9px}.fc-state{margin-top:12px}.fc-subtitles{min-height:32px;margin-top:6px}.fc-controls{padding-bottom:calc(8px + env(safe-area-inset-bottom))}#fc-typing-panel{padding-left:10px;padding-right:10px}.fc-round{width:58px;height:58px}}
+</style>
+<div id="fiction-incoming-overlay" aria-modal="true" role="dialog" aria-label="微信语音来电">
+  <div class="fc-topbar"><span></span><div class="fc-top-center">语音来电</div><span aria-hidden="true"></span></div>
+  <div class="fc-main">
+    <div class="fc-identity"><img class="fc-avatar" id="fiction-incoming-avatar" alt="来电角色头像" src=""><strong class="fc-name" id="fiction-incoming-name"></strong><div class="fc-call-kind">邀请你进行语音通话</div></div>
+    <div id="fc-incoming-status">等待接听</div>
+    <div style="flex:1;min-height:20px"></div>
+  </div>
+  <div class="fc-controls">
+    <div class="fc-control"><button type="button" id="fci-decline" class="fc-round hang" aria-label="拒接"><svg class="fc-icon-svg fc-icon-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.7 13.3c5.1-4.2 11.5-4.2 16.6 0 .5.4.6 1.1.2 1.6l-2.3 3.2c-.3.5-.9.6-1.4.3a9.7 9.7 0 0 0-9.6 0c-.5.3-1.1.2-1.4-.3l-2.3-3.2c-.4-.5-.3-1.2.2-1.6z"/></svg></button><span>拒绝</span></div>
+    <div class="fc-control"><button type="button" id="fci-answer" class="fc-round active-listen" aria-label="接听"><svg class="fc-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 3.8 8.5 3l2.1 4.7-2.1 1.7a14 14 0 0 0 6.1 6.1l1.7-2.1 4.7 2.1-.8 3.3a2 2 0 0 1-2.2 1.5A17.7 17.7 0 0 1 3.7 6a2 2 0 0 1 1.5-2.2z"/></svg></button><span>接听</span></div>
+  </div>
+</div>
+<div id="fiction-call-overlay" aria-modal="true" role="dialog" aria-label="微信式语音通话">
+  <div class="fc-topbar">
+    <button type="button" class="fc-top-btn" id="fc-minimize" aria-label="返回聊天"><svg class="fc-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 8h12v12H8z"/><path d="M16 8V4H4v12h4"/></svg></button>
+    <div class="fc-top-center" id="fc-top-duration">等待对方接受邀请</div>
+    <span aria-hidden="true"></span>
+  </div>
+  <div class="fc-main">
+    <div class="fc-identity"><img class="fc-avatar" id="fc-avatar" alt="通话角色头像" src=""><strong class="fc-name" id="fc-name">语音通话</strong><div class="fc-call-kind">语音通话</div></div>
+    <div class="fc-state" id="fc-status">等待对方接受邀请</div>
+    
+    <div class="fc-subtitles" id="fc-subtitles" aria-live="polite"></div>
+    <div style="flex:1;min-height:18px"></div>
+  </div>
+  <div id="fc-typing-panel">
+    <form id="fc-form" class="fc-type-row"><input id="fc-text-input" autocomplete="off" placeholder="输入消息，回车也可发送…" maxlength="8000" aria-label="输入通话消息"><button class="fc-small-btn green" type="submit" id="fc-send">发送</button></form>
+  </div>
+  <div class="fc-controls">
+    <div class="fc-control"><button type="button" class="fc-round" id="fc-mic" aria-label="开始语音输入"><svg class="fc-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11v1a7 7 0 0 0 14 0v-1M12 19v3M8 22h8"/><path class="fc-mic-slash" d="M4 4 20 20"/></svg></button><span id="fc-mic-label">麦克风已开</span></div>
+    <div class="fc-control"><button type="button" class="fc-round hang" id="fc-hangup" aria-label="挂断"><svg class="fc-icon-svg fc-icon-fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.7 13.3c5.1-4.2 11.5-4.2 16.6 0 .5.4.6 1.1.2 1.6l-2.3 3.2c-.3.5-.9.6-1.4.3a9.7 9.7 0 0 0-9.6 0c-.5.3-1.1.2-1.4-.3l-2.3-3.2c-.4-.5-.3-1.2.2-1.6z"/></svg></button><span>挂断</span></div>
+    <div class="fc-control"><button type="button" class="fc-round ai-call" id="fc-ai-control" aria-label="调用 AI 继续对话"><svg class="fc-icon-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.1 5.9L20 11l-5.9 2.1L12 19l-2.1-5.9L4 11l5.9-2.1L12 3zM19 16l.7 1.8 1.8.7-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7L19 16z"/></svg></button><span>AI应答</span></div>
+  </div>
+</div>
+<button type="button" id="fc-minimized-pill" aria-label="返回语音通话"><span class="fc-pill-dot"></span><span>语音通话</span><strong id="fc-pill-duration">00:00</strong></button>
+<div class="fc-picker" id="fc-picker" role="dialog" aria-modal="true" aria-label="选择通话方式"><div class="fc-picker-card"><div class="fc-picker-title">选择通话方式</div><button type="button" id="fc-audio-choice" class="fc-mode-choice"><svg class="fc-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 3.8 8.5 3l2.1 4.7-2.1 1.7a14 14 0 0 0 6.1 6.1l1.7-2.1 4.7 2.1-.8 3.3a2 2 0 0 1-2.2 1.5A17.7 17.7 0 0 1 3.7 6a2 2 0 0 1 1.5-2.2z"/></svg><span>语音通话</span></button><button type="button" id="fc-video-choice" class="fc-mode-choice"><svg class="fc-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/></svg><span>视频通话（下一阶段开放）</span></button><button type="button" id="fc-share-choice" class="fc-mode-choice"><svg class="fc-mode-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M9 10l3-3 3 3M12 7v7"/></svg><span>共享屏幕（下一阶段开放）</span></button><button type="button" class="cancel" id="fc-picker-cancel">取消</button></div></div>
+<script>
+(function(){
+'use strict';
+const DEFAULT_RING_URL='https://imgbed.heliar.top/i/nZIkl3qTrx_BQm5n_%E5%96%9C%E7%BE%8A%E7%BE%8A.mp3';
+const $=id=>document.getElementById(id);
+const app=()=>window.__fictionCallApp||{};
+const notify=message=>{try{if(typeof app().showToast==='function')app().showToast(message);else console.warn(message)}catch(e){console.warn(message,e)}};
+const persist=async()=>{if(typeof app().saveData==='function')return app().saveData();if(typeof window.saveData==='function')return window.saveData();throw new Error('应用保存接口未就绪')};
+const refreshList=()=>{try{if(typeof app().renderChatList==='function')app().renderChatList()}catch(e){console.warn('刷新聊天列表失败',e)}};
+const overlay=$('fiction-call-overlay'),picker=$('fc-picker'),incomingOverlay=$('fiction-incoming-overlay');
+if(!overlay||!picker||!incomingOverlay)return;
+let active=false,connected=false,muted=false,micListening=false,pendingUserText="",callDirection='outgoing',startedAt=0,durationTimer=null,connectTimer=null,callChat=null,busy=false,callLines=[],ringAudio=null,callRecord=null,pendingCharacterId=null,incomingCharacterId=null,nextCallIncoming=false,recognition=null,replyAbortController=null,currentAudio=null,recordingStream=null,mediaRecorder=null,recordedChunks=[];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function getContext(){try{return typeof app().getContext==='function'?app().getContext():{id:null,type:null}}catch(e){return {id:null,type:null}}}
+function getChat(id){const ctx=getContext();const targetId=typeof id==='string'&&id?id:((ctx.type==='private'&&ctx.id)?String(ctx.id):'');if(!targetId)return null;return typeof app().getCharacter==='function'?app().getCharacter(targetId):((db.characters||[]).find(c=>String(c.id)===targetId)||null)}
+function fmt(ms){const sec=Math.max(0,Math.floor(ms/1000));return String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0')}
+function updateDuration(){if(connected){const d=fmt(Date.now()-startedAt);$('fc-top-duration').textContent=d;$('fc-pill-duration').textContent=d}}
+function setStatus(s){$('fc-status').textContent=s;$('fc-top-duration').textContent=connected?fmt(Date.now()-startedAt):s}
+function setBusy(v){busy=!!v;$('fc-send').disabled=busy;$('fc-ai-control').disabled=busy;if(connected)setStatus(busy?'对方正在说话…':'通话中')}
+function setScene(who,narration,spoken){const host=$('fc-subtitles');host.replaceChildren();if(narration){const n=document.createElement('div');n.className='fc-scene';n.textContent=narration;host.appendChild(n)}if(spoken){const s=document.createElement('div');s.className='fc-spoken-caption';s.textContent=(who==='user'?'你：':'')+spoken;host.appendChild(s)}if(!narration&&!spoken)host.textContent=''}
+function trackLine(who,narration,spoken,raw){callLines.push({who,narration:narration||'',spoken:spoken||'',raw:raw||[narration,spoken].filter(Boolean).join('\n'),at:Date.now()});if(callLines.length>160)callLines=callLines.slice(-160)}
+function stopSpeechCapture(){if(recognition){try{recognition.onresult=null;recognition.onend=null;recognition.onerror=null;recognition.stop()}catch(e){}recognition=null}try{if(mediaRecorder&&mediaRecorder.state!=='inactive')mediaRecorder.stop()}catch(e){}mediaRecorder=null;recordedChunks=[];if(recordingStream){try{recordingStream.getTracks().forEach(t=>t.stop())}catch(e){}recordingStream=null}micListening=false;$('fc-mic').classList.remove('active-listen');$('fc-mic-label').textContent=muted?'麦克风已关':'麦克风已开';$('fc-mic').setAttribute('aria-label',muted?'打开麦克风':'开始语音输入')}
+function stopCurrentAudio(){if(currentAudio){try{currentAudio.pause();currentAudio.currentTime=0;if(currentAudio.src&&currentAudio.src.startsWith('blob:'))URL.revokeObjectURL(currentAudio.src)}catch(e){}currentAudio=null}if('speechSynthesis'in window)window.speechSynthesis.cancel()}
+function updateControlLabels(){$('fc-mic-label').textContent=muted?'麦克风已关':(micListening?'正在听你说话…':'麦克风已开');$('fc-mic').classList.toggle('toggle-off',muted);$('fc-mic').classList.toggle('active-listen',micListening);$('fc-mic').setAttribute('aria-label',muted?'打开麦克风':'开始语音输入')}
+function openPicker(characterId){if(active){notify('当前已有一通通话');return false}const ctx=getContext();const id=typeof characterId==='string'&&characterId.trim()?characterId.trim():((ctx.type==='private'&&ctx.id)?String(ctx.id):'');const target=getChat(id);if(!target){notify('请先打开一个角色的私聊窗口');return false}pendingCharacterId=String(target.id);picker.classList.add('visible');return true}
+window.openFictionCallPickerForCharacter=function(characterId){return openPicker(typeof characterId==='string'?characterId:null)};
+const entry=$('voice-call-entry-btn');if(entry)entry.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openPicker(getContext().type==='private'?String(getContext().id||''):null)}});
+function appendCallRecord(status,duration,direction){if(!callChat)return;const now=Date.now();const content=status==='missed'?'[语音通话：未接听]':status==='cancelled'?'[语音通话：已取消]':`[语音通话：已接听，时长 ${duration||'00:00'}]`;const msg={id:'call_record_'+now+'_'+Math.random().toString(36).slice(2,7),role:'assistant',content,parts:[{type:'text',text:content}],timestamp:now,callRecord:true,callStatus:status,callDirection:direction||'outgoing',callDuration:duration||'00:00'};callChat.history=Array.isArray(callChat.history)?callChat.history:[];callChat.history.push(msg);return msg}
+function buildCallSummaryFallback(duration){const relevant=callLines.filter(x=>x.who==='user'||x.who==='ai');const lines=relevant.map(x=>x.who==='user'?'用户说：'+(x.spoken||x.raw||''):('角色说：'+[x.narration,x.spoken].filter(Boolean).join('；'))).filter(Boolean);return `语音通话（${duration}）。${lines.slice(-24).join('。').slice(0,3000)||'双方接通了语音通话。'} 该通话已经真实发生，后续对话应保持角色对这次通话的连续记忆。`}
+async function summarizeCallMemory(chat,duration){const fallback=buildCallSummaryFallback(duration);let summary=fallback,importance=Math.min(1,Math.max(.25,.35+callLines.length*.02)),facts=[];const cfg=db.apiSettings||{};if(cfg.url&&cfg.key&&cfg.model){try{const system='你是角色扮演聊天应用的长期记忆整理器。把一通刚结束的语音通话整理成有用、准确、便于未来回忆的记忆。按照内容的重要程度自行给 importance 赋 0.0 到 1.0。只输出 JSON：{"summary":"...","importance":0.0,"facts":["..."]}。保留明确承诺、关系变化、重要事件、用户偏好和待办；忽略琐碎寒暄；不要捏造未出现的信息。';const prompt=`角色：${chat.realName||chat.name||'TA'}\n通话时长：${duration}\n通话内容：\n${callLines.map(x=>(x.who==='user'?'用户':'角色')+'：'+[x.narration,x.spoken||x.raw].filter(Boolean).join(' ')).join('\n').slice(-9000)}`;let endpoint,headers,body;const provider=cfg.provider||'openai';if(provider==='gemini'){endpoint=`${String(cfg.url).replace(/\/$/,'')}/v1beta/models/${cfg.model}:generateContent?key=${encodeURIComponent(String(cfg.key).split(/[\n,，]/)[0].trim())}`;headers={'Content-Type':'application/json'};body={system_instruction:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:prompt}]}],generationConfig:{temperature:.2}}}else{endpoint=String(cfg.url).replace(/\/$/,'')+'/v1/chat/completions';headers={'Content-Type':'application/json','Authorization':'Bearer '+String(cfg.key).split(/[\n,，]/)[0].trim()};body={model:cfg.model,messages:[{role:'system',content:system},{role:'user',content:prompt}],temperature:.2}}const ctrl=new AbortController();const timeout=setTimeout(()=>ctrl.abort(),30000);let response;try{response=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(body),signal:ctrl.signal})}finally{clearTimeout(timeout)}if(!response.ok)throw new Error('summary API '+response.status);const data=await response.json();let raw=provider==='gemini'?(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n'):(data.choices?.[0]?.message?.content||'');raw=String(raw).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();const obj=JSON.parse(raw.slice(raw.indexOf('{'),raw.lastIndexOf('}')+1));if(typeof obj.summary==='string'&&obj.summary.trim())summary=obj.summary.trim().slice(0,4000);if(Number.isFinite(Number(obj.importance)))importance=Math.min(1,Math.max(0,Number(obj.importance)));if(Array.isArray(obj.facts))facts=obj.facts.filter(x=>typeof x==='string').slice(0,20).map(x=>x.slice(0,300))}catch(e){console.warn('AI 通话记忆总结失败，保存备用摘要',e)}}if(!Array.isArray(chat.callMemorySummaries))chat.callMemorySummaries=[];chat.callMemorySummaries.push({id:'callmem_'+Date.now(),timestamp:Date.now(),duration,content:summary,importance,facts,source:'voice-call'});if(chat.callMemorySummaries.length>500)chat.callMemorySummaries=chat.callMemorySummaries.slice(-500);const memContent=`[语音通话记忆｜重要度 ${importance.toFixed(2)}｜${duration}] ${summary}`;if(typeof app().addMemory==='function'){const level=importance>=.85?'anchor':importance>=.62?'important':importance>=.3?'daily':'trivial';await app().addMemory(chat,{level,content:memContent,originalQuote:summary.slice(0,1200),permanent:importance>=.85,emotionalWeight:importance})}else{if(!Array.isArray(chat.memories))chat.memories=[];chat.memories.push({id:'callmem_main_'+Date.now(),level:importance>=.8?'important':'daily',content:memContent,importance,createdAt:Date.now(),sourceTime:Date.now(),keywords:typeof extractKeywords==='function'?extractKeywords(memContent):[]})}await persist();return {summary,importance}}
+async function finishCall(){if(!active)return;const wasConnected=connected;active=false;connected=false;if(connectTimer)clearTimeout(connectTimer);connectTimer=null;if(durationTimer)clearInterval(durationTimer);durationTimer=null;if(replyAbortController){try{replyAbortController.abort()}catch(e){}replyAbortController=null}stopSpeechCapture();stopCurrentAudio();overlay.classList.remove('visible');$('fc-minimized-pill').classList.remove('visible');const chat=callChat;const duration=wasConnected?fmt(Date.now()-startedAt):'00:00';if(chat){appendCallRecord(wasConnected?'completed':'cancelled',duration,callDirection);try{await persist();refreshList()}catch(e){console.warn('通话记录保存失败',e);notify('通话记录保存失败，请导出备份')}if(wasConnected){notify('已挂断，正在整理本次通话记忆');try{await summarizeCallMemory(chat,duration);await persist();refreshList();notify('通话结束，记忆已归档（重要度已评估）')}catch(e){console.warn('强制保存通话记忆失败',e);notify('记忆归档失败，请立即导出备份')}}else notify('通话已取消')}callChat=null;callRecord=null;callLines=[];busy=false;muted=false;micListening=false;connected=false;}
+async function connectCall(incoming){if(!active||connected)return;connected=true;startedAt=Date.now();setStatus('通话中');if(durationTimer)clearInterval(durationTimer);durationTimer=setInterval(updateDuration,1000);$('fc-name').textContent=callChat?.realName||callChat?.name||'TA';setScene('ai','电话接通后，对方正在开口…','');requestCallReply('',incoming?'incoming-answer':'outgoing-answer')}
+async function startCall(){const targetId=pendingCharacterId;pendingCharacterId=null;callChat=getChat(targetId);if(!callChat){notify('找不到联系人，请重新进入私聊再拨打');return}const incoming=nextCallIncoming;nextCallIncoming=false;callDirection=incoming?'incoming':'outgoing';callChat.history=Array.isArray(callChat.history)?callChat.history:[];picker.classList.remove('visible');incomingOverlay.classList.remove('visible');window.stopFictionCallRingtone();active=true;connected=false;muted=false;micListening=false;pendingUserText='';callLines=[];callRecord=null;$('fc-avatar').src=callChat.avatar||'';$('fc-name').textContent=callChat.realName||callChat.name||'TA';$('fc-top-duration').textContent='等待对方接受邀请';setStatus(incoming?'正在接通…':'等待对方接受邀请');setScene('','','');$('fc-minimized-pill').classList.remove('visible');updateControlLabels();overlay.classList.add('visible');if(connectTimer)clearTimeout(connectTimer);connectTimer=setTimeout(()=>connectCall(incoming),incoming?350:1300)}
+function splitCallResponse(text){let narration=[],spoken=[];const lines=String(text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);for(let line of lines){line=line.replace(/^\[[^\]]*的消息：/,'').replace(/\]$/,'');const bold=[...line.matchAll(/\*\*(.+?)\*\*/g)].map(m=>m[1].trim()).filter(Boolean);if(bold.length){spoken.push(...bold);const rest=line.replace(/\*\*(.+?)\*\*/g,'').trim();if(rest)narration.push(rest)}else if(line){narration.push(line.replace(/^（|）$/g,''))}}return {narration:narration.join('\n'),spoken:spoken.join(' '),raw:String(text||'')}}
+async function playSpoken(text){if(!text)return;stopCurrentAudio();try{const cfg=db.voiceSettings||{};if(cfg.enabled&&cfg.key&&typeof app().generateMiniMaxAudio==='function'){const audioUrl=await app().generateMiniMaxAudio(text,callChat?.voiceId||cfg.voiceId);const audio=new Audio(audioUrl);currentAudio=audio;audio.volume=1;audio.onended=()=>{try{if(audio.src.startsWith('blob:'))URL.revokeObjectURL(audio.src)}catch(e){}if(currentAudio===audio)currentAudio=null};await audio.play()}else if('speechSynthesis'in window){const utter=new SpeechSynthesisUtterance(text);utter.lang='zh-CN';utter.volume=1;currentAudio={pause:()=>window.speechSynthesis.cancel(),get currentTime(){return 0},set currentTime(v){}};utter.onend=()=>{currentAudio=null};window.speechSynthesis.speak(utter)}else throw new Error('当前设备没有可用的语音播放能力')}catch(e){console.warn('通话语音播放失败',e);notify('语音播放失败，请检查语音设置或设备媒体音量')}}
+async function requestCallReply(userText,mode){if(!active||!connected||busy)return;const chat=callChat;if(!chat)return;const settings=db.apiSettings||{},url=settings.url,key=settings.key,model=settings.model,provider=settings.provider||'openai';if(!url||!key||!model){notify('请先配置 API');$('fc-text-input').focus();return}setBusy(true);try{const name=chat.realName||chat.name||'TA';const persona=chat.persona||chat.description||chat.profile||'按照既有聊天表现塑造角色';const normalHistory=(chat.history||[]).filter(m=>m&&m.content&&!m.callRecord&&!m.callMessage&&!m.callSummary&&!/^\[语音通话/.test(String(m.content))).slice(-14).map(m=>({role:m.role==='assistant'?'assistant':'user',content:String(m.content).slice(0,1800)}));const callContext=callLines.slice(0,-(userText?1:0)||undefined).slice(-20).map(x=>({role:x.who==='user'?'user':'assistant',content:[x.narration,x.spoken?`**${x.spoken}**`:null].filter(Boolean).join('\n').slice(0,2200)})).filter(m=>m.content);const allowedWorldBooks=(db.worldBooks||[]).filter(wb=>wb&&wb.enabled!==false&&((wb.scope||'global')==='global'||(chat.worldBookIds||[]).includes(wb.id))).map(wb=>String(wb.content||wb.text||'').slice(0,4000)).filter(Boolean).join('\n');const callMemories=(chat.callMemorySummaries||[]).slice(-8).map(m=>m.content).filter(Boolean).join('\n');let retrievedMemory='';try{if(typeof app().buildMemoryBlock==='function')retrievedMemory=app().buildMemoryBlock(chat,userText||'语音通话')}catch(e){console.warn('通话记忆检索失败',e)}const system=`你正在与用户进行微信式沉浸语音通话，扮演「${name}」。\n【角色人设】\n${persona}\n【当前有效世界书】\n${allowedWorldBooks||'无匹配的已启用世界书'}\n【既往通话记忆】\n${callMemories||'暂无'}\n【相关长期记忆】\n${retrievedMemory||'暂无'}\n冲突裁决：角色自身人设 > 当前有效世界书 > 相关长期记忆 > 其他上下文。不得因推动情节而违背人设。\n【输出模式】像真实语音通话一样自然、简短、可连续交流。可以写可见的动作、环境、神态，但这些描写必须是普通文本；真正说出口的话必须单独使用 **双星号加粗**。只有加粗部分会被朗读，绝不朗读普通文本。每次至少优先给出一句加粗台词，除非角色此刻确实沉默。不要输出聊天气泡格式、角色名前缀、JSON、标题、系统标记或解释。不要替用户决定动作、心理或台词。不要每轮总结。`;
+const recentCallHistory=callContext;let userPrompt;if(mode==='incoming-answer')userPrompt='用户接听了你主动发起的语音来电。请作为角色自然开始通话，给出简短动作/环境描写（可选）和一句真实说出口的加粗台词。';else if(mode==='outgoing-answer')userPrompt='用户主动拨打了你的语音电话，现在对方已经接通。请根据当前人设和关系，以自然的接电话反应开口；输出真实说出口的加粗台词，可带少量普通动作/环境描写。';else userPrompt=userText?`用户在电话里说：${userText}\n请像通话中自然接话。`:'请自然接着当前通话说一句，不要重复上文。';let endpoint,headers,body;if(provider==='gemini'){endpoint=`${String(url).replace(/\/$/,'')}/v1beta/models/${model}:generateContent?key=${encodeURIComponent(String(key).split(/[\n,，]/)[0].trim())}`;headers={'Content-Type':'application/json'};body={system_instruction:{parts:[{text:system}]},contents:[...normalHistory.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),...recentCallHistory.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]})),{role:'user',parts:[{text:userPrompt}]}],generationConfig:{temperature:.85}}}else{endpoint=String(url).replace(/\/$/,'')+'/v1/chat/completions';headers={'Content-Type':'application/json','Authorization':'Bearer '+String(key).split(/[\n,，]/)[0].trim()};body={model,messages:[{role:'system',content:system},...normalHistory,...recentCallHistory,{role:'user',content:userPrompt}],temperature:.85,stream:false}}const ctrl=new AbortController();replyAbortController=ctrl;const timeout=setTimeout(()=>ctrl.abort(),90000);let response;try{response=await fetch(endpoint,{method:'POST',headers,body:JSON.stringify(body),signal:ctrl.signal})}finally{clearTimeout(timeout);if(replyAbortController===ctrl)replyAbortController=null}if(!response.ok)throw new Error('API '+response.status+'：'+(await response.text()).slice(0,150));const data=await response.json();let raw=provider==='gemini'?(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('\n'):(data.choices?.[0]?.message?.content||'');if(Array.isArray(raw))raw=raw.map(x=>x.text||'').join('\n');if(!String(raw).trim())throw new Error('模型没有返回可用内容');if(!active)return;const parsed=splitCallResponse(raw);trackLine('ai',parsed.narration,parsed.spoken,parsed.raw);setScene('ai',parsed.narration,parsed.spoken||(!parsed.narration?'对方没有说话。':''));if(parsed.spoken)await playSpoken(parsed.spoken)}catch(e){if(e.name!=='AbortError'){console.error('语音通话请求失败',e);notify(('通话失败：'+(e.message||'网络异常')).slice(0,90));setScene('system','本次回复没有成功，可以再次尝试。','')}}finally{if(active)setBusy(false);else busy=false}}
+function sendCallText(text){const value=String(text||'').trim();if(!value||busy||!active||!connected)return;if(micListening)stopSpeechCapture();trackLine('user','',value,value);setScene('user','',value);requestCallReply(value,'user-text')}
+$('fc-audio-choice').onclick=startCall;$('fc-video-choice').onclick=()=>notify('视频通话下一阶段接入');$('fc-share-choice').onclick=()=>notify('共享屏幕下一阶段接入');$('fc-picker-cancel').onclick=()=>{picker.classList.remove('visible');pendingCharacterId=null};picker.addEventListener('click',e=>{if(e.target===picker){picker.classList.remove('visible');pendingCharacterId=null}});
+const typingShortcut=$('fc-open-typing');if(typingShortcut)typingShortcut.onclick=()=>{$('fc-text-input').focus()};$('fc-minimize').onclick=()=>{if(active){overlay.classList.remove('visible');$('fc-minimized-pill').classList.add('visible');}};$('fc-minimized-pill').onclick=()=>{if(active){$('fc-minimized-pill').classList.remove('visible');overlay.classList.add('visible')}};
+$('fc-form').addEventListener('submit',e=>{e.preventDefault();const input=$('fc-text-input');const value=input.value.trim();if(!value)return;pendingUserText=pendingUserText?pendingUserText+'\n'+value:value;trackLine('user','',value,value);setScene('user','',value);input.value='';});$('fc-ai-control').onclick=()=>{if(!active||!connected||busy)return;const value=pendingUserText.trim();if(value){pendingUserText='';requestCallReply(value,'user-text')}else{trackLine('user','', '', '用户等待角色继续说话');requestCallReply('','continue')}};
+async function transcribeCallRecording(blob){const cfg=db.apiSettings||{};if(!cfg.url||!cfg.key){setStatus('录音完成，但请先配置 API 才能转成文字');return}if((cfg.provider||'newapi')==='gemini'){setStatus('当前 Gemini 配置不支持此录音转文字方式；请使用兼容 OpenAI 转写接口的 API');return}setStatus('正在把录音转成文字…');try{const ext=blob.type.includes('mp4')?'m4a':blob.type.includes('ogg')?'ogg':blob.type.includes('wav')?'wav':'webm';const form=new FormData();form.append('file',blob,'call-recording.'+ext);form.append('model','whisper-1');let base=String(cfg.url).trim().replace(/\/$/,'').replace(/\/chat\/completions$/i,'').replace(/\/models$/i,'');const endpoint=/\/v1$/i.test(base)?base+'/audio/transcriptions':base+'/v1/audio/transcriptions';form.append('language','zh');const response=await fetch(endpoint,{method:'POST',headers:{Authorization:'Bearer '+String(cfg.key).split(/[\n,，]/)[0].trim()},body:form});if(!response.ok){let detail='';try{detail=(await response.text()).slice(0,180)}catch(e){}throw new Error('语音转写接口 '+response.status+(detail?'：'+detail:'；请确认 API 支持 audio/transcriptions'))}const data=await response.json();const text=String(data.text||'').trim();if(!text){setStatus('没有识别到语音，请再试一次');return}const input=$('fc-text-input');input.value=(input.value?input.value+' ':'')+text;input.dispatchEvent(new Event('input',{bubbles:true}));input.focus();setStatus('语音已转成文字，可点发送，再点 AI 应答')}catch(e){console.warn('录音转文字失败',e);setStatus((e.message||'录音转文字失败').slice(0,90))}}
+$('fc-mic').onclick=async()=>{if(micListening){const rec=mediaRecorder;micListening=false;$('fc-mic').classList.remove('active-listen');$('fc-mic-label').textContent='正在处理录音…';$('fc-mic').setAttribute('aria-label','正在处理录音');if(rec&&rec.state!=='inactive'){rec.onstop=async()=>{const blob=new Blob(recordedChunks,{type:rec.mimeType||'audio/webm'});recordedChunks=[];if(recordingStream){recordingStream.getTracks().forEach(t=>t.stop());recordingStream=null}mediaRecorder=null;updateControlLabels();if(blob.size>0)await transcribeCallRecording(blob);else setStatus('没有录到声音，请再试一次')};try{rec.stop()}catch(e){stopSpeechCapture();setStatus('录音停止失败，请重试')}}else{stopSpeechCapture();setStatus('录音已停止')}return}if(muted){muted=false;updateControlLabels()}if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia||typeof MediaRecorder==='undefined'){setStatus('此浏览器不支持录音，请用输入栏或键盘语音输入');return}try{recordingStream=await navigator.mediaDevices.getUserMedia({audio:true});let mime='';for(const t of ['audio/webm;codecs=opus','audio/webm','audio/mp4']){if(MediaRecorder.isTypeSupported(t)){mime=t;break}}mediaRecorder=new MediaRecorder(recordingStream,mime?{mimeType:mime}:undefined);recordedChunks=[];mediaRecorder.ondataavailable=e=>{if(e.data&&e.data.size)recordedChunks.push(e.data)};mediaRecorder.onerror=e=>{console.warn('录音错误',e);stopSpeechCapture();setStatus('录音失败，请检查麦克风权限')};mediaRecorder.start(250);micListening=true;updateControlLabels();setStatus('正在录音；说完后再点一次麦克风结束并转文字')}catch(e){console.warn('无法启动录音',e);stopSpeechCapture();if(e&&(['NotAllowedError','PermissionDeniedError','SecurityError'].includes(e.name)))setStatus('浏览器未授权麦克风：请在地址栏网站设置中允许麦克风');else setStatus('无法启动录音，请检查麦克风权限')}};
+$('fc-hangup').onclick=finishCall;
+window.playFictionCallRingtone=async function(){try{if(!db.soundSettings)db.soundSettings={};if(!db.soundSettings.call)db.soundSettings.call={enabled:true,url:DEFAULT_RING_URL,userConfigured:false};const cfg=db.soundSettings.call;if(cfg.userConfigured!==true){cfg.url=String(cfg.url||DEFAULT_RING_URL).trim()||DEFAULT_RING_URL;cfg.enabled=true;cfg.userConfigured=true;persist().catch(e=>console.warn('保存默认来电铃声失败',e))}if(cfg.enabled===false)return false;const url=String(cfg.url||DEFAULT_RING_URL).trim();if(!url)return false;if(ringAudio){ringAudio.pause();ringAudio.currentTime=0}ringAudio=new Audio(url);ringAudio.loop=true;ringAudio.preload='auto';await ringAudio.play();return true}catch(e){console.warn('来电铃声播放失败',e);return false}};
+window.stopFictionCallRingtone=function(){if(ringAudio){try{ringAudio.pause();ringAudio.currentTime=0}catch(e){}ringAudio=null}if($('fci-ringer-label'))$('fci-ringer-label').textContent='来电静音'};
+window.showFictionIncomingCall=async function(characterId){if(active){notify('当前正在通话，暂不能接听新来电');return false}const char=getChat(String(characterId||''));if(!char){notify('找不到来电角色');return false}incomingCharacterId=String(char.id);$('fiction-incoming-avatar').src=char.avatar||'';$('fiction-incoming-name').textContent=char.realName||char.name||'未知联系人';$('fc-incoming-status').textContent='等待接听';incomingOverlay.classList.add('visible');await window.playFictionCallRingtone();return true};
+
+$('fci-answer').onclick=()=>{if(!incomingCharacterId)return;pendingCharacterId=incomingCharacterId;incomingCharacterId=null;nextCallIncoming=true;window.stopFictionCallRingtone();startCall()};
+$('fci-decline').onclick=async()=>{const id=incomingCharacterId;incomingCharacterId=null;window.stopFictionCallRingtone();incomingOverlay.classList.remove('visible');const chat=getChat(id);if(!chat)return;const now=Date.now();const content='[语音通话：未接听]';chat.history=Array.isArray(chat.history)?chat.history:[];chat.history.push({id:'call_missed_'+now,role:'assistant',content,parts:[{type:'text',text:content}],timestamp:now,callRecord:true,callStatus:'missed',callDirection:'incoming',callDuration:'00:00'});const room=$('chat-room-screen');const ctx=getContext();const viewing=ctx.type==='private'&&String(ctx.id)===String(chat.id)&&room&&room.classList.contains('active');if(!viewing){chat.unreadCount=Math.max(0,Number(chat.unreadCount)||0)+1;chat.unread=true}try{await persist();refreshList();notify('已记录未接来电')}catch(e){notify('未接来电记录保存失败')}};
+window.addEventListener('beforeunload',()=>{window.stopFictionCallRingtone();if(connectTimer)clearTimeout(connectTimer);if(durationTimer)clearInterval(durationTimer);if(replyAbortController)replyAbortController.abort();stopCurrentAudio();stopSpeechCapture()});
+})();
 </script>
 </body>
 </html>
