@@ -512,6 +512,9 @@ body {
   color: #666; font-size: 12px;
   padding: 4px 10px; border-radius: 10px; text-align: center;
 }
+/* 独立旁白气泡：与系统提示区分，居中显示为轻量场景叙述。 */
+.narration-bubble-wrapper { justify-content: center !important; width: 100%; margin: 8px 0; }
+.narration-bubble { display: block; max-width: min(88%, 560px); padding: 9px 14px; border-radius: 14px; background: rgba(130, 135, 150, 0.12); color: var(--secondary-text, #737782); font-size: 13px; line-height: 1.65; white-space: pre-wrap; text-align: center; box-shadow: none; }
 .msg-status-icon {
   width: 18px; height: 18px;
   background-color: #fa5151; color: #ffffff;
@@ -5379,14 +5382,15 @@ body:has(#api-settings-screen.active) #group-settings-screen {
           <label><input type="radio" name="offline-length" value="short"><span>短篇</span></label>
           <label><input type="radio" name="offline-length" value="medium" checked><span>中篇</span></label>
           <label><input type="radio" name="offline-length" value="long"><span>长篇</span></label>
+          <label><input type="radio" name="offline-length" value="custom"><span>自定义字数</span></label>
         </div>
-        <label class="offline-setting-label" for="offline-custom-words">自定义字数（可选）</label>
-        <input id="offline-custom-words" type="number" min="100" max="10000" step="100" placeholder="留空则使用上方篇幅">
+        <label class="offline-setting-label" for="offline-custom-words">自定义字数</label>
+        <input id="offline-custom-words" type="number" min="100" max="10000" step="100" placeholder="输入目标字数">
 
         <div class="offline-setting-label">角色叙事视角</div>
         <div class="offline-perspective-grid">
-          <label>角色（TA）视角<select id="offline-char-perspective"><option value="first">第一人称</option><option value="second">第二人称</option><option value="third" selected>第三人称</option></select></label>
-          <label>用户（我）视角<select id="offline-user-perspective"><option value="first">第一人称</option><option value="second" selected>第二人称</option><option value="third">第三人称</option></select></label>
+          <label>角色视角<select id="offline-char-perspective"><option value="first">第一人称</option><option value="second">第二人称</option><option value="third" selected>第三人称</option></select></label>
+          <label>用户视角<select id="offline-user-perspective"><option value="first">第一人称</option><option value="second" selected>第二人称</option><option value="third">第三人称</option></select></label>
         </div>
         <label class="offline-setting-label" for="offline-banned-words">违禁词 / 禁止提及内容</label>
         <textarea id="offline-banned-words" rows="3" placeholder="每行一个词或短语，也可以用逗号分隔。AI 将尽量避免输出这些内容。"></textarea>
@@ -6324,12 +6328,20 @@ body:has(#api-settings-screen.active) #group-settings-screen {
     <div class="chat-info-section-gap"></div>
 
     <div class="chat-info-item">
-      <span>消息免打扰</span>
-      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-mute-toggle"><span class="slider round"></span></label>
-    </div>
-    <div class="chat-info-item">
       <span>置顶聊天</span>
       <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-pin-toggle"><span class="slider round"></span></label>
+    </div>
+    <div class="chat-info-item">
+      <span>动描模式</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-action-description-toggle"><span class="slider round"></span></label>
+    </div>
+    <div class="chat-info-item">
+      <span>旁白模式</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-narration-toggle"><span class="slider round"></span></label>
+    </div>
+    <div class="chat-info-item">
+      <span>消息免打扰</span>
+      <label class="switch" style="margin: 0;"><input type="checkbox" id="chat-info-mute-toggle"><span class="slider round"></span></label>
     </div>
     <div class="chat-info-item">
       <span>外语自动翻译</span>
@@ -6338,18 +6350,10 @@ body:has(#api-settings-screen.active) #group-settings-screen {
     <div class="chat-info-item" style="min-height:64px;">
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
         <span>手机聊天设定</span>
-        <span style="font-size:12px;color:#999;max-width:280px;white-space:normal;line-height:1.45;">开启：角色可以知道并提及手机聊天。关闭：只进行自然对话，不提手机、屏幕或聊天软件。</span>
       </div>
       <label class="switch" style="margin:0;flex-shrink:0;"><input type="checkbox" id="chat-info-phone-awareness-toggle"><span class="slider round"></span></label>
     </div>
-    <div class="chat-info-item" id="chat-info-heart-prompt-btn" role="button" tabindex="0" style="min-height:72px;">
-      <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-        <span>心声提示词</span>
-        <span id="chat-info-heart-prompt-preview" style="font-size:12px;color:#999;max-width:280px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">自定义心声生成规则，优先于默认提示词</span>
-      </div>
-      <span class="chat-info-arrow">›</span>
-    </div>
-    
+
 
 <div class="chat-info-section-gap"></div>
 
@@ -11325,22 +11329,26 @@ function createMessageBubbleElement(message) {
   const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
   const inviteRegex = /\[(.*?)邀请(.*?)加入了群聊\]/;
   const renameRegex = /\[(.*?)修改群名为：(.*?)\]/;
+  const narrationBubbleRegex = /^\[旁白[：:]([\s\S]*?)\]$/;
   const timeSkipMatch = content.match(timeSkipRegex);
   const inviteMatch = content.match(inviteRegex);
   const renameMatch = content.match(renameRegex);
+  const narrationBubbleMatch = content.trim().match(narrationBubbleRegex);
   const invisibleRegex = /\[[\s\S]*?(?:接收|退回)[\s\S]*?的转账\]|\[[\s\S]*?更新状态为：[\s\S]*?\]|\[[\s\S]*?更新签名为：[\s\S]*?\]|\[[\s\S]*?已接收礼物\]|\[system:[\s\S]*?\]/i;
   if (invisibleRegex.test(content)) return null;
   const wrapper = document.createElement('div');
   wrapper.dataset.id = id;
   if (senderId) wrapper.dataset.senderId = senderId;
-  if (timeSkipMatch || inviteMatch || renameMatch) {
-    wrapper.className = 'message-wrapper system-notification';
+  if (timeSkipMatch || inviteMatch || renameMatch || narrationBubbleMatch) {
+    const isNarrationBubble = !!narrationBubbleMatch;
+    wrapper.className = 'message-wrapper system-notification' + (isNarrationBubble ? ' narration-bubble-wrapper' : '');
     let bubbleText = '';
     if (timeSkipMatch) bubbleText = timeSkipMatch[1];
     if (inviteMatch) bubbleText = `${inviteMatch[1]}邀请${inviteMatch[2]}加入了群聊`;
     if (renameMatch) bubbleText = `${renameMatch[1]}修改群名为“${renameMatch[2]}”`;
+    if (isNarrationBubble) bubbleText = narrationBubbleMatch[1].trim();
     const systemBubble = document.createElement('div');
-    systemBubble.className = 'system-notification-bubble';
+    systemBubble.className = 'system-notification-bubble' + (isNarrationBubble ? ' narration-bubble' : '');
     systemBubble.textContent = bubbleText;
     wrapper.appendChild(systemBubble);
     return wrapper;
@@ -11927,6 +11935,8 @@ function generatePrivateSystemPrompt(character) {
   const worldBooksAfter = getApplicableWorldBooks(character, 'after');
 
   const phoneAwarenessEnabled = character.phoneAwarenessEnabled !== false;
+  const actionDescriptionEnabled = character.actionDescriptionMode === true;
+  const narrationEnabled = character.narrationMode === true;
   let prompt = phoneAwarenessEnabled
     ? `【任务】你正在扮演一个真实的人，和我（${currentUserName}）在手机上的「404」聊天软件里对话。\n\n`
     : `【任务】你正在扮演角色本人，与我（${currentUserName}）处于同一个现实场景中面对面交谈。请把这当成两个人正在现场自然说话，而不是线上聊天；绝对不要提手机、屏幕、软件、消息、打字、发送、已读、回复速度、网络或任何线上媒介。\n\n`;
@@ -12042,7 +12052,11 @@ prompt += `【最后】固定优先级：角色人设 > 当前有效世界书 > 
   prompt += `【格式约束】现在必须在"线上聊天模式"，你不能模仿线下模式的小说体格式！你的回复必须严格遵守下方的【输出格式】，使用方括号包裹，绝不能直接输出纯文本段落。\n`;
   prompt += `【不替用户做决定】在线下剧情里发生过的事，你们可以自然地延续。但绝对不能在线聊天中替用户做决定，也不要凭空捏造用户没有做过的事！如果线下剧情里交代了某些背景，你可以自然地提起来当做默契，但不能逼问用户"你上个月去哪了"这种你根本没看到过的事。\n\n`;
   prompt += `════ 输出格式 ════\n`;
-  prompt += `你的所有回复都必须是下面这些格式，可以组合，但绝不能出现 [心理活动]、(动作)、*环境描写* 这类叙述性内容：\n\n`;
+  prompt += actionDescriptionEnabled || narrationEnabled
+    ? `你的所有回复都必须遵守下面的消息格式。普通台词使用 [${character.realName}的消息：内容]。动描模式和旁白模式是两套独立功能：只有动描模式负责在普通消息里用中文圆括号（……）写角色动作；旁白模式必须另发独立的 [旁白：内容] 气泡，不能把旁白写成圆括号动作，也不能用旁白气泡代替角色台词。不得替用户编造动作、台词、心理或决定。\n\n`
+    : `你的所有回复都必须是下面这些格式，可以组合，但绝不能出现 [心理活动]、(动作)、*环境描写* 这类叙述性内容：\n\n`;
+  if (actionDescriptionEnabled) prompt += `════ 动描模式 ════\n用户可以使用中文圆括号（……）补充自己明确做出的动作、神态或现场行为；把它们当作当前场景事实理解，不要逐字复述为台词。你的普通消息内容可以自然加入角色自身的动作描写，并用中文圆括号（……）包裹，例如 [${character.realName}的消息：（抬手替她理好衣领）别动。]。只描写角色自己的动作，不替用户续写动作或决定。动作要贴合当前情境，不必每条消息都加。此模式只控制普通消息中的圆括号动作描写；不要因此额外生成旁白气泡，除非旁白模式也已开启。\n\n`;
+  if (narrationEnabled) prompt += `════ 旁白模式 ════\n请把第三人称旁白作为独立气泡输出，格式严格为 [旁白：旁白内容]，随后再用 [${character.realName}的消息：角色说出口的台词] 输出角色台词。旁白气泡单独描写现场、氛围、环境变化、人物整体状态或镜头感，不使用中文圆括号，不要把旁白塞进角色消息里；旁白内容不需要角色名前缀。示例：[旁白：窗外的雨声渐密，昏黄灯光落在两人之间。]\n[${character.realName}的消息：过来一点。]。旁白简洁自然，不写成长篇小说，不替用户补写动作、心理或决定。此模式只负责独立旁白气泡；不要因此在角色台词中额外加圆括号动作，除非动描模式也已开启。\n\n`;
   prompt += `· 普通消息    [${character.realName}的消息：{内容}]\n`;
   prompt += `· 送礼        [${character.realName}送来的礼物：{礼物描述}]\n`;
   prompt += `· 语音        [${character.realName}的语音：{语音内容}]\n`;
@@ -12269,7 +12283,7 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
 
   {
     const worldBooks = getApplicableWorldBooks(chat);
-    if (worldBooks) prompt += `════ 当前有效世界书（仅补充事实与世界观；角色人设优先）════\n${worldBooks}\n\n`;
+    if (worldBooks) prompt += `════ 当前有效世界书（补充世界观；不得覆盖角色人设）════\n${worldBooks}\n\n`;
   }
   prompt += `════ 绝对线下剧情铁律 ════\n`;
   prompt += `历史记录中带 [xxx的消息：...] 等格式的，那是过去的【线上聊天记录】，仅作背景了解。\n`;
@@ -12289,11 +12303,11 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
   // 用户在「线下设置」中填写的规则属于本角色专属覆盖规则，优先于上方基础提示词中相冲突的同类规则。
   const offlineCfg = chat.offlineSettings || {};
   const perspectiveNames = { first: '第一人称', second: '第二人称', third: '第三人称' };
-  const lengthNames = { short: '短篇（约 300–600 字）', medium: '中篇（约 700–1500 字）', long: '长篇（约 1600–2800 字）' };
+  const lengthNames = { short: '短篇', medium: '中篇', long: '长篇', custom: '自定义字数' };
   const overrideRules = [];
   if (offlineCfg.style && offlineCfg.style.trim()) overrideRules.push(`【自定义文风·优先执行】\n${offlineCfg.style.trim()}`);
   if (offlineCfg.length || offlineCfg.customWords) {
-    const lengthText = offlineCfg.customWords ? `每次回复约 ${Math.max(100, Math.min(10000, Number(offlineCfg.customWords) || 700))} 字` : (lengthNames[offlineCfg.length] || lengthNames.medium);
+    const lengthText = offlineCfg.customWords ? `每次回复约 ${Math.max(100, Math.min(100000, Number(offlineCfg.customWords) || 700))} 字` : (lengthNames[offlineCfg.length] || lengthNames.medium);
     overrideRules.push(`【自定义篇幅·优先执行】\n${lengthText}`);
   }
   if (offlineCfg.charPerspective || offlineCfg.userPerspective) {
@@ -12310,6 +12324,7 @@ prompt += `【最后】人设 > 情节需要。任何时候冲突，让情节拐
   }
   prompt += `\n【输出排版】心理描写请用 *心理内容* 标记；角色说出口的对话尽量单独成段，动作/环境/心理描写与对话分段，便于界面进行区分。`;
   // 用户自定义文风不能改变角色核心身份；统一层级最后注入，再守住面具关系边界。
+  prompt += `\n【优先级】角色人设与既有行为逻辑 > 当前有效世界书 > 已确认记忆 > 其他提示。不要为迎合风格或篇幅而改变人设。\n【用户发言边界·强制】除非用户明确开启线下设置中的「抢话模式」，绝对不得替用户补完、续写或抢先生成用户的台词、动作、心理、反应、选择或决定；不得把用户尚未说完的话当作已经说完，不得替用户接话或预设用户下一步。只写 AI 角色自身的言行与环境，并在需要用户回应的位置停下等待。即使剧情需要推进，也必须给用户留出发言和行动空间。`;
   prompt += buildPromptPriorityRules();
   prompt += buildFinalMaskRelationshipGuard(chat);
   return prompt;
@@ -12656,10 +12671,11 @@ const locMsg = {
 };
             if (chat.isBlacklisted) locMsg.sendFailed = true;
             chat.history.push(locMsg);
-            await addMessageBubble(locMsg, chat, chatType);
+            // 先立即更新未读状态和提示音，再执行可能耗时的气泡渲染。
             registerIncomingAIMessage(chat, chatType, 1);
-            await saveData();
             renderChatList();
+            await addMessageBubble(locMsg, chat, chatType);
+            await saveData();
             await new Promise(r => setTimeout(r, MESSAGE_STAGGER_DELAY_MS));
             continue;
           }
@@ -12693,10 +12709,10 @@ if (aiAvatarMatch) {
     };
     
     chat.history.push(sysMsg);
-    await addMessageBubble(sysMsg, chat, chatType);
     registerIncomingAIMessage(chat, chatType, 1);
-    await saveData();
     renderChatList();
+    await addMessageBubble(sysMsg, chat, chatType);
+    await saveData();
     showToast(`TA换上了新头像，快去换另一半吧！`);
   } else if (target === '截取用户') {
     // AI 主动偷用户头像，必须截取
@@ -12836,10 +12852,10 @@ if (aiStickerMatch) {
           if (receivedTransferRegex.test(message.content)) message.transferStatus = 'pending';
           else if (giftRegex.test(message.content)) message.giftStatus = 'sent';
           chat.history.push(message);
-          await addMessageBubble(message, chat, chatType);
           registerIncomingAIMessage(chat, chatType, 1);
-          await saveData();
           renderChatList();
+          await addMessageBubble(message, chat, chatType);
+          await saveData();
           await new Promise(r => setTimeout(r, MESSAGE_STAGGER_DELAY_MS));
         }
       } else {
@@ -12851,10 +12867,10 @@ if (aiStickerMatch) {
           timestamp: Date.now()
         };
         chat.history.push(simpleMessage);
-        await addMessageBubble(simpleMessage, chat, chatType);
         registerIncomingAIMessage(chat, chatType, 1);
-        await saveData();
         renderChatList();
+        await addMessageBubble(simpleMessage, chat, chatType);
+        await saveData();
       }
     
 if (character.aiBlockedUser) {
@@ -12930,10 +12946,10 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
                 senderId: sender.id
               };
               group.history.push(message);
-              await addMessageBubble(message, chat, chatType);
               registerIncomingAIMessage(group, chatType, 1);
-              await saveData();
               renderChatList();
+              await addMessageBubble(message, chat, chatType);
+              await saveData();
               await new Promise(r => setTimeout(r, MESSAGE_STAGGER_DELAY_MS));
             } else {
               // 解析出了消息但发言者不匹配成员名时，保留原始文本，避免整段回复静默丢失。
@@ -12947,10 +12963,10 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
                   timestamp: Date.now(), senderId: fallbackMember.id
                 };
                 group.history.push(fallbackMessage);
-                await addMessageBubble(fallbackMessage, chat, chatType);
                 registerIncomingAIMessage(group, chatType, 1);
-                await saveData();
                 renderChatList();
+                await addMessageBubble(fallbackMessage, chat, chatType);
+                await saveData();
                 await new Promise(r => setTimeout(r, MESSAGE_STAGGER_DELAY_MS));
               }
             }
@@ -12970,10 +12986,10 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
             senderId: firstMember.id
           };
           group.history.push(simpleMessage);
-          await addMessageBubble(simpleMessage, chat, chatType);
           registerIncomingAIMessage(group, chatType, 1);
-          await saveData();
           renderChatList();
+          await addMessageBubble(simpleMessage, chat, chatType);
+          await saveData();
         }
       }
       /* 功能开始：群聊自动记忆归档 */
@@ -13638,7 +13654,7 @@ function setupGiftSystem() {
 let lastSoundTime = 0;
 function playSoundWithThrottle(type) {
   const now = Date.now();
-  if (now - lastSoundTime < 800) return;
+  if (now - lastSoundTime < 250) return;
   lastSoundTime = now;
   if (!db.soundSettings || !db.soundSettings[type]) return;
   const soundConf = db.soundSettings[type];
@@ -13864,6 +13880,22 @@ function setupWorldBookApp() {
       worldBookSelectionModal.classList.remove('visible');
       showToast('局部世界书已选择');
     
+} else if (ctx === 'offline-settings') {
+  const chat = typeof getOfflineActiveChat === 'function' ? getOfflineActiveChat() : null;
+  if (chat) {
+    chat.offlineSettings = chat.offlineSettings || {};
+    const localIds = new Set((db.worldBooks || []).filter(wb => (wb.scope || 'global') === 'local').map(wb => String(wb.id)));
+    chat.offlineSettings.offlineWorldBookIds = selectedIds.map(String).filter(id => localIds.has(id));
+    await saveData();
+    if (typeof renderWorldBooks === 'function') renderWorldBooks();
+    const count = document.getElementById('offline-worldbook-count');
+    const names = (db.worldBooks || []).filter(wb => localIds.has(String(wb.id)) && chat.offlineSettings.offlineWorldBookIds.includes(String(wb.id))).map(wb => wb.name || '未命名世界书');
+    if (count) count.textContent = names.length ? '已绑定：' + names.join('、') : '未绑定局部世界书';
+    const btn = document.getElementById('offline-worldbook-bind-btn');
+    if (btn) btn.textContent = names.length ? '已选 ' + names.length + ' 本局部世界书 · 点击修改' : '选择局部世界书';
+  }
+  worldBookSelectionModal.classList.remove('visible');
+  showToast('线下局部世界书绑定已更新');
 } else if (ctx === 'edit-profile') {
   tempEditProfileWorldBooks = selectedIds;
   const countSpan = document.getElementById('edit-profile-wb-count');
@@ -14053,6 +14085,24 @@ if (ciPinToggle) ciPinToggle.addEventListener('change', async (e) => {
   showToast(char.isPinned ? '已置顶' : '已取消置顶');
 });
 
+/* 私聊：动描模式与旁白模式，按角色独立保存并注入当前私聊提示词。 */
+const ciActionDescriptionToggle = document.getElementById('chat-info-action-description-toggle');
+if (ciActionDescriptionToggle) ciActionDescriptionToggle.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => String(c.id) === String(currentChatId));
+  if (!char) return;
+  char.actionDescriptionMode = !!e.target.checked;
+  await saveData();
+  showToast(char.actionDescriptionMode ? '已开启动描模式' : '已关闭动描模式');
+});
+const ciNarrationToggle = document.getElementById('chat-info-narration-toggle');
+if (ciNarrationToggle) ciNarrationToggle.addEventListener('change', async (e) => {
+  const char = db.characters.find(c => String(c.id) === String(currentChatId));
+  if (!char) return;
+  char.narrationMode = !!e.target.checked;
+  await saveData();
+  showToast(char.narrationMode ? '已开启旁白模式' : '已关闭旁白模式');
+});
+
 const ciAutoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
 if (ciAutoTranslateToggle) ciAutoTranslateToggle.addEventListener('change', async (e) => {
   const char = db.characters.find(c => c.id === currentChatId);
@@ -14076,30 +14126,6 @@ if (ciPhoneAwarenessToggle) ciPhoneAwarenessToggle.addEventListener('change', as
   await saveData();
   showToast(char.phoneAwarenessEnabled ? '已允许角色提及手机聊天设定' : '已关闭手机聊天设定，角色将只进行自然对话');
 });
-
-/* 私聊：心声自定义提示词。使用应用内输入框，不调用浏览器系统弹窗。 */
-const ciHeartPromptBtn = document.getElementById('chat-info-heart-prompt-btn');
-if (ciHeartPromptBtn) {
-  const openHeartPromptEditor = async () => {
-    const char = db.characters.find(c => c.id === currentChatId);
-    if (!char) return;
-    const value = await showHgInput({
-      title: '心声提示词',
-      sub: '这里的规则优先于默认心声要求。例如：严格写成三行小诗。留空则恢复默认规则。',
-      placeholder: '写下你希望心声如何生成……',
-      value: char.heartPrompt || '',
-      allowEmpty: true
-    });
-    if (value === null) return;
-    char.heartPrompt = value.trim();
-    await saveData();
-    const preview = document.getElementById('chat-info-heart-prompt-preview');
-    if (preview) preview.textContent = char.heartPrompt || '自定义心声生成规则，优先于默认提示词';
-    showToast(char.heartPrompt ? '心声提示词已保存' : '已恢复默认心声提示词');
-  };
-  ciHeartPromptBtn.addEventListener('click', openHeartPromptEditor);
-  ciHeartPromptBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openHeartPromptEditor(); } });
-}
 
 /* 功能开始：时间戳开关（聊天信息页） */
 const ciTimestampToggle = document.getElementById('chat-info-timestamp-toggle');
@@ -14197,6 +14223,10 @@ function renderChatInfoScreen() {
   document.getElementById('chat-info-avatar-name').textContent = getMaskRemarkForCharacter(char, getMaskIdForCharacterSession(char) || db.activeProfileMaskId) || char.realName || '';
   document.getElementById('chat-info-mute-toggle').checked = !!char.isMuted;
   document.getElementById('chat-info-pin-toggle').checked = !!char.isPinned;
+  const actionDescriptionToggle = document.getElementById('chat-info-action-description-toggle');
+  if (actionDescriptionToggle) actionDescriptionToggle.checked = !!char.actionDescriptionMode;
+  const narrationToggle = document.getElementById('chat-info-narration-toggle');
+  if (narrationToggle) narrationToggle.checked = !!char.narrationMode;
   const autoTranslateToggle = document.getElementById('chat-info-auto-translate-toggle');
   if (autoTranslateToggle) autoTranslateToggle.checked = !!char.autoTranslateEnabled;
   const phoneAwarenessToggle = document.getElementById('chat-info-phone-awareness-toggle');
@@ -22288,6 +22318,471 @@ window.addEventListener('beforeunload',()=>{window.stopFictionCallRingtone();if(
     render();return true;
   };
   document.addEventListener('DOMContentLoaded',()=>{bindEvents();reloadStore();render();});
+})();
+</script>
+
+
+<script id="offline-expanded-settings-addon">
+(function(){
+  const $=id=>document.getElementById(id);
+  const modes=[
+    ['常用线下','ordinary'],['平行世界','parallel']
+  ];
+  const stylePresets=[
+    ['白描','以白描为主，少用华丽修辞；用准确动作、神态、对话和细节呈现情绪，不直接解释情绪。'],
+    ['酸涩拉扯','情绪克制、欲言又止，重视错过、停顿、误解与未说出口的话；避免刻意煽情。'],
+    ['细腻电影感','镜头感清晰，关注光线、声音、空间和微表情；节奏有层次，画面具体但不堆砌形容词。'],
+    ['暧昧张力','通过距离、眼神、动作停顿和潜台词营造张力；自然推进，不强行越界或替用户决定。'],
+    ['轻松日常','自然口语与生活细节，节奏轻快，有来有回；避免重复关心吃饭睡觉。'],
+    ['冷感克制','句子简洁，情绪藏在动作和选择里，少直白抒情，保持人物一贯的性格。']
+  ];
+  function ensureField(id, html, beforeId){
+    if($(id))return $(id);
+    const anchor=$(beforeId);
+    if(!anchor)return null;
+    const wrap=document.createElement('div');wrap.innerHTML=html;
+    const el=wrap.firstElementChild; anchor.parentNode.insertBefore(el,anchor); return $(id);
+  }
+  function init(){
+    const body=document.querySelector('#offline-settings-modal .offline-settings-body');
+    if(!body||$('offline-world-mode'))return;
+    const mode=document.createElement('section');
+    mode.innerHTML=`<label class="offline-setting-label" for="offline-world-mode">剧情世界</label>
+      <select id="offline-world-mode" style="width:100%;padding:11px;border:1px solid #e2e2e7;border-radius:10px;background:#fff">
+        <option value="ordinary">常用线下</option>
+        <option value="parallel">平行世界</option></select>
+      <label class="offline-setting-label" for="offline-worldbook-bind-btn">绑定局部世界书</label>
+      <button type="button" id="offline-worldbook-bind-btn" style="width:100%;padding:11px;border:1px solid #e2e2e7;border-radius:10px;background:#fff;text-align:left;color:var(--text-color,#444)">选择局部世界书</button>
+      <div id="offline-worldbook-count" style="font-size:11px;color:var(--secondary-text,#777);margin-top:5px">未绑定局部世界书</div>
+      <label class="offline-setting-label" for="offline-style-preset">文风预设</label>
+      <select id="offline-style-preset" style="width:100%;padding:11px;border:1px solid #e2e2e7;border-radius:10px;background:#fff"><option value="">选择文风</option>${stylePresets.map((x,i)=>`<option value="${i}">${x[0]}</option>`).join('')}<option value="saved">已保存的自定义文风</option></select>
+      
+      <label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:#555"><input id="offline-translation-enabled" type="checkbox"> 外语回复附带中文翻译</label>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#555"><input id="offline-god-mode" type="checkbox"> 上帝模式</label>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#555"><input id="offline-interrupt-mode" type="checkbox"> 抢话模式</label>
+      <label style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:13px;color:#555"><input id="offline-cot-mode" type="checkbox"> 思考摘要</label>`;
+    const styleLabel=body.querySelector('label[for="offline-style-text"]');
+    if(styleLabel)body.insertBefore(mode,styleLabel);else body.appendChild(mode);
+    const lengthLabel=body.querySelector('label[for="offline-custom-words"]');
+    if(lengthLabel){ lengthLabel.style.display='none'; const legacyInput=$('offline-custom-words'); if(legacyInput)legacyInput.style.display='none';
+      const row=document.createElement('div');row.id='offline-custom-length-row';row.style.cssText='display:none;gap:8px;align-items:center;margin:8px 0 4px';
+      row.innerHTML='<span style="font-size:12px;color:#777;white-space:nowrap">目标字数</span><input id="offline-custom-length" type="number" min="100" max="10000" step="100" inputmode="numeric" placeholder="输入 100–10000 字" style="flex:1;min-width:0;padding:10px;border:1px solid #e2e2e7;border-radius:10px">';
+      const choice=$('offline-length-choice'); if(choice)choice.insertAdjacentElement('afterend',row); else lengthLabel.parentNode.insertBefore(row,lengthLabel.nextSibling);
+      const old=$('offline-custom-words'); if(old){old.style.display='none'; old.value='';}
+    }
+    const wbBtn=$('offline-worldbook-bind-btn');
+    if(wbBtn&&!wbBtn.dataset.bound){wbBtn.dataset.bound='1';wbBtn.addEventListener('click',()=>{
+      const localBooks=(db.worldBooks||[]).filter(wb=>(wb.scope||'global')==='local');
+      if(!localBooks.length){if(typeof showToast==='function')showToast('暂无局部世界书，请先前往世界书界面创建');return;}
+      const chat=getOfflineActiveChat(),selected=(chat?.offlineSettings?.offlineWorldBookIds||[]).map(String);
+      worldBookSelectionList.innerHTML='';
+      localBooks.forEach(book=>appendWorldBookSelectionItem(worldBookSelectionList,book,'wb-offline-settings-',selected.includes(String(book.id))));
+      window.currentWorldBookSelectionContext='offline-settings';
+      worldBookSelectionModal.classList.add('visible');
+    });}
+    $('offline-style-preset').addEventListener('change',e=>{
+      const v=e.target.value; const area=$('offline-style-text');
+      if(v==='saved'){const c=getOfflineActiveChat()?.offlineSettings||{};area.value=c.savedStyles?.[c.selectedSavedStyle]||area.value;return}
+      if(v!==''&&stylePresets[Number(v)])area.value=stylePresets[Number(v)][1];
+    });
+    const syncCustomLength=()=>{const selected=document.querySelector('input[name="offline-length"]:checked')?.value;const input=$('offline-custom-length'),row=$('offline-custom-length-row');if(row)row.style.display=selected==='custom'?'flex':'none';if(input)input.disabled=selected!=='custom';};
+    $('offline-length-choice')?.querySelectorAll('input[name="offline-length"]').forEach(r=>r.addEventListener('change',syncCustomLength));
+    $('offline-custom-length')?.addEventListener('focus',()=>{const custom=document.querySelector('input[name="offline-length"][value="custom"]');if(custom)custom.checked=true;syncCustomLength();});
+    $('offline-custom-length')?.addEventListener('input',()=>{const custom=document.querySelector('input[name="offline-length"][value="custom"]');if(custom)custom.checked=true;syncCustomLength();});
+  }
+  const oldOpen=window.openOfflineSettings;
+  window.openOfflineSettings=function(){
+    init(); if(oldOpen)oldOpen();
+    const c=getOfflineActiveChat()?.offlineSettings||{};
+    if($('offline-world-mode'))$('offline-world-mode').value=c.worldMode||'ordinary';
+    if($('offline-translation-enabled'))$('offline-translation-enabled').checked=!!c.translationEnabled;
+    if($('offline-god-mode'))$('offline-god-mode').checked=!!c.godMode;
+    if($('offline-interrupt-mode'))$('offline-interrupt-mode').checked=!!c.interruptMode;
+    if($('offline-cot-mode'))$('offline-cot-mode').checked=!!c.cotMode;
+    if($('offline-custom-length')){$('offline-custom-length').value=c.customLength||c.customWords||'';$('offline-custom-length').disabled=(c.length||'medium')!=='custom';}
+    document.querySelectorAll('input[name="offline-length"]').forEach(el=>el.checked=el.value===(c.length||'medium'));
+    if($('offline-custom-length-row'))$('offline-custom-length-row').style.display=c.length==='custom'?'flex':'none';
+    if(c.length==='custom'&&$('offline-custom-length'))$('offline-custom-length').disabled=false;
+    const boundIds=(c.offlineWorldBookIds||[]).map(String),localBooks=(db.worldBooks||[]).filter(wb=>(wb.scope||'global')==='local');
+    const boundNames=localBooks.filter(wb=>boundIds.includes(String(wb.id))).map(wb=>wb.name||'未命名世界书');
+    if($('offline-worldbook-count'))$('offline-worldbook-count').textContent=boundNames.length?'已绑定：'+boundNames.join('、'):'未绑定局部世界书';
+    if($('offline-worldbook-bind-btn'))$('offline-worldbook-bind-btn').textContent=boundNames.length?'已选 '+boundNames.length+' 本局部世界书 · 点击修改':'选择局部世界书';
+    const selectedLength=document.querySelector('input[name="offline-length"]:checked')?.value;
+    if($('offline-custom-length-row'))$('offline-custom-length-row').style.display=selectedLength==='custom'?'flex':'none';
+    if($('offline-custom-length'))$('offline-custom-length').disabled=selectedLength!=='custom';
+    if(c.selectedSavedStyle&&$('offline-style-name'))$('offline-style-name').value=c.selectedSavedStyle;
+  };
+  const oldSave=window.saveOfflineSettings;
+  window.saveOfflineSettings=async function(){
+    const chat=getOfflineActiveChat();if(!chat)return;
+    const c=chat.offlineSettings||{};
+    c.worldMode=$('offline-world-mode')?.value||'ordinary';
+    c.translationEnabled=!!$('offline-translation-enabled')?.checked;
+    c.godMode=!!$('offline-god-mode')?.checked;
+    c.interruptMode=!!$('offline-interrupt-mode')?.checked;
+    c.cotMode=!!$('offline-cot-mode')?.checked;
+    c.customLength=$('offline-custom-length')?.value||'';
+    const legacyWords=$('offline-custom-words'); if(legacyWords) legacyWords.value=''; c.customWords='';
+    const chosenPreset=$('offline-style-preset')?.value;
+    if(chosenPreset) c.selectedPreset=String(chosenPreset);
+    if(chosenPreset==='saved'&&$('offline-style-preset')?.dataset.savedName)c.selectedSavedStyle=$('offline-style-preset').dataset.savedName;
+    chat.offlineSettings=c;
+    if(oldSave)await oldSave();
+    else {await saveData();closeOfflineSettings();}
+    const savedChat=getOfflineActiveChat();if(savedChat){savedChat.offlineSettings=savedChat.offlineSettings||{};const saved=savedChat.offlineSettings;saved.length=document.querySelector('input[name="offline-length"]:checked')?.value||'medium';saved.customLength=saved.length==='custom'?($('offline-custom-length')?.value||''):'';saved.customWords=saved.length==='custom'?saved.customLength:'';if(typeof saveData==='function')await saveData();}
+  };
+  const oldPrompt=window.generateOfflineSystemPrompt;
+  window.generateOfflineSystemPrompt=function(chat){
+    let p=oldPrompt?oldPrompt(chat):'';
+    const c=chat?.offlineSettings||{};
+    const ids=new Set((c.offlineWorldBookIds||[]).map(String));
+    const books=(db.worldBooks||[]).filter(w=>(w.scope||'global')==='local'&&ids.has(String(w.id)));
+    if(books.length)p+='\n\n【本角色绑定的线下世界书】\n'+books.map(w=>`【${w.name||'世界书'}】\n${w.content||w.description||''}`).join('\n\n');
+    if(c.worldMode==='parallel')p+='\n【平行世界模式】本轮剧情属于独立平行世界，与线上主线隔离；不得读取或写入主线记忆，不得把本轮事件存入长期记忆。';
+    else p+='\n【常用线下模式】请延续同一角色的线上剧情、关系、事件和已形成的记忆；线下新发生的重要事实可延续到后续剧情。';
+    if(c.translationEnabled)p+='\n【外语翻译】角色若使用任何非中文语言（包括少数民族语言、藏语、维吾尔语、法语等），必须紧跟原文附上准确自然的简体中文翻译，格式：原文（中文：译文）。中文内容不重复翻译。';
+    if(c.godMode)p+='\n【上帝模式】生成角色在用户不在场、未参与或睡着时的独立场景，只描写其他角色可发生的事；不要假设用户在场，也不要替用户行动。';
+    if(c.interruptMode)p+='\n【抢话模式开启】允许在明确开启本模式时补写用户的回应或动作，但必须贴合用户已表达的意图，不得改变用户核心选择。';
+    else p+='\n【抢话模式关闭】绝对不代写用户台词、行动、心理、决定；只描写 AI 角色自身和环境。';
+    if(c.cotMode)p+='\n【思考摘要】如模型支持，请在回复末尾用简短、可展示的决策摘要说明角色如何基于人设回应；不要输出隐藏的逐字内部推理链。';
+    if(c.customLength&&c.length!=='custom')p+='\n【自定义篇幅】本次回复目标约'+Math.max(100,Math.min(10000,Number(c.customLength)||1000))+'字。';
+    return p;
+  };
+  document.addEventListener('DOMContentLoaded',init);
+  setTimeout(init,0);
+})();
+</script>
+
+
+<style id="offline-settings-ui-polish">
+/* Offline settings refresh: clear cards, readable presets, draggable world switch and library-based worldbooks. */
+#offline-settings-modal .offline-settings-body{gap:14px!important;padding:16px!important}
+#offline-settings-modal .offline-settings-body section{display:block;background:var(--panel-bg,#fff);border:1px solid rgba(120,120,140,.16);border-radius:16px;padding:15px;margin:10px 0;box-shadow:0 3px 14px rgba(30,30,50,.045)}
+#offline-settings-modal .offline-settings-body .offline-setting-label{display:block;font-size:13px;font-weight:700;letter-spacing:.01em;color:var(--text-color,#383844);margin:14px 0 8px}
+#offline-settings-modal #offline-world-mode{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+#offline-settings-modal #offline-worldbook-select{display:none!important}
+#offline-world-switch{position:relative;isolation:isolate;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:5px;border-radius:15px;background:rgba(120,120,140,.11);margin:8px 0 8px;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;overflow:hidden}
+#offline-world-switch.is-dragging{cursor:grabbing}
+#offline-world-switch .offline-world-indicator{position:absolute;z-index:0;left:5px;top:5px;bottom:5px;width:calc((100% - 15px)/2);border-radius:11px;background:var(--panel-bg,#fff);box-shadow:0 2px 9px rgba(20,20,40,.12);transition:transform .2s ease;pointer-events:none}
+#offline-world-switch[data-mode="parallel"] .offline-world-indicator{transform:translateX(calc(100% + 5px))}
+#offline-world-switch button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:64px;border:1px solid transparent;border-radius:11px;padding:10px 6px;background:transparent;color:var(--secondary-text,#737381);font-size:13px;font-weight:600;cursor:pointer;transition:color .18s,border-color .18s}
+#offline-world-switch button[aria-pressed="true"]{color:var(--accent-color,#7357c8)}
+#offline-world-switch .offline-world-name{font-size:13px;font-weight:750;line-height:1.2}
+#offline-world-switch .offline-world-desc{font-size:10px;font-weight:450;line-height:1.45;text-align:center;opacity:.88}
+#offline-world-switch .offline-world-badge{display:none;font-size:10px;font-weight:700;line-height:1.2;color:var(--accent-color,#7357c8)}
+#offline-world-switch button[aria-pressed="true"] .offline-world-badge{display:block}
+#offline-world-hint{margin:0 2px 12px;color:var(--secondary-text,#858592);font-size:11px;line-height:1.55}
+#offline-style-editor{margin:8px 0 12px;padding:12px;border:1px solid rgba(120,120,140,.18);border-radius:13px;background:rgba(120,120,140,.035)}
+#offline-style-editor[hidden]{display:none!important}
+#offline-style-editor #offline-style-text{width:100%;box-sizing:border-box;margin-top:8px}
+#offline-saved-style-library{margin-top:12px;padding-top:10px;border-top:1px solid rgba(120,120,140,.15)}
+#offline-saved-style-library .offline-saved-list{display:flex;flex-direction:column;gap:7px}
+#offline-saved-style-library .offline-saved-item{display:flex;align-items:center;gap:6px;min-width:0}
+#offline-saved-style-library .offline-saved-load{flex:1;min-width:0;text-align:left;border-radius:9px;white-space:normal}
+#offline-saved-style-library .offline-saved-action{border:1px solid rgba(120,120,140,.22);border-radius:8px;padding:7px 9px;background:var(--panel-bg,#fff);color:var(--text-color,#555);font-size:11px;cursor:pointer}
+#offline-saved-style-library .offline-saved-delete{color:#b33}
+#offline-saved-style-library .offline-saved-empty{font-size:12px;color:var(--secondary-text,#777);padding:6px 0}
+#offline-style-preset{display:none!important}
+#offline-style-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:8px 0 12px}
+#offline-style-cards button{display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:108px;min-width:0;border:1px solid rgba(120,120,140,.20);border-radius:13px;padding:12px;background:var(--panel-bg,#fff);color:var(--text-color,#383844);text-align:left;cursor:pointer;transition:border-color .16s,background .16s,box-shadow .16s,transform .16s}
+#offline-style-cards button:active{transform:scale(.985)}
+#offline-style-cards button[aria-pressed="true"]{border-color:var(--accent-color,#b9a6ee);box-shadow:0 0 0 1px var(--accent-color,#b9a6ee);background:rgba(190,172,245,.16)!important}
+#offline-style-cards strong{font-size:13px;font-weight:750;line-height:1.35}
+#offline-style-cards span{font-size:11px;line-height:1.6;color:var(--secondary-text,#777);font-weight:400;overflow-wrap:anywhere}
+#offline-style-cards .offline-style-custom{grid-column:1/-1;min-height:76px;background:linear-gradient(135deg,rgba(128,104,216,.065),rgba(128,104,216,.015))}
+#offline-saved-style-library{margin:8px 0 12px;padding:10px;border:1px solid rgba(120,120,140,.15);border-radius:12px;background:rgba(120,120,140,.035)}
+#offline-saved-style-library[hidden]{display:none!important}
+#offline-saved-style-library .offline-saved-heading{font-size:11px;font-weight:750;color:var(--secondary-text,#777);margin:0 0 8px}
+#offline-saved-style-library .offline-saved-list{display:flex;flex-wrap:wrap;gap:7px}
+#offline-saved-style-library button{max-width:100%;border:1px solid rgba(120,120,140,.22);border-radius:999px;padding:7px 10px;background:var(--panel-bg,#fff);color:var(--text-color,#454550);font-size:11px;cursor:pointer;overflow-wrap:anywhere}
+#offline-saved-style-library button[aria-pressed="true"]{border-color:var(--accent-color,#b9a6ee);background:rgba(128,104,216,.09);color:var(--accent-color,#7357c8)}
+#offline-worldbook-library{margin:8px 0 13px}
+#offline-worldbook-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+#offline-worldbook-count{font-size:11px;color:var(--secondary-text,#777);line-height:1.5}
+#offline-worldbook-manage{border:1px solid rgba(120,120,140,.23);border-radius:9px;background:var(--panel-bg,#fff);color:var(--text-color,#555);font-size:11px;font-weight:650;padding:7px 10px;white-space:nowrap;cursor:pointer}
+#offline-worldbook-cards{display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+#offline-worldbook-cards .offline-worldbook-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid rgba(120,120,140,.18);border-radius:12px;padding:11px;background:var(--panel-bg,#fff);min-width:0}
+#offline-worldbook-cards .offline-worldbook-card.is-bound{border-color:var(--accent-color,#b9a6ee);background:rgba(128,104,216,.055)}
+#offline-worldbook-cards .offline-worldbook-info{min-width:0}
+#offline-worldbook-cards .offline-worldbook-name{font-size:12px;font-weight:750;line-height:1.4;color:var(--text-color,#383844);overflow-wrap:anywhere}
+#offline-worldbook-cards .offline-worldbook-meta{display:inline-block;margin-top:4px;font-size:10px;line-height:1.3;color:var(--secondary-text,#858592)}
+#offline-worldbook-cards .offline-worldbook-summary{margin-top:5px;font-size:11px;line-height:1.55;color:var(--secondary-text,#777);overflow-wrap:anywhere}
+#offline-worldbook-cards .offline-worldbook-bind{border:1px solid var(--accent-color,#b9a6ee);border-radius:9px;padding:8px 10px;background:transparent;color:var(--accent-color,#7357c8);font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer}
+#offline-worldbook-cards .offline-worldbook-bind[aria-pressed="true"]{background:var(--accent-color,#7357c8);color:#fff}
+#offline-worldbook-cards .offline-worldbook-empty{padding:16px 12px;border:1px dashed rgba(120,120,140,.3);border-radius:12px;text-align:center;color:var(--secondary-text,#777);font-size:12px;line-height:1.7}
+#offline-worldbook-cards .offline-worldbook-empty button{display:block;margin:10px auto 0;border:0;border-radius:9px;padding:9px 12px;background:var(--accent-color,#7357c8);color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+#offline-settings-modal #offline-style-save{border:0;border-radius:10px;padding:0 14px;background:var(--accent-color,#7357c8);color:white;font-weight:700;white-space:nowrap;min-height:38px}
+#offline-settings-modal input[type=checkbox]{appearance:none!important;-webkit-appearance:none!important;width:38px!important;height:22px!important;flex:0 0 38px!important;border-radius:99px!important;background:#c9c9d1!important;position:relative!important;border:0!important;cursor:pointer;transition:background .18s}
+#offline-settings-modal input[type=checkbox]::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:0 1px 3px #0002;transition:transform .18s}
+#offline-settings-modal input[type=checkbox]:checked{background:var(--accent-color,#b9a6ee)!important}
+#offline-settings-modal input[type=checkbox]:checked::after{transform:translateX(16px)}
+@media(max-width:420px){#offline-settings-modal .offline-settings-body{padding:11px!important}#offline-world-switch button{min-height:66px;padding:9px 4px}#offline-style-cards{gap:7px}#offline-style-cards button{padding:10px;min-height:116px}#offline-worldbook-cards .offline-worldbook-card{padding:9px;gap:6px}#offline-worldbook-cards .offline-worldbook-bind{padding:8px}}
+@media(prefers-reduced-motion:reduce){#offline-world-switch .offline-world-indicator,#offline-style-cards button{transition:none!important}}
+</style>
+<script id="offline-settings-ui-polish-js">
+(function(){
+ const presets=[
+  ['白描','用准确动作、神态、对话与细节呈现情绪；少用华丽修辞，不直接解释感受。'],
+  ['酸涩拉扯','克制、欲言又止，重视停顿、错过与未说出口的话；避免刻意煽情。'],
+  ['细腻电影感','注重光线、声音、空间和微表情；画面具体、节奏有层次，不堆砌形容词。'],
+  ['暧昧张力','通过距离、眼神、动作停顿与潜台词营造张力；自然推进，不替用户越界决定。'],
+  ['轻松日常','自然口语、生活细节与轻快节奏，有来有回；避免反复催吃饭睡觉。'],
+  ['冷感克制','句子简洁，情绪藏在动作与选择里，少直白抒情，保持人物性格一致。']
+ ];
+ const $=id=>document.getElementById(id);
+ const getBooks=()=>typeof db!=='undefined'&&Array.isArray(db.worldBooks)?db.worldBooks.filter(wb=>(wb.scope||'global')==='local'):[];
+ function decorate(){
+  const mode=$('offline-world-mode'),preset=$('offline-style-preset'),body=document.querySelector('#offline-settings-modal .offline-settings-body');
+  if(!mode||!preset||!body||$('offline-world-switch'))return;
+
+  /* Two-way drag switch: left continues the mainline, right starts an isolated parallel world. */
+  const switcher=document.createElement('div');
+  switcher.id='offline-world-switch';switcher.setAttribute('role','group');switcher.setAttribute('aria-label','剧情世界切换');
+  switcher.innerHTML='<span class="offline-world-indicator" aria-hidden="true"></span>'+ 
+   '<button type="button" data-mode="ordinary" aria-pressed="true"><span class="offline-world-name">常用线下</span><span class="offline-world-desc">接续线上剧情与记忆</span><span class="offline-world-badge">当前启用</span></button>'+ 
+   '<button type="button" data-mode="parallel" aria-pressed="false"><span class="offline-world-name">平行世界</span><span class="offline-world-desc">独立剧情 · 隔离主线</span><span class="offline-world-badge">当前启用</span></button>';
+  const modeLabel=body.querySelector('label[for="offline-world-mode"]');
+  if(modeLabel){modeLabel.textContent='剧情世界';modeLabel.insertAdjacentElement('afterend',switcher);}else mode.parentNode.insertBefore(switcher,mode);
+  const hint=document.createElement('p');hint.id='offline-world-hint';hint.textContent='左右拖动滑块，或直接点选一侧；松手即切换当前剧情模式。';switcher.insertAdjacentElement('afterend',hint);
+
+  async function saveMode(v){
+   const chat=window.getOfflineActiveChat?.();if(!chat)return;
+   chat.offlineSettings=chat.offlineSettings||{};chat.offlineSettings.worldMode=v;
+   try{if(typeof saveData==='function')await saveData();}catch(err){console.error('保存剧情世界模式失败',err);}
+  }
+  function setMode(v,persist=true){
+   mode.value=v;mode.dispatchEvent(new Event('change',{bubbles:true}));switcher.dataset.mode=v;
+   switcher.querySelectorAll('button[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===v)));
+   if(persist)saveMode(v);
+  }
+  let dragging=false,downX=0,moved=false,blockClickUntil=0;
+  const modeFromX=x=>{const r=switcher.getBoundingClientRect();return x<r.left+r.width/2?'ordinary':'parallel';};
+  switcher.querySelectorAll('button[data-mode]').forEach(b=>b.addEventListener('click',e=>{
+   if(Date.now()<blockClickUntil){e.preventDefault();return;}setMode(b.dataset.mode,true);
+  }));
+  switcher.addEventListener('pointerdown',e=>{
+   if(e.button!==undefined&&e.button!==0)return;dragging=true;moved=false;downX=e.clientX;switcher.classList.add('is-dragging');
+   try{switcher.setPointerCapture(e.pointerId);}catch(_e){}
+  });
+  switcher.addEventListener('pointermove',e=>{
+   if(!dragging)return;if(Math.abs(e.clientX-downX)>7)moved=true;
+   if(moved){e.preventDefault();setMode(modeFromX(e.clientX),false);}
+  });
+  const endDrag=e=>{
+   if(!dragging)return;dragging=false;switcher.classList.remove('is-dragging');
+   if(moved){setMode(modeFromX(e.clientX),true);blockClickUntil=Date.now()+450;}
+  };
+  switcher.addEventListener('pointerup',endDrag);switcher.addEventListener('pointercancel',endDrag);
+
+  /* Style cards stay visible; the editor opens only when the custom style card is selected. */
+  const cards=document.createElement('div');cards.id='offline-style-cards';
+  cards.innerHTML=presets.map((p,i)=>'<button type="button" data-preset="'+i+'" aria-pressed="false"><strong>'+p[0]+'</strong><span>'+p[1]+'</span></button>').join('')+
+   '<button type="button" class="offline-style-custom" data-preset="saved" aria-pressed="false"><strong>我的自定义文风</strong><span>管理自己保存的文风</span></button>';
+  preset.parentNode.insertBefore(cards,preset);
+  const editor=document.createElement('div');editor.id='offline-style-editor';editor.hidden=true;
+  const styleLabel=body.querySelector('label[for="offline-style-text"]'),styleArea=$('offline-style-text');
+  if(styleLabel&&styleArea){
+   editor.appendChild(styleLabel);editor.appendChild(styleArea);
+   const nameRow=document.createElement('div');nameRow.id='offline-style-name-row';nameRow.style.cssText='display:flex;gap:8px;margin-top:8px';
+   nameRow.innerHTML='<input id="offline-style-name" placeholder="文风名称" style="min-width:0;flex:1;padding:10px;border:1px solid #e2e2e7;border-radius:10px"><button type="button" id="offline-style-save" class="offline-text-btn">保存文风</button>';
+   editor.appendChild(nameRow);
+   const savedBox=document.createElement('div');savedBox.id='offline-saved-style-library';savedBox.hidden=false;editor.appendChild(savedBox);
+   preset.insertAdjacentElement('afterend',editor);
+  }
+  function setStyleCard(value){cards.querySelectorAll('button[data-preset]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.preset===String(value))));}
+  function showEditor(show){editor.hidden=!show;}
+  function selectPreset(v){
+   const area=$('offline-style-text');if(!area)return;
+   if(v==='saved'){
+    showEditor(true);const c=window.getOfflineActiveChat?.()?.offlineSettings||{};const wasCustom=preset.value==='saved';const name=preset.dataset.savedName||(wasCustom?c.selectedSavedStyle:null);
+    if(name&&c.savedStyles?.[name]){area.value=c.savedStyles[name];$('offline-style-name').value=name;preset.dataset.savedName=name;}
+    else if(!area.value.trim())area.value='';
+   }else{
+    showEditor(false);area.value=presets[Number(v)]?.[1]||'';delete preset.dataset.savedName;
+   }
+   preset.value=v;setStyleCard(v);
+  }
+  cards.querySelectorAll('button[data-preset]').forEach(b=>b.addEventListener('click',()=>selectPreset(b.dataset.preset)));
+  function renderSavedStyles(){
+   const c=window.getOfflineActiveChat?.()?.offlineSettings||{},styles=c.savedStyles||{},names=Object.keys(styles),box=$('offline-saved-style-library');
+   if(!box)return;box.innerHTML='';
+   const heading=document.createElement('div');heading.className='offline-saved-heading';heading.textContent='已保存的文风';box.appendChild(heading);
+   if(!names.length){const empty=document.createElement('div');empty.className='offline-saved-empty';empty.textContent='还没有保存的文风';box.appendChild(empty);return;}
+   const list=document.createElement('div');list.className='offline-saved-list';box.appendChild(list);
+   names.forEach(name=>{
+    const item=document.createElement('div');item.className='offline-saved-item';
+    const load=document.createElement('button');load.type='button';load.className='offline-saved-load';load.textContent=name;load.title=String(styles[name]||'');load.setAttribute('aria-pressed',String(c.selectedPreset==='saved'&&c.selectedSavedStyle===name));
+    load.addEventListener('click',()=>{const area=$('offline-style-text');if(area)area.value=styles[name]||'';$('offline-style-name').value=name;preset.value='saved';preset.dataset.savedName=name;setStyleCard('saved');showEditor(true);list.querySelectorAll('.offline-saved-load').forEach(x=>x.setAttribute('aria-pressed',String(x===load)));});
+    const edit=document.createElement('button');edit.type='button';edit.className='offline-saved-action';edit.textContent='编辑';edit.addEventListener('click',()=>{load.click();$('offline-style-name').focus();});
+    const del=document.createElement('button');del.type='button';del.className='offline-saved-action offline-saved-delete';del.textContent='删除';del.addEventListener('click',async()=>{if(!confirm('删除文风「'+name+'」？'))return;const chat=window.getOfflineActiveChat?.();if(!chat)return;chat.offlineSettings=chat.offlineSettings||{};const cfg=chat.offlineSettings;delete cfg.savedStyles?.[name];if(cfg.selectedSavedStyle===name){delete cfg.selectedSavedStyle;cfg.selectedPreset='';}if(preset.dataset.savedName===name)delete preset.dataset.savedName;await saveData();renderSavedStyles();decorateState();});
+    item.append(load,edit,del);list.appendChild(item);
+   });
+  }
+  $('offline-style-save')?.addEventListener('click',async()=>{
+   const chat=window.getOfflineActiveChat?.();if(!chat)return;const name=$('offline-style-name').value.trim(),value=$('offline-style-text').value.trim();
+   if(!name||!value){showToast('请填写文风名称和内容');return;}
+   chat.offlineSettings=chat.offlineSettings||{};const c=chat.offlineSettings;c.savedStyles=c.savedStyles||{};c.savedStyles[name]=value;c.selectedSavedStyle=name;c.selectedPreset='saved';c.style=value;
+   preset.value='saved';preset.dataset.savedName=name;setStyleCard('saved');showEditor(true);await saveData();renderSavedStyles();showToast('文风已保存');
+  });
+
+  /* The offline picker deliberately reuses the app's existing local-worldbook selection modal. */
+  function renderWorldBooks(){
+   const chat=window.getOfflineActiveChat?.(),cfg=chat?.offlineSettings||{},ids=new Set((cfg.offlineWorldBookIds||[]).map(String));
+   const books=(window.db?.worldBooks||[]).filter(wb=>(wb.scope||'global')==='local');
+   const names=books.filter(wb=>ids.has(String(wb.id))).map(wb=>wb.name||'未命名世界书');
+   const count=$('offline-worldbook-count'),btn=$('offline-worldbook-bind-btn');
+   if(count)count.textContent=names.length?'已绑定：'+names.join('、'):'未绑定局部世界书';
+   if(btn)btn.textContent=names.length?'已选 '+names.length+' 本局部世界书 · 点击修改':'选择局部世界书';
+  }
+  function openOfflineWorldBookPicker(){
+   const localBooks=(window.db?.worldBooks||[]).filter(wb=>(wb.scope||'global')==='local');
+   if(!localBooks.length){if(typeof window.showToast==='function')window.showToast('暂无局部世界书，请先前往世界书界面创建');return;}
+   const chat=window.getOfflineActiveChat?.(),selected=(chat?.offlineSettings?.offlineWorldBookIds||[]).map(String);
+   window.worldBookSelectionList.innerHTML='';
+   localBooks.forEach(book=>window.appendWorldBookSelectionItem(window.worldBookSelectionList,book,'wb-offline-settings-',selected.includes(String(book.id))));
+   window.currentWorldBookSelectionContext='offline-settings';
+   window.worldBookSelectionModal.classList.add('visible');
+  }
+  $('offline-worldbook-bind-btn')?.addEventListener('click',openOfflineWorldBookPicker);
+
+  const oldOpen=window.openOfflineSettings;
+  window.openOfflineSettings=function(){
+   if(oldOpen)oldOpen();decorateState();renderWorldBooks();renderSavedStyles();
+  };
+  function decorateState(){
+   const c=window.getOfflineActiveChat?.()?.offlineSettings||{},v=c.worldMode||'ordinary';
+   mode.value=v;switcher.dataset.mode=v;switcher.querySelectorAll('button[data-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===v)));
+   if(c.selectedPreset!==undefined&&c.selectedPreset!==null){preset.value=String(c.selectedPreset);setStyleCard(c.selectedPreset);}
+   else if(c.selectedSavedStyle){preset.value='saved';preset.dataset.savedName=c.selectedSavedStyle;setStyleCard('saved');}
+   else{preset.value='';delete preset.dataset.savedName;setStyleCard('');}
+   if(c.selectedSavedStyle)preset.dataset.savedName=c.selectedSavedStyle;
+   const editor=$('offline-style-editor');if(editor)editor.hidden=preset.value!=='saved';
+   if(preset.value==='saved'&&c.selectedSavedStyle){$('offline-style-name').value=c.selectedSavedStyle;if($('offline-style-text'))$('offline-style-text').value=c.savedStyles?.[c.selectedSavedStyle]||c.style||'';}
+  }
+  document.addEventListener('DOMContentLoaded',()=>{renderWorldBooks();renderSavedStyles();});
+ }
+ document.addEventListener('DOMContentLoaded',decorate);setTimeout(decorate,100);setTimeout(decorate,800);
+})();
+</script>
+
+
+<style id="offline-settings-final-fixes">
+#offline-settings-modal #offline-custom-length-row[hidden],#offline-settings-modal #offline-style-editor[hidden]{display:none!important}
+#offline-settings-modal #offline-custom-length-row{display:none;align-items:center;gap:8px;margin:10px 0 4px}
+#offline-settings-modal #offline-custom-length{width:100%;box-sizing:border-box;min-width:0;padding:11px;border:1px solid #dedee6;border-radius:10px;background:var(--panel-bg,#fff);color:var(--text-color,#333)}
+#offline-settings-modal #offline-style-preset{display:none!important}
+#offline-style-cards .offline-style-card{border:1px solid rgba(120,120,140,.18);border-radius:12px;padding:10px;background:var(--panel-bg,#fff);min-width:0;display:flex;flex-direction:column;gap:7px}
+#offline-style-cards .offline-style-card[aria-pressed="true"]{border-color:var(--accent-color,#b9a6ee);background:rgba(190,172,245,.16);box-shadow:0 0 0 1px var(--accent-color,#b9a6ee) inset}
+#offline-style-cards .offline-style-card{user-select:none;-webkit-user-select:none;touch-action:pan-y}
+#offline-style-cards .offline-style-pick{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;border:0;background:transparent;color:var(--text-color,#444);padding:0;cursor:pointer;min-width:0}
+#offline-style-cards .offline-style-pick strong{font-size:13px}
+#offline-style-cards .offline-style-pick span{font-size:11px;line-height:1.5;color:var(--secondary-text,#777)}
+#offline-settings-modal #offline-style-editor{margin-top:10px;padding:12px;border:1px solid rgba(120,120,140,.18);border-radius:12px;background:rgba(120,120,140,.035)}
+#offline-settings-modal #offline-style-editor textarea{width:100%;box-sizing:border-box}
+</style>
+<script id="offline-settings-final-fixes-js">
+(function(){
+ const $=id=>document.getElementById(id);
+ const defaults=[
+  ['白描','用准确动作、神态、对话与细节呈现情绪；少用华丽修辞，不直接解释感受。'],
+  ['酸涩拉扯','克制、欲言又止，重视停顿、错过与未说出口的话；避免刻意煽情。'],
+  ['细腻电影感','注重光线、声音、空间和微表情；画面具体、节奏有层次，不堆砌形容词。'],
+  ['暧昧张力','通过距离、眼神、动作停顿与潜台词营造张力；自然推进，不替用户越界决定。'],
+  ['轻松日常','自然口语、生活细节与轻快节奏，有来有回；避免反复催吃饭睡觉。'],
+  ['冷感克制','句子简洁，情绪藏在动作与选择里，少直白抒情，保持人物性格一致。']
+ ];
+ const activeChat=()=>typeof window.getOfflineActiveChat==='function'?window.getOfflineActiveChat():null;
+ const cfg=()=>{const c=activeChat();if(!c)return null;c.offlineSettings=c.offlineSettings||{};return c.offlineSettings;};
+ async function persist(){if(typeof window.saveData==='function')await window.saveData();}
+ function toast(msg){if(/已选择文风|已切换文风|文风已切换/.test(String(msg||'')))return;if(typeof window.showToast==='function')window.showToast(msg);}
+ function install(){
+  const body=document.querySelector('#offline-settings-modal .offline-settings-body');
+  const cards=$('offline-style-cards'),editor=$('offline-style-editor'),area=$('offline-style-text'),preset=$('offline-style-preset');
+  if(!body||!cards||!editor||!area||!preset)return;
+  if(cards.dataset.finalFix==='1')return;cards.dataset.finalFix='1';
+  const nameInput=$('offline-style-name');
+  let editing=null; // {type:'system'|'saved', name:string}
+  const styleMap=()=>{const c=cfg()||{};return c.stylePresetOverrides||{};};
+  const hiddenSet=()=>new Set((cfg()?.hiddenStylePresets||[]).map(String));
+  function showEditor(on){editor.hidden=!on;editor.style.display=on?'block':'none';}
+  function getStyles(){const c=cfg()||{},overrides=c.stylePresetOverrides||{},hidden=hiddenSet();return defaults.filter(x=>!hidden.has(x[0])).map(([name,txt])=>({type:'system',name,text:overrides[name]||txt})).concat(Object.entries(c.savedStyles||{}).map(([name,text])=>({type:'saved',name,text})));}
+  function setSelected(style){const c=cfg();if(!c)return;c.style=style.text;c.selectedStyleType=style.type;c.selectedStyleName=style.name;if(style.type==='saved'){c.selectedPreset='saved';c.selectedSavedStyle=style.name;preset.value='saved';preset.dataset.savedName=style.name;}else{c.selectedPreset=String(defaults.findIndex(x=>x[0]===style.name));delete c.selectedSavedStyle;preset.value=c.selectedPreset;delete preset.dataset.savedName;} }
+  let styleLongPressTriggered=false,stylePressTimer=null,styleStartX=0,styleStartY=0;
+  function deleteStyle(style){
+    const c=cfg();if(!c)return;
+    if(!window.confirm('删除文风「'+style.name+'」？'))return;
+    if(style.type==='saved'){if(c.savedStyles)delete c.savedStyles[style.name];}
+    else{c.hiddenStylePresets=Array.from(new Set([...(c.hiddenStylePresets||[]),style.name]));if(c.stylePresetOverrides)delete c.stylePresetOverrides[style.name];}
+    if(c.selectedStyleName===style.name||c.selectedSavedStyle===style.name){c.style='';delete c.selectedStyleName;delete c.selectedSavedStyle;c.selectedPreset='';}
+    if(editing?.name===style.name)editing=null;
+    persist().then(()=>{renderCards();toast('文风已删除');});
+  }
+  function showStyleActions(style){
+    document.getElementById('offline-style-actions')?.remove();
+    const overlay=document.createElement('div');overlay.id='offline-style-actions';overlay.className='offline-message-actions-overlay';
+    overlay.innerHTML='<div class="offline-message-actions-panel" role="dialog" aria-modal="true" aria-label="文风操作"><div class="offline-message-actions-grabber"></div><div class="offline-message-actions-title"></div><button type="button" data-action="edit">编辑文风</button><button type="button" data-action="delete" class="danger">删除文风</button><button type="button" data-action="cancel" class="cancel">取消</button></div>';
+    overlay.querySelector('.offline-message-actions-title').textContent=style.name;
+    if(!document.getElementById('offline-style-actions-style')){const css=document.createElement('style');css.id='offline-style-actions-style';css.textContent='.offline-message-actions-overlay{position:fixed;inset:0;z-index:10050;background:rgba(25,27,32,.28);display:flex;align-items:flex-end;justify-content:center;padding:12px 12px calc(12px + var(--safe-bottom, 0px));box-sizing:border-box;backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px)}.offline-message-actions-panel{width:min(100%,480px);background:var(--panel-bg,#f8f8fa);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:10px 12px calc(12px + var(--safe-bottom, 0px));box-shadow:0 10px 35px rgba(20,22,28,.16);font-family:inherit;box-sizing:border-box}.offline-message-actions-grabber{width:34px;height:4px;border-radius:4px;background:#d4d5da;margin:2px auto 12px}.offline-message-actions-title{text-align:center;color:var(--secondary-text,#898b94);font-size:12px;letter-spacing:1px;padding:4px 0 10px}.offline-message-actions-panel button{display:block;width:100%;min-height:46px;border:1px solid rgba(120,120,140,.16);border-radius:12px;background:var(--panel-bg,#fff);color:var(--text-color,#3c3e45);font:inherit;font-size:15px;margin-top:8px;padding:11px 14px}.offline-message-actions-panel button:active{background:rgba(120,120,140,.12)}.offline-message-actions-panel button.danger{color:#b84b50}.offline-message-actions-panel button.cancel{background:rgba(120,120,140,.09);color:var(--secondary-text,#777983);border-color:transparent;margin-top:12px}';document.head.appendChild(css);}
+    const close=()=>overlay.remove();overlay.addEventListener('click',ev=>{if(ev.target===overlay){close();return;}const b=ev.target.closest('button[data-action]');if(!b)return;const action=b.dataset.action;close();if(action==='edit'){editing={type:style.type,name:style.name};nameInput.value=style.name;area.value=style.text;showEditor(true);nameInput.focus();}else if(action==='delete')deleteStyle(style);});
+    document.body.appendChild(overlay);
+  }
+  function renderCards(){
+   const selectedCfg=cfg()||{},selectedName=selectedCfg.selectedStyleName||selectedCfg.selectedSavedStyle||'';
+   cards.replaceChildren();cards.style.display='grid';cards.style.gridTemplateColumns='repeat(2,minmax(0,1fr))';cards.style.gap='9px';
+   getStyles().forEach(style=>{
+    const card=document.createElement('div');card.className='offline-style-card';const isSelected=style.name===selectedName;card.setAttribute('aria-pressed',String(isSelected));card.setAttribute('role','group');card.setAttribute('aria-label',style.name);card.style.setProperty('background-color',isSelected?'#f5f1ff':'#ffffff','important');card.style.setProperty('border-color',isSelected?'#b9a6ee':'rgba(120,120,140,.18)','important');card.style.setProperty('box-shadow',isSelected?'0 0 0 2px #b9a6ee inset':'none','important');card.style.setProperty('border-radius','13px','important');card.style.setProperty('transition','background-color .18s,border-color .18s,box-shadow .18s','important');
+    const pick=document.createElement('button');pick.type='button';pick.className='offline-style-pick';
+    const title=document.createElement('strong');title.textContent=style.name;
+    const desc=document.createElement('span');desc.textContent=style.text;
+    // 选择文风只由按钮 click 触发；移除卡片长按/鼠标定时器，避免移动端触摸结束后吞掉 click。
+    pick.setAttribute('aria-pressed',String(style.name===selectedName));
+    pick.style.cssText='display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;width:100%;min-height:72px;border:0!important;border-radius:10px;background:transparent!important;color:var(--text-color,#444);padding:8px;cursor:pointer;touch-action:manipulation;pointer-events:auto;position:relative;z-index:1;box-shadow:none!important';
+    pick.append(title,desc);pick.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();setSelected(style);area.value=style.text;showEditor(false);card.style.setProperty('background-color','#f5f1ff','important');card.style.setProperty('border-color','#b9a6ee','important');card.style.setProperty('box-shadow','0 0 0 2px #b9a6ee inset','important');cards.querySelectorAll('.offline-style-card').forEach(other=>{if(other!==card){other.style.setProperty('background-color','#ffffff','important');other.style.setProperty('border-color','rgba(120,120,140,.18)','important');other.style.setProperty('box-shadow','none','important');}});card.setAttribute('aria-pressed','true');pick.setAttribute('aria-pressed','true');await persist();});
+    card.appendChild(pick);cards.appendChild(card);
+   });
+   const custom=document.createElement('button');custom.type='button';custom.className='offline-style-custom';custom.innerHTML='<strong>我的自定义文风</strong><span>新建并保存自己的文风</span>';custom.style.cssText='grid-column:1/-1;min-height:58px;border:1px dashed rgba(120,120,140,.24);border-radius:12px;padding:12px;text-align:left;background:#fff;color:var(--text-color,#444);display:flex;flex-direction:column;gap:5px;cursor:pointer';
+   custom.addEventListener('click',()=>{editing={type:'new',name:''};nameInput.value='';area.value='';showEditor(true);nameInput.focus();});cards.appendChild(custom);
+  }
+  // Replace the old save button so only this save logic runs.
+  let save=$('offline-style-save');if(save){const fresh=save.cloneNode(true);save.replaceWith(fresh);save=fresh;save.addEventListener('click',async()=>{
+    const c=cfg();if(!c)return;const name=nameInput.value.trim(),text=area.value.trim();if(!name||!text){toast('请填写文风名称和内容');return;}
+    if(editing?.type==='system'){
+      if(name!==editing.name){c.hiddenStylePresets=Array.from(new Set([...(c.hiddenStylePresets||[]),editing.name]));c.savedStyles=c.savedStyles||{};c.savedStyles[name]=text;c.selectedStyleType='saved';c.selectedSavedStyle=name;c.selectedPreset='saved';preset.value='saved';preset.dataset.savedName=name;}else{c.stylePresetOverrides=c.stylePresetOverrides||{};c.stylePresetOverrides[name]=text;c.selectedStyleType='system';c.selectedStyleName=name;c.selectedPreset=String(defaults.findIndex(x=>x[0]===name));}
+      c.style=text;c.selectedStyleName=name;
+    }else{
+      c.savedStyles=c.savedStyles||{};if(editing?.type==='saved'&&editing.name!==name)delete c.savedStyles[editing.name];c.savedStyles[name]=text;c.selectedStyleType='saved';c.selectedStyleName=name;c.selectedSavedStyle=name;c.selectedPreset='saved';preset.value='saved';preset.dataset.savedName=name;c.style=text;
+    }
+    editing=null;await persist();renderCards();showEditor(false);toast('文风已保存');
+   });}
+  // Add an explicit close/collapse affordance to the editor.
+  if(!editor.querySelector('#offline-style-cancel')){const cancel=document.createElement('button');cancel.id='offline-style-cancel';cancel.type='button';cancel.textContent='收起编辑';cancel.style.cssText='margin-top:8px;border:1px solid rgba(120,120,140,.2);border-radius:9px;padding:8px 11px;background:transparent;color:var(--text-color,#555)';cancel.addEventListener('click',()=>showEditor(false));editor.appendChild(cancel);}
+  renderCards();showEditor(false);
+
+  // Custom length: force the fourth radio option to reveal a usable exact word-count field.
+  const choice=$('offline-length-choice'),row=$('offline-custom-length-row'),input=$('offline-custom-length');
+  if(row&&input){input.min='1';input.max='100000';input.step='1';input.placeholder='输入目标字数';row.hidden=true;row.style.setProperty('display','none','important');
+   const sync=()=>{const selected=document.querySelector('input[name="offline-length"]:checked')?.value;const on=selected==='custom';row.hidden=!on;row.style.setProperty('display',on?'flex':'none','important');input.disabled=!on;};
+   choice?.addEventListener('change',e=>{if(e.target.matches('input[name="offline-length"]'))sync();},true);
+   choice?.querySelectorAll('input[name="offline-length"]').forEach(r=>{r.addEventListener('click',()=>setTimeout(sync,0),true);r.addEventListener('change',sync,true);});
+   input.addEventListener('focus',()=>{const r=choice?.querySelector('input[value="custom"]');if(r)r.checked=true;sync();});
+   input.addEventListener('input',()=>{const r=choice?.querySelector('input[value="custom"]');if(r)r.checked=true;sync();});
+   const originalOpen=window.openOfflineSettings;
+   window.openOfflineSettings=function(){if(originalOpen)originalOpen();const c=cfg()||{};input.value=c.customLength||c.customWords||'';const v=c.length||'medium';const radio=choice?.querySelector('input[value="'+v+'"]');if(radio)radio.checked=true;sync();renderCards();showEditor(false);};
+   const originalSave=window.saveOfflineSettings;
+   window.saveOfflineSettings=async function(){const c=cfg();if(c){const v=choice?.querySelector('input[name="offline-length"]:checked')?.value||'medium';c.length=v;c.customLength=v==='custom'?input.value:'';c.customWords=v==='custom'?input.value:'';}if(originalSave)await originalSave();else await persist();};
+   sync();
+  }
+  // Reuse exactly the same local-worldbook modal and selection-item builder as Add Friend.
+  const oldBind=$('offline-worldbook-bind-btn');if(oldBind){const btn=oldBind.cloneNode(true);oldBind.replaceWith(btn);btn.addEventListener('click',()=>{
+    const books=(typeof db!=='undefined'&&Array.isArray(db.worldBooks)?db.worldBooks:[]).filter(wb=>(wb.scope||'global')==='local');
+    if(!books.length){toast('暂无局部世界书，请前往世界书界面创建');return;}
+    const c=cfg()||{},selected=(c.offlineWorldBookIds||[]).map(String);
+    if(typeof worldBookSelectionList==='undefined'||typeof worldBookSelectionModal==='undefined'||typeof appendWorldBookSelectionItem!=='function'){toast('世界书选择界面暂不可用');return;}
+    worldBookSelectionList.innerHTML='';books.forEach(book=>appendWorldBookSelectionItem(worldBookSelectionList,book,'wb-offline-settings-',selected.includes(String(book.id))));
+    window.currentWorldBookSelectionContext='offline-settings';worldBookSelectionModal.classList.add('visible');
+  });}
+ }
+ document.addEventListener('DOMContentLoaded',install);setTimeout(install,1500);setTimeout(install,2500);
 })();
 </script>
 
