@@ -3246,9 +3246,12 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 #api-settings-screen .api-float-icon-actions #api-float-icon-reset:active{background:#ececec;border-color:#cfcfcf}
 #api-settings-screen .api-float-icon-actions #api-float-icon-reset{background:#fff;color:#555}
 #api-settings-screen .api-float-icon-actions #api-float-icon-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-#api-floating-ball{isolation:isolate}
-#api-floating-ball{padding:0!important;border:0!important;border-radius:50%!important;overflow:hidden!important;background:#292929!important}
-#api-floating-ball img{display:block;position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;object-position:center!important;border-radius:50%!important;aspect-ratio:1/1;clip-path:circle(50% at 50% 50%)}
+#api-floating-ball{isolation:auto!important}
+/* 透明悬浮图：不再给图片垫深色底或阴影；PNG/WebP 的透明像素直接透出页面背景 */
+#api-floating-ball{padding:0!important;border:0!important;border-radius:50%!important;overflow:hidden!important;background:transparent!important;box-shadow:none!important;outline:none!important}
+#api-floating-ball img{display:block;position:absolute;inset:0;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;object-position:center!important;border-radius:0!important;aspect-ratio:1/1;clip-path:none!important;background:transparent!important}
+#api-floating-ball .api-ball-default{background:rgba(41,41,41,.88);border-radius:50%;color:white}
+#api-floating-ball:focus-visible{outline:2px solid rgba(120,120,120,.65)!important;outline-offset:2px}
 #api-floating-ball .api-ball-default{display:flex;width:100%;height:100%;align-items:center;justify-content:center}
 #api-floating-ball .api-ball-default svg{display:block;width:58%;height:58%}
 </style>
@@ -14461,10 +14464,15 @@ function setupApiPresetAndFloatingBall() {
   const floatSizeValueEl = document.getElementById('api-float-size-value');
   if (!apiForm || !providerEl || !urlEl || !keyEl || !modelEl) return;
 
+  const DEFAULT_FLOATING_BALL_IMAGE = 'https://imgbed.heliar.top/i/iSquXn7q0gfRLJie_Image_1792055670393_267.png';
   const ensureStore = () => {
     if (!Array.isArray(db.apiPresets)) db.apiPresets = [];
     if (!db.apiFloatingBall || typeof db.apiFloatingBall !== 'object') {
-      db.apiFloatingBall = { enabled: false, icon: '', size: 40 };
+      db.apiFloatingBall = { enabled: false, icon: DEFAULT_FLOATING_BALL_IMAGE, size: 40 };
+    } else if (!db.apiFloatingBall.icon) {
+      // 默认悬浮球图标使用用户指定图片；已有自定义图标不覆盖。
+      db.apiFloatingBall.icon = DEFAULT_FLOATING_BALL_IMAGE;
+      saveData();
     }
   };
   ensureStore();
@@ -14788,10 +14796,10 @@ function setupApiPresetAndFloatingBall() {
     reader.readAsDataURL(file);
   });
   document.getElementById('api-float-icon-reset')?.addEventListener('click', async () => {
-    db.apiFloatingBall.icon = '';
+    db.apiFloatingBall.icon = DEFAULT_FLOATING_BALL_IMAGE;
     await saveData();
     updateBallVisibility();
-    showToast('已恢复默认悬浮球图标');
+    showToast('已恢复默认悬浮球图片');
   });
 
   // Allow the ball to be dragged around the viewport like a phone assistant bubble.
