@@ -1909,6 +1909,8 @@ input:checked + .slider:before { transform: translateX(22px); }
   user-select: none; -webkit-user-select: none;
 }
 .memory-tab.active { background: #333; color: #fff; }
+.memory-tab[data-level="withdrawn"].active{background:#eee8ff;color:#6f58a7;border:1px solid #d8ccff;}
+
 .memory-search-bar { padding: 12px 16px 12px; background: #ffffff; border-bottom: 1px solid #eaeaea; flex-shrink: 0; }
 .memory-search-bar input {
   width: 100%; padding: 10px 14px;
@@ -3262,6 +3264,367 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <style id="api-switch-neutral-theme">
 #api-presets-section .api-switch input:checked+span{background:#343434!important}
 </style>
+<style id="layout-refresh-v25">
+/* v25：韩系灰白系统画风。只作用于系统面板，微信界面、聊天气泡、转账与微信 CSS 美化效果保持原样。 */
+.system-panel {
+  --bg-color: #f5f5f4;
+  --primary-color: #777777;
+  --secondary-color: #a3a3a3;
+  --accent-color: #777777;
+  --text-color: #303030;
+  --white-color: #ffffff;
+  --border-radius: 18px;
+  --top-pinned-bg: #eeeeec;
+  --layout-line: #e8e7e4;
+  --layout-muted: #92918e;
+  --layout-shadow: 0 7px 22px rgba(35, 35, 32, .045);
+}
+html { background: #eeedeb; }
+body {
+  background: radial-gradient(ellipse at top left, #faf9f7 0%, #f0efed 58%, #e9e8e5 100%);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+.phone-screen {
+  width: min(100%, 460px);
+  height: min(940px, 100dvh);
+  max-height: 940px;
+  background: #f8f7f5;
+  border: 1px solid rgba(255,255,255,.9);
+  border-radius: 28px;
+  box-shadow: 0 22px 60px rgba(35,35,32,.12);
+  isolation: isolate;
+}
+/* Avoid applying the system palette to any WeChat screen. */
+.system-panel { min-height: 0; background: #f7f6f4; }
+.system-panel > .header,
+.system-panel > header,
+.system-panel .app-header {
+  background: rgba(255,255,255,.94);
+  border-bottom: 1px solid #e9e8e5;
+  box-shadow: 0 2px 10px rgba(35,35,32,.025);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+.system-panel .header h1,
+.system-panel header h1,
+.system-panel .title,
+.system-panel .title-container { color: #30302e; letter-spacing: -.02em; }
+.system-panel .content {
+  min-height: 0;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #c9c7c2 transparent;
+}
+.system-panel .content::-webkit-scrollbar { width: 4px; }
+.system-panel .content::-webkit-scrollbar-thumb { background: #c9c7c2; border-radius: 99px; }
+.system-panel .settings-list-item,
+.system-panel .list-item,
+.system-panel .card,
+.system-panel .setting-card {
+  border-color: var(--layout-line);
+  box-shadow: var(--layout-shadow);
+}
+.system-panel .settings-list-item {
+  border: 1px solid #eae9e6;
+  border-radius: 16px;
+  margin: 0 0 10px;
+  padding: 16px 17px;
+  background: #fff;
+  transition: transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.system-panel .settings-list-item:active { transform: scale(.99); background: #f3f2ef; }
+.system-panel .settings-list-item .item-name { color: #30302e; font-weight: 600; }
+.system-panel .settings-list-item .item-arrow { color: #a3a19b; }
+.system-panel .list-container { padding: 14px 15px 26px; }
+.system-panel .list-item { border-bottom-color: #eae9e6; }
+.system-panel button,
+.system-panel input,
+.system-panel select,
+.system-panel textarea { font: inherit; }
+.system-panel input:not([type="checkbox"]):not([type="radio"]),
+.system-panel select,
+.system-panel textarea {
+  border-color: #deddd9;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.system-panel input:not([type="checkbox"]):not([type="radio"]):focus,
+.system-panel select:focus,
+.system-panel textarea:focus {
+  border-color: #a8a6a0 !important;
+  box-shadow: 0 0 0 3px rgba(120,118,112,.10);
+}
+.system-panel button { transition: transform .14s ease, filter .14s ease, box-shadow .14s ease; }
+.system-panel button:active { transform: translateY(1px); }
+#api-settings-screen .content {
+  padding: 18px 16px calc(30px + var(--safe-bottom, 0px)) !important;
+  background: linear-gradient(180deg, #f8f7f5 0%, #f1f0ed 100%) !important;
+}
+#api-settings-screen #api-presets-section {
+  padding: 18px !important;
+  margin: 0 0 16px !important;
+  border: 1px solid #e7e6e2 !important;
+  border-radius: 20px !important;
+  background: #fff !important;
+  box-shadow: 0 8px 24px rgba(40,38,32,.045) !important;
+}
+#api-settings-screen #api-presets-section h3 {
+  font-size: 18px !important;
+  line-height: 1.35;
+  font-weight: 750 !important;
+  letter-spacing: -.02em !important;
+  margin-bottom: 9px !important;
+  color: #30302e !important;
+}
+#api-settings-screen .api-preset-help,
+#api-preset-memory-status { color: #85837d !important; line-height: 1.65 !important; }
+#api-settings-screen .api-preset-save-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  gap: 9px !important;
+}
+#api-settings-screen .api-preset-save-row select {
+  grid-column: 1 / -1;
+  min-width: 0 !important;
+  width: 100%;
+  height: 44px;
+  border: 1px solid #deddd9 !important;
+  border-radius: 12px !important;
+  background-color: #fbfaf8 !important;
+  color: #393936 !important;
+  padding: 0 11px !important;
+}
+#api-settings-screen .api-preset-save-row button,
+#api-settings-screen .api-preset-item button,
+#api-settings-screen .api-float-icon-row button {
+  min-width: 0 !important;
+  width: 100%;
+  min-height: 44px !important;
+  border-radius: 12px !important;
+  padding: 0 8px !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+  background: #f0efed !important;
+  color: #4b4a46 !important;
+  border: 1px solid #e3e2de !important;
+  white-space: nowrap;
+  box-shadow: none !important;
+}
+#api-settings-screen #api-preset-save-btn,
+#api-settings-screen #api-preset-memory-btn {
+  grid-row: 2;
+  height: 44px !important;
+  min-height: 44px !important;
+  background: #42413e !important;
+  color: #fff !important;
+  border-color: #42413e !important;
+  box-shadow: 0 3px 8px rgba(35,34,31,.10) !important;
+}
+#api-settings-screen #api-preset-save-btn { grid-column: 1; }
+#api-settings-screen #api-preset-memory-btn { grid-column: 2; }
+#api-settings-screen #api-preset-delete-btn {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  background: #f3f2ef !important;
+  color: #686761 !important;
+  border-color: #e8e7e3 !important;
+}
+#api-settings-screen .api-preset-list { gap: 9px !important; }
+#api-settings-screen .api-preset-item {
+  border: 1px solid #e8e7e3 !important;
+  border-radius: 15px !important;
+  background: #fbfaf8 !important;
+  padding: 9px !important;
+}
+#api-settings-screen .api-float-setting,
+#api-settings-screen .api-float-icon-row {
+  border-top: 1px solid #eae9e5;
+  padding-top: 14px;
+  margin-top: 14px;
+}
+#api-settings-screen .api-float-setting strong { color: #373632; }
+#api-settings-screen .api-float-setting small { color: #898780; }
+.modal-overlay, .modal, .popup, .dialog {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+@media (min-width: 700px) {
+  body { padding: 20px; }
+  .phone-screen { height: min(940px, calc(100dvh - 40px)); }
+}
+@media (max-width: 480px) {
+  html, body { width: 100%; min-height: 100%; background: #f8f7f5; }
+  body { display: block; min-height: 100vh; min-height: 100dvh; }
+  .phone-screen {
+    width: 100%; max-width: none; height: 100vh; height: 100dvh; max-height: none;
+    border: 0; border-radius: 0; box-shadow: none;
+  }
+  #api-settings-screen .content { padding: 14px 12px calc(24px + var(--safe-bottom, 0px)) !important; }
+  #api-settings-screen #api-presets-section { padding: 15px !important; border-radius: 18px !important; }
+  #api-settings-screen .api-preset-save-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  #api-settings-screen .api-preset-save-row button { padding: 0 6px !important; font-size: 12px !important; }
+}
+@media (max-width: 340px) {
+  #api-settings-screen .api-preset-save-row button { font-size: 11px !important; letter-spacing: -.02em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+</style>
+
+<style id="v26-korean-lockscreen-wallpaper">
+/* v26：仅系统美化/锁屏组件；微信消息、转账和微信 CSS 美化区域不套用本主题 */
+/* 设置与美化菜单统一加宽：减少两侧留白，让列表栏更贴近屏幕边缘 */
+#settings-menu-screen .content, #beautify-menu-screen .content, #beautify-settings-screen .content, #customize-screen .content { padding-left: 8px !important; padding-right: 8px !important; box-sizing:border-box; }
+#settings-menu-screen .list-container, #beautify-menu-screen .list-container, #beautify-settings-screen .list-container { width:100%; max-width:none; margin:0 auto; }
+#settings-menu-screen .settings-list-item, #beautify-menu-screen .settings-list-item, #beautify-settings-screen .settings-list-item { width:100%; min-height:64px; padding:16px 14px; box-sizing:border-box; }
+#settings-menu-screen > .content > div { padding-left:8px !important; padding-right:8px !important; box-sizing:border-box; }
+#customize-screen .content { padding-top:12px; }
+@media (min-width:700px) { #settings-menu-screen .content, #beautify-menu-screen .content, #beautify-settings-screen .content, #customize-screen .content { padding-left:12px!important; padding-right:12px!important; } }
+/* 朋友圈只移除封面上的灰色渐隐遮罩，不改动微信其它颜色 */
+#discover-cover-area > div:first-of-type { display:none !important; }
+#discover-cover-area { background-color:transparent !important; filter:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+#home-screen { position:relative; isolation:isolate; background-size:cover; background-position:center; }
+#home-screen > .v26-live-wallpaper { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; pointer-events:none; }
+#home-screen > :not(.v26-live-wallpaper) { position:relative; z-index:1; }
+#lockscreen-overlay { position:fixed; inset:0; z-index:2147483000; display:none; overflow:hidden; background:#dededb; color:#fff; font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif; touch-action:pan-y; }
+#lockscreen-overlay.v26-visible { display:flex; }
+#lockscreen-overlay .v26-lock-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; background-size:cover; background-position:center; }
+#lockscreen-overlay .v26-lock-shade { position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.10),rgba(0,0,0,.02) 35%,rgba(0,0,0,.34)); pointer-events:none; }
+#lockscreen-overlay .v26-lock-content { position:relative; z-index:2; width:100%; min-height:100%; box-sizing:border-box; padding:calc(12vh + env(safe-area-inset-top)) 26px calc(28px + env(safe-area-inset-bottom)); display:flex; flex-direction:column; align-items:center; text-align:center; }
+#lockscreen-overlay .v26-lock-time { font-size:clamp(68px,19vw,98px); font-weight:250; letter-spacing:-4.5px; line-height:1; font-variant-numeric:tabular-nums; text-shadow:0 1px 0 rgba(255,255,255,.34), 0 4px 9px rgba(0,0,0,.24), 0 12px 28px rgba(0,0,0,.22); -webkit-text-stroke:.25px rgba(255,255,255,.14); transition:color .25s ease,text-shadow .25s ease,transform .25s ease; }
+#lockscreen-overlay .v26-lock-date { margin-top:15px; font-size:15px; letter-spacing:1.6px; font-weight:550; text-shadow:0 1px 0 rgba(255,255,255,.22), 0 3px 10px rgba(0,0,0,.22); transition:color .25s ease,text-shadow .25s ease; }
+#lockscreen-overlay.v26-clock-dark .v26-lock-time { text-shadow:0 1px 0 rgba(255,255,255,.72), 0 2px 0 rgba(0,0,0,.06), 0 8px 18px rgba(0,0,0,.13); -webkit-text-stroke:.25px rgba(0,0,0,.10); }
+#lockscreen-overlay.v26-clock-dark .v26-lock-date { text-shadow:0 1px 0 rgba(255,255,255,.7), 0 3px 8px rgba(0,0,0,.10); }
+#lockscreen-overlay .v26-lock-bottom { margin-top:auto; width:min(100%,340px); display:flex; flex-direction:column; align-items:center; gap:15px; }
+#lockscreen-overlay .v26-lock-hint { font-size:13px; letter-spacing:1.4px; color:rgba(255,255,255,.92); text-shadow:0 1px 8px rgba(0,0,0,.35); }
+#lockscreen-overlay .v26-lock-time, #lockscreen-overlay .v26-lock-date { color:var(--v26-lock-clock-color,#fff); transition:color .18s ease; }
+#lockscreen-overlay .v26-lock-triangle { display:flex; align-items:center; justify-content:center; width:auto; height:auto; padding:8px 12px; border:0; border-radius:0; color:var(--v26-lock-clock-color,#fff); background:transparent; -webkit-backdrop-filter:none; backdrop-filter:none; box-shadow:none; cursor:pointer; font-size:30px; line-height:1; font-weight:300; }
+#lockscreen-overlay .v26-lock-triangle span { transform:translateY(2px); }
+#lockscreen-overlay.v26-clock-dark .v26-lock-triangle { border-color:transparent; background:transparent; }
+#lockscreen-overlay .v26-lock-pill { border:1px solid rgba(255,255,255,.62); color:#fff; background:rgba(255,255,255,.18); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border-radius:999px; min-height:46px; padding:0 26px; font-size:14px; letter-spacing:1px; box-shadow:0 8px 28px rgba(0,0,0,.12); }
+#lockscreen-overlay .v26-passcode-panel { width:100%; border-radius:24px; padding:18px 16px 16px; background:rgba(245,245,243,.92); color:#292929; box-sizing:border-box; box-shadow:0 18px 50px rgba(0,0,0,.18); -webkit-backdrop-filter:blur(24px); backdrop-filter:blur(24px); }
+#lockscreen-overlay .v26-passcode-title { font-size:16px; font-weight:600; margin-bottom:14px; }
+#lockscreen-overlay .v26-passcode-input { width:100%; box-sizing:border-box; border:1px solid #d6d6d2; border-radius:13px; padding:13px 14px; background:rgba(255,255,255,.9); color:#242424; outline:none; font-size:17px; text-align:center; letter-spacing:5px; }
+#lockscreen-overlay .v26-passcode-actions { display:flex; gap:10px; margin-top:12px; }
+#lockscreen-overlay .v26-passcode-actions button { flex:1; min-height:42px; border:0; border-radius:12px; font-size:14px; }
+#lockscreen-overlay .v26-passcode-submit { background:#555; color:#fff; }
+#lockscreen-overlay .v26-passcode-cancel { background:#e6e6e2; color:#333; }
+#lockscreen-overlay .v26-lock-pass-dots { display:flex; justify-content:center; gap:11px; margin:4px 0 8px; }
+#lockscreen-overlay .v26-lock-pass-dots span { width:10px; height:10px; border-radius:50%; border:1px solid #bfc0c4; background:rgba(255,255,255,.86); }
+#lockscreen-overlay .v26-lock-pass-dots span.filled { background:#555861; border-color:#555861; }
+#lockscreen-overlay .v26-lock-pass-error { min-height:18px; color:#b85b5b; font-size:12px; text-align:center; }
+#lockscreen-overlay .v26-lock-pass-keypad { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:5px; }
+#lockscreen-overlay .v26-lock-pass-keypad button { height:38px; border:0; border-radius:10px; background:rgba(255,255,255,.88); color:#333; font-size:19px; }
+#lockscreen-overlay .v26-lock-pass-keypad button:active { background:#dededb; }
+#lockscreen-overlay .v26-lock-pass-keypad button[data-lock-key=""] { visibility:hidden; }
+#lockscreen-overlay .v26-lock-pass-back { margin-top:8px; width:100%; border:0; border-radius:10px; min-height:34px; background:rgba(220,220,216,.85); color:#333; font-size:13px; }
+.v26-lock-settings-card { background:#fff; border:1px solid #e9e9e6; border-radius:18px; padding:18px; margin:14px 0; box-shadow:0 5px 20px rgba(25,25,25,.035); }
+.v26-lock-settings-card h3 { margin:0 0 8px; font-size:16px; color:#303030; }
+.v26-lock-settings-card p { margin:0 0 14px; color:#8a8a86; font-size:12px; line-height:1.7; }
+.v26-lock-preview { width:100%; aspect-ratio:9/16; max-height:360px; border-radius:16px; overflow:hidden; background:#e5e5e2 center/cover no-repeat; position:relative; margin:12px 0; }
+.v26-lock-settings-actions { display:flex; gap:10px; flex-wrap:wrap; }
+.v26-lock-settings-actions .btn { flex:1; min-width:130px; }
+.v26-lock-toggle-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; color:#333; font-size:14px; }
+.v26-lock-file { display:none; }
+@media (max-width:380px) { #lockscreen-overlay .v26-lock-content { padding-left:20px; padding-right:20px; } #lockscreen-overlay .v26-lock-time { letter-spacing:-3px; } }
+
+/* 精致手机锁屏：四位圆点、轻透磨砂层、圆形数字键盘 */
+#lockscreen-overlay .v26-lock-content{padding-top:calc(10vh + env(safe-area-inset-top));padding-bottom:calc(24px + env(safe-area-inset-bottom));}
+#lockscreen-overlay .v26-lock-bottom{width:min(100%,360px);gap:10px;}
+#lockscreen-overlay .v26-passcode-panel{background:linear-gradient(160deg,rgba(255,255,255,.20),rgba(255,255,255,.09));border:1px solid rgba(255,255,255,.27);border-radius:30px;padding:19px 18px 15px;color:#fff;box-shadow:0 18px 48px rgba(0,0,0,.16);-webkit-backdrop-filter:blur(26px) saturate(1.25);backdrop-filter:blur(26px) saturate(1.25);}
+#lockscreen-overlay .v26-passcode-title{font-size:15px;font-weight:500;letter-spacing:.4px;margin:0 0 17px;color:rgba(255,255,255,.96);text-shadow:0 1px 8px rgba(0,0,0,.24)}
+#lockscreen-overlay .v26-lock-pass-dots{gap:14px;margin:3px 0 8px;min-height:14px}
+#lockscreen-overlay .v26-lock-pass-dots span{width:10px;height:10px;box-sizing:border-box;border:1px solid rgba(255,255,255,.85);background:rgba(255,255,255,.08);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+#lockscreen-overlay .v26-lock-pass-dots span.filled{background:#fff;border-color:#fff;box-shadow:0 0 8px rgba(255,255,255,.35)}
+#lockscreen-overlay .v26-lock-pass-keypad{gap:10px 16px;margin:8px auto 0;max-width:270px}
+#lockscreen-overlay .v26-lock-pass-keypad button{height:56px;width:56px;justify-self:center;border-radius:50%;border:1px solid rgba(255,255,255,.33);background:rgba(255,255,255,.17);color:#fff;font-size:23px;font-weight:400;box-shadow:0 3px 10px rgba(0,0,0,.07);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:transform .12s,background .12s}
+#lockscreen-overlay .v26-lock-pass-keypad button:active{background:rgba(255,255,255,.38);transform:scale(.94)}
+#lockscreen-overlay .v26-lock-pass-keypad button[data-lock-key=""]{visibility:hidden}
+#lockscreen-overlay .v26-lock-pass-keypad button[data-lock-key="⌫"]{font-size:20px;background:rgba(0,0,0,.12);border-color:rgba(255,255,255,.2)}
+#lockscreen-overlay .v26-lock-pass-error{color:#fff1f1;text-shadow:0 1px 5px #0005;min-height:17px;margin-top:2px}
+#lockscreen-overlay .v26-lock-pass-back{background:transparent;color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.3);border-radius:999px;min-height:34px;width:auto;padding:0 22px;margin:10px auto 0;display:block}
+#lockscreen-overlay .v26-lock-pass-submit{display:block;margin:0 auto 2px;border:0;border-radius:999px;background:rgba(255,255,255,.22);color:#fff;padding:6px 18px;min-height:30px;font-size:12px}
+.v26-setpass-overlay{position:fixed;inset:0;z-index:2147483001;background:rgba(10,15,25,.48);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box}
+.v26-setpass-card{width:min(340px,100%);border-radius:30px;padding:26px 20px 20px;text-align:center;color:#fff;background:linear-gradient(145deg,rgba(38,48,66,.96),rgba(22,29,43,.94));border:1px solid rgba(255,255,255,.18);box-shadow:0 24px 70px rgba(0,0,0,.35);position:relative}
+.v26-setpass-close{position:absolute;top:12px;right:15px;border:0;background:transparent;color:#ffffffb8;font-size:27px;line-height:1}
+.v26-setpass-title{font-size:19px;font-weight:650;letter-spacing:.3px;margin:5px 0 8px}
+.v26-setpass-sub{font-size:12px;color:rgba(255,255,255,.65);line-height:1.6}
+.v26-setpass-dots{display:flex;justify-content:center;gap:17px;margin:25px 0 12px}
+.v26-setpass-dots span{width:12px;height:12px;border-radius:50%;border:1px solid rgba(255,255,255,.65);background:transparent;box-sizing:border-box}
+.v26-setpass-dots span.filled{background:#fff;border-color:#fff;box-shadow:0 0 10px #ffffff65}
+.v26-setpass-error{height:18px;font-size:12px;color:#ffc3c3}
+.v26-setpass-keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 12px;margin:8px auto 0;max-width:260px}
+.v26-setpass-keypad button{height:54px;width:54px;justify-self:center;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(255,255,255,.10);color:#fff;font-size:22px}
+.v26-setpass-keypad button:active{background:rgba(255,255,255,.27);transform:scale(.95)}
+.v26-setpass-keypad button[data-key=""]{visibility:hidden}
+@media(max-height:740px){#lockscreen-overlay .v26-lock-content{padding-top:calc(7vh + env(safe-area-inset-top));}#lockscreen-overlay .v26-lock-time{font-size:clamp(58px,16vw,82px)}#lockscreen-overlay .v26-lock-pass-keypad button{height:49px;width:49px}.v26-setpass-keypad button{height:48px;width:48px}}
+
+</style>
+
+
+<style id="vivo-inspired-lockscreen-polish">
+/* vivo 风格灵感：全屏壁纸、轻薄文字、无卡片数字键盘；不使用 vivo 商标或系统组件 */
+#lockscreen-overlay.v26-password-mode .v26-lock-shade{background:linear-gradient(180deg,rgba(0,0,0,.14),rgba(0,0,0,.06) 28%,rgba(0,0,0,.38) 100%)}
+#lockscreen-overlay.v26-password-mode .v26-lock-content{padding:calc(7.5vh + env(safe-area-inset-top)) 22px calc(22px + env(safe-area-inset-bottom));}
+#lockscreen-overlay.v26-password-mode .v26-lock-time{font-size:clamp(50px,14vw,68px);font-weight:300;letter-spacing:-2.8px;line-height:1;text-shadow:0 2px 18px rgba(0,0,0,.18);}
+#lockscreen-overlay.v26-password-mode .v26-lock-date{font-size:14px;font-weight:400;letter-spacing:.3px;margin-top:10px;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+#lockscreen-overlay.v26-password-mode .v26-lock-bottom{margin-top:auto;width:min(100%,330px);gap:0;}
+#lockscreen-overlay.v26-password-mode .v26-passcode-panel{display:contents;}
+#lockscreen-overlay.v26-password-mode .v26-passcode-title{order:0;margin:0 0 22px;color:#fff;font-size:15px;font-weight:400;letter-spacing:.5px;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-dots{order:1;display:flex;justify-content:center;align-items:center;gap:18px;min-height:14px;margin:0 0 11px;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-dots span{width:9px;height:9px;border-radius:50%;box-sizing:border-box;border:1px solid rgba(255,255,255,.9);background:rgba(255,255,255,.04);box-shadow:none;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-dots span.filled{background:#fff;border-color:#fff;box-shadow:0 0 9px rgba(255,255,255,.24)}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-error{order:2;height:18px;min-height:18px;margin:0 0 6px;font-size:12px;color:#fff;text-shadow:0 1px 5px rgba(0,0,0,.65)}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad{order:3;display:grid;grid-template-columns:repeat(3,1fr);width:min(100%,285px);gap:13px 22px;margin:0 auto;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad button{height:clamp(56px,15vw,66px);width:clamp(56px,15vw,66px);justify-self:center;border-radius:50%;border:1px solid rgba(255,255,255,.36);background:rgba(235,240,246,.16);color:#fff;font-size:25px;font-weight:300;line-height:1;box-shadow:0 4px 15px rgba(0,0,0,.08);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);transition:background .15s ease,transform .15s ease,border-color .15s ease;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad button:active{background:rgba(255,255,255,.36);border-color:rgba(255,255,255,.62);transform:scale(.94)}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad button[data-lock-key=""]{visibility:hidden}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad button[data-lock-key="⌫"]{font-size:22px;background:rgba(0,0,0,.12);border-color:rgba(255,255,255,.22)}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-submit{order:4;display:none!important;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-back{order:5;display:block;width:auto;min-height:32px;margin:17px auto 0;padding:0 24px;border:0;background:transparent;color:rgba(255,255,255,.88);font-size:13px;font-weight:400;letter-spacing:.2px;}
+#lockscreen-overlay.v26-password-mode .v26-lock-pass-back:active{opacity:.65}
+.v26-setpass-overlay{background:rgba(4,12,24,.42)!important;backdrop-filter:blur(18px) saturate(1.18)!important;-webkit-backdrop-filter:blur(18px) saturate(1.18)!important;}
+.v26-setpass-card{width:min(330px,100%)!important;border-radius:28px!important;padding:28px 20px 22px!important;background:linear-gradient(155deg,rgba(35,48,66,.94),rgba(12,21,35,.94))!important;border:1px solid rgba(255,255,255,.20)!important;box-shadow:0 24px 80px rgba(0,0,0,.32)!important;}
+.v26-setpass-title{font-size:18px!important;font-weight:500!important;letter-spacing:.2px!important;}
+.v26-setpass-sub{font-size:12px!important;letter-spacing:.1px!important;color:rgba(255,255,255,.72)!important;}
+.v26-setpass-keypad{gap:11px 14px!important;margin-top:10px!important;}
+.v26-setpass-keypad button{height:56px!important;width:56px!important;border:1px solid rgba(255,255,255,.25)!important;background:rgba(255,255,255,.11)!important;font-size:23px!important;font-weight:300!important;box-shadow:0 3px 12px rgba(0,0,0,.08)!important;}
+.v26-setpass-keypad button:active{background:rgba(255,255,255,.28)!important;transform:scale(.94)!important;}
+@media(max-height:700px){#lockscreen-overlay.v26-password-mode .v26-lock-content{padding-top:calc(4vh + env(safe-area-inset-top));padding-bottom:calc(12px + env(safe-area-inset-bottom))}#lockscreen-overlay.v26-password-mode .v26-lock-time{font-size:clamp(44px,12vw,58px)}#lockscreen-overlay.v26-password-mode .v26-passcode-title{margin-bottom:13px}#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad{gap:8px 18px}#lockscreen-overlay.v26-password-mode .v26-lock-pass-keypad button{height:50px;width:50px}}
+</style>
+<style id="lockscreen-clean-no-prompts">
+/* 清理锁屏界面多余提示词，仅保留时间、日期、密码点位与数字键盘 */
+#lockscreen-overlay .v26-lock-hint, #lockscreen-overlay .v26-passcode-title, #lockscreen-overlay .v26-lock-pass-back { display:none !important; }
+#lockscreen-overlay.v26-password-mode .v26-lock-bottom { gap:0 !important; }
+</style>
+
+<style id="sound-settings-unified-preview-button-size">
+/* 音效设置：短信铃声、特别关心的试听/重置按钮统一为来电铃声按钮尺寸 */
+#sound-settings-screen #sound-settings-form > div:nth-of-type(1) form,
+#sound-settings-screen #sound-settings-form > div { box-sizing:border-box; }
+#sound-settings-screen #sound-settings-form > div:nth-of-type(1) > div:last-of-type,
+#sound-settings-screen #sound-settings-form > div:nth-of-type(2) > div:last-of-type,
+#sound-settings-screen #sound-settings-form > div:nth-of-type(3) > div:last-of-type { gap:8px !important; }
+#sound-settings-screen #sound-sms-url,
+#sound-settings-screen #sound-special-url,
+#sound-settings-screen #sound-call-url { min-width:0; height:34px; box-sizing:border-box; padding:0 9px !important; border:1px solid #dedede !important; border-radius:8px !important; font-size:12px !important; }
+#sound-settings-screen #preview-sms-btn,
+#sound-settings-screen #reset-sms-btn,
+#sound-settings-screen #preview-special-btn,
+#sound-settings-screen #reset-special-btn,
+#sound-settings-screen #preview-call-btn,
+#sound-settings-screen #reset-call-btn { flex:0 0 auto; height:30px !important; min-height:30px !important; padding:0 10px !important; margin:0 !important; border-radius:16px !important; font-size:12px !important; line-height:1 !important; white-space:nowrap; box-sizing:border-box; }
+#sound-settings-screen #sound-settings-form > div { border-radius:14px !important; padding:14px !important; box-shadow:0 2px 9px rgba(0,0,0,.035) !important; }
+@media(max-width:380px){
+ #sound-settings-screen #sound-sms-url, #sound-settings-screen #sound-special-url, #sound-settings-screen #sound-call-url { padding:0 7px !important; }
+ #sound-settings-screen #preview-sms-btn, #sound-settings-screen #reset-sms-btn, #sound-settings-screen #preview-special-btn, #sound-settings-screen #reset-special-btn, #sound-settings-screen #preview-call-btn, #sound-settings-screen #reset-call-btn { padding:0 8px !important; }
+}
+</style>
 </head>
 <body>
 <div class="phone-screen">
@@ -3291,7 +3654,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：主屏幕
      ========================================================== -->
-<div id="home-screen" class="screen active"></div>
+<div id="home-screen" class="screen active system-panel"></div>
 <!-- ==========================================================
      功能结束：主屏幕
      ========================================================== -->
@@ -3521,7 +3884,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
   </main>
 </div>
 
-<div id="settings-menu-screen" class="screen">
+<div id="settings-menu-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="home-screen">‹</button>
     <div class="title-container"><h1 class="title">设置</h1></div>
@@ -3556,7 +3919,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：美化菜单
      ========================================================== -->
-<div id="beautify-menu-screen" class="screen">
+<div id="beautify-menu-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="home-screen">‹</button>
     <div class="title-container"><h1 class="title">美化</h1></div>
@@ -3609,7 +3972,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：美化设置子菜单
      ========================================================== -->
-<div id="beautify-settings-screen" class="screen">
+<div id="beautify-settings-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-menu-screen">‹</button>
     <div class="title-container"><h1 class="title">美化设置</h1></div>
@@ -3622,6 +3985,10 @@ body:has(#api-settings-screen.active) #group-settings-screen {
       <div class="item-details"><div class="item-name">壁纸设置</div></div>
       <div class="item-arrow">›</div>
     </li>
+    <li class="settings-list-item" id="go-to-lockscreen-settings-btn">
+      <div class="item-details"><div class="item-name">锁屏设置</div><div style="font-size:12px;color:#999;margin-top:4px;">锁屏壁纸、密码与滑动解锁</div></div>
+      <div class="item-arrow">›</div>
+    </li>
     <li class="settings-list-item" id="go-to-customize-btn">
       <div class="item-details"><div class="item-name">桌面设置</div></div>
       <div class="item-arrow">›</div>
@@ -3629,6 +3996,10 @@ body:has(#api-settings-screen.active) #group-settings-screen {
     <li class="settings-list-item" id="go-to-css-beautify-btn">
       <div class="item-details"><div class="item-name">CSS美化</div></div>
       <div class="item-arrow">›</div>
+    </li>
+    <li class="settings-list-item" id="clear-beautify-settings-btn" role="button" tabindex="0" aria-label="清空美化并恢复默认">
+      <div class="item-details"><div class="item-name" style="color:#b94b4b;font-weight:600;">清空美化</div><div style="font-size:12px;color:#999;margin-top:4px;">清除自定义壁纸、图标、CSS 和字体等美化</div></div>
+      <div class="item-arrow" style="color:#b94b4b;">›</div>
     </li>
   </ul>
 </main>
@@ -3641,7 +4012,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：CSS美化二级菜单
      ========================================================== -->
-<div id="css-beautify-screen" class="screen">
+<div id="css-beautify-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-settings-screen">‹</button>
     <div class="title-container"><h1 class="title">CSS美化</h1></div>
@@ -3680,7 +4051,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：心声美化屏
      ========================================================== -->
-<div id="beautify-heart-screen" class="screen">
+<div id="beautify-heart-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-settings-screen">‹</button>
     <div class="title-container"><h1 class="title">心声美化</h1></div>
@@ -3717,7 +4088,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：气泡美化屏
      ========================================================== -->
-<div id="beautify-bubble-screen" class="screen">
+<div id="beautify-bubble-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-settings-screen">‹</button>
     <div class="title-container"><h1 class="title">气泡美化</h1></div>
@@ -3762,7 +4133,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：列表美化屏
      ========================================================== -->
-<div id="beautify-list-screen" class="screen">
+<div id="beautify-list-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="css-beautify-screen">‹</button>
     <div class="title-container"><h1 class="title">列表美化</h1></div>
@@ -3799,7 +4170,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：线上美化屏
      ========================================================== -->
-<div id="beautify-online-screen" class="screen">
+<div id="beautify-online-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="css-beautify-screen">‹</button>
     <div class="title-container"><h1 class="title">线上美化</h1></div>
@@ -3844,7 +4215,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：线下美化屏
      ========================================================== -->
-<div id="beautify-offline-screen" class="screen">
+<div id="beautify-offline-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="beautify-settings-screen">‹</button>
     <div class="title-container"><h1 class="title">线下美化</h1></div>
@@ -3889,7 +4260,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：占位屏幕
      ========================================================== -->
-<div id="placeholder2-screen" class="screen">
+<div id="placeholder2-screen" class="screen system-panel">
   <header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">占位</h1></div><div class="placeholder"></div></header>
   <main class="content"></main>
 </div>
@@ -4765,7 +5136,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：世界书列表
      ========================================================== -->
-<div id="world-book-screen" class="screen">
+<div id="world-book-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="home-screen">‹</button>
     <div class="title-container"><h1 class="title">世界书</h1></div>
@@ -4793,7 +5164,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：编辑世界书
      ========================================================== -->
-<div id="edit-world-book-screen" class="screen">
+<div id="edit-world-book-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" data-target="world-book-screen">‹</button>
     <div class="title-container"><h1 class="title" id="edit-world-book-title">创建/编辑条目</h1></div>
@@ -4850,12 +5221,13 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：动态注入屏（API/壁纸/字体/音效/自定义/教程）
      ========================================================== -->
-<div id="api-settings-screen" class="screen"></div>
-<div id="wallpaper-screen" class="screen"></div>
-<div id="font-settings-screen" class="screen"></div>
-<div id="sound-settings-screen" class="screen"></div>
-<div id="customize-screen" class="screen"></div>
-<div id="tutorial-screen" class="screen"></div>
+<div id="api-settings-screen" class="screen system-panel"></div>
+<div id="wallpaper-screen" class="screen system-panel"></div>
+<div id="lockscreen-settings-screen" class="screen system-panel"></div>
+<div id="font-settings-screen" class="screen system-panel"></div>
+<div id="sound-settings-screen" class="screen system-panel"></div>
+<div id="customize-screen" class="screen system-panel"></div>
+<div id="tutorial-screen" class="screen system-panel"></div>
 <!-- ==========================================================
      功能结束：动态注入屏
      ========================================================== -->
@@ -4864,7 +5236,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：小决定
      ========================================================== -->
-<div id="decision-screen" class="screen">
+<div id="decision-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" id="decision-back-btn">‹</button>
     <div class="title-container"><h1 class="title" id="decision-title">小决定</h1></div>
@@ -5116,7 +5488,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：计算器 / 音乐模式
      ========================================================== -->
-<div id="calculator-screen" class="screen">
+<div id="calculator-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" id="calc-back-btn">‹</button>
     <div class="title-container"><h1 class="title" id="calc-title">计算器</h1></div>
@@ -5153,7 +5525,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：每日记
      ========================================================== -->
-<div id="accounting-screen" class="screen">
+<div id="accounting-screen" class="screen system-panel">
   <div id="acct-bill-view" style="flex-grow: 1; display: flex; flex-direction: column; position: relative; min-height: 0;">
     <header class="app-header">
       <button class="back-btn" id="acct-back-btn-1" style="color: #333;">‹</button>
@@ -5343,7 +5715,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：线下模式界面
      ========================================================== -->
-<div id="offline-screen" class="screen">
+<div id="offline-screen" class="screen system-panel">
   <header class="app-header">
     <button class="back-btn" id="offline-back-btn">‹</button>
     <div class="title-container"><h1 class="title" id="offline-title">线下剧情</h1></div>
@@ -5415,7 +5787,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
 <!-- ==========================================================
      功能开始：记忆界面
      ========================================================== -->
-<div id="memory-screen" class="screen">
+<div id="memory-screen" class="screen system-panel">
 <header class="app-header">
   <button class="back-btn" id="memory-back-btn">‹</button>
   <div class="title-container"><h1 class="title" id="memory-title">记忆</h1></div>
@@ -6486,7 +6858,7 @@ body:has(#api-settings-screen.active) #group-settings-screen {
   </main>
 </div>
 
-<div class="screen df-screen" id="daily-food-screen" aria-label="每日食">
+<div class="screen df-screen system-panel" id="daily-food-screen" aria-label="每日食">
   <div class="df-app">
     <header class="df-topbar">
       <button class="df-back" id="df-back" aria-label="返回服务号">‹</button>
@@ -6751,10 +7123,12 @@ function cropImageForCouple(imageUrl, callback) {
 document.getElementById('api-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">API 设置</h1></div><div class="placeholder"></div></header><main class="content"><section id="api-presets-section" class="api-presets-section">
   <h3>API 预设</h3>
   
-  <div class="api-preset-save-row"><select id="api-preset-select" aria-label="选择已保存的 API 预设" style="flex:1;min-width:0;border:1px solid #dedede;border-radius:13px;padding:0 12px;background:#fff;color:inherit;font:inherit;font-size:14px;min-height:44px"><option value="">选择已保存的预设</option></select><button type="button" id="api-preset-delete-btn" class="api-preset-delete-selected" title="删除当前选中的预设" style="display:none;background:#f0f0f0;color:#444">删除</button><button type="button" id="api-preset-save-btn">保存预设</button></div>
+  <div class="api-preset-save-row"><select id="api-preset-select" aria-label="选择已保存的 API 预设" style="flex:1;min-width:0;border:1px solid #dedede;border-radius:13px;padding:0 12px;background:#fff;color:inherit;font:inherit;font-size:14px;min-height:44px"><option value="">选择已保存的预设</option></select><button type="button" id="api-preset-delete-btn" class="api-preset-delete-selected" title="删除当前选中的预设" style="display:none;background:#f0f0f0;color:#444">删除</button><button type="button" id="api-preset-save-btn">保存预设</button><button type="button" id="api-preset-memory-btn" title="将选中的已有预设设为记忆总结专用 API">保存设定记忆</button></div>
+  <p id="api-preset-memory-status" style="margin:0 0 12px;font-size:12px;color:#888;line-height:1.5">记忆总结专用预设：使用主 API（未单独指定）</p>
   <div class="api-float-setting"><div><strong>悬浮球</strong><small>快捷切换预设与模型</small></div><label class="api-switch"><input id="api-float-enabled" type="checkbox"><span></span></label></div>
   <div class="api-float-icon-row"><label class="api-float-icon-heading" for="api-float-icon-file">悬浮球图标</label><div class="api-float-icon-actions"><label class="api-file-button" for="api-float-icon-file">选择图片</label><input id="api-float-icon-file" type="file" accept="image/*"><button type="button" id="api-float-icon-reset">恢复默认</button></div></div><div class="api-float-size-row"><label for="api-float-size">悬浮球大小 <span id="api-float-size-value">40 px</span></label><input id="api-float-size" type="range" min="24" max="64" step="2" value="40"></div>
 </section><form id="api-form"><div class="form-group"><label for="api-provider">API 服务商</label><select id="api-provider" name="provider"><option value="newapi">NewAPI (自定义)</option><option value="deepseek">DeepSeek</option><option value="gemini">Gemini</option></select></div><div class="form-group"><label for="api-url">API 地址</label><input type="url" id="api-url" name="url" placeholder="https://..." required></div><div class="form-group"><label for="api-key">密钥 (Key)</label><input type="password" id="api-key" name="key" placeholder="API Key" required></div><button type="button" class="btn btn-secondary" id="fetch-models-btn"><span class="btn-text">获取模型</span><div class="spinner"></div></button><div class="form-group"><label for="api-model">选择模型</label><select id="api-model" name="model" required><option value="">选择模型</option></select></div><button type="submit" class="btn btn-primary" id="save-btn"><span class="btn-text">保存设置</span><div class="spinner"></div></button></form>
+
 
 </main>`;
 
@@ -6806,7 +7180,7 @@ document.getElementById('voice-settings-screen').innerHTML = `<header class="app
   <div class="voice-footnote">密钥保存在当前应用的本地数据中。生成语音需要联网，并可能消耗账户额度。此功能仅用于应用内的角色语音播放。</div>
 </main>`;
 
-document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">更换壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*" style="display: none;"><label for="wallpaper-upload" class="btn btn-primary">从相册选择新壁纸</label></main>`;
+document.getElementById('wallpaper-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">桌面壁纸</h1></div><div class="placeholder"></div></header><main class="content"><div class="wallpaper-preview" id="wallpaper-preview"><span>当前壁纸预览</span></div><input type="file" id="wallpaper-upload" accept="image/*,video/*,.gif,.webp,.heic,.heif,.mov,.mp4,.3gp" multiple style="display:none;"><label for="wallpaper-upload" class="btn btn-primary">选择图片 / GIF / Live 视频</label><p style="font-size:12px;color:#888;text-align:center;line-height:1.8;margin-top:14px;">支持静态图片、GIF 动图和视频壁纸。视频建议选择较短、体积较小的文件。</p></main>`;
 
 document.getElementById('font-settings-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-menu-screen">‹</button><div class="title-container"><h1 class="title">字体设置</h1></div><div class="placeholder"></div></header><main class="content"><form id="font-settings-form"><div class="form-group"><label for="font-url">字体链接 (ttf, woff, woff2)</label><input type="url" id="font-url" placeholder="https://.../font.ttf" required></div><p style="font-size:12px; color:#888; text-align:center;">示例: https://lf3-static.bytednsdoc.com/obj/eden-cn/jplptk/ljhwZthlaukjlkulzlp/portal/fonts/HarmonyOS_Sans_SC_Regular.woff2</p><button type="submit" class="btn btn-primary">应用字体</button><button type="button" class="btn btn-neutral" id="restore-default-font-btn" style="margin-top: 15px;">恢复默认字体</button></form></main>`;
 
@@ -6832,7 +7206,7 @@ const colorThemes = {
 };
 
 const defaultIcons = {
-  'chat-list-screen': { name: '404', url: 'https://imgbed.heliar.top/i/DmZU-yZCsVSfEgo5_b_007.png' },
+  'chat-list-screen': { name: '微信', url: 'https://imgbed.heliar.top/i/DmZU-yZCsVSfEgo5_b_007.png' },
   'api-settings-screen': { name: 'api', url: 'https://imgbed.heliar.top/i/29i4ZtkV75Tmwh8z_003.png' },
   'wallpaper-screen': { name: '壁纸', url: 'https://imgbed.heliar.top/i/joUFRtJDPOXWNQ5A_b_003.png' },
   'world-book-screen': { name: '世界书', url: 'https://imgbed.heliar.top/i/b14je9QqhsUH6HCA_005.png' },
@@ -7636,11 +8010,11 @@ if (!db.myProfile) {
   db.myProfile = {
     nickname: '我',
     avatar: 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg',
-    cover: 'https://imgbed.heliar.top/i/jZ1OI1whdv32dikS_IMG_20261004_034256.jpg',
+    cover: 'https://imgbed.heliar.top/i/F_DwwfEKYXd7as7B_Image_1792102006593_420.jpg',
     signature: '这个人很懒，什么都没有留下'
   };
 } else {
-  if (!db.myProfile.cover) db.myProfile.cover = 'https://imgbed.heliar.top/i/jZ1OI1whdv32dikS_IMG_20261004_034256.jpg';
+  if (!db.myProfile.cover || db.myProfile.cover === 'https://imgbed.heliar.top/i/jZ1OI1whdv32dikS_IMG_20261004_034256.jpg' || db.myProfile.cover === 'https://imgbed.heliar.top/i/vI5nX8lpRUdC4QhS_IMG_20261016_060523.jpg') db.myProfile.cover = 'https://imgbed.heliar.top/i/F_DwwfEKYXd7as7B_Image_1792102006593_420.jpg';
   if (!db.myProfile.avatar) db.myProfile.avatar = 'https://i.postimg.cc/GtbTnxhP/o-o-1.jpg';
   if (!db.myProfile.nickname) db.myProfile.nickname = '我';
   if (!db.myProfile.signature) db.myProfile.signature = '这个人很懒，什么都没有留下';
@@ -7950,8 +8324,12 @@ function setupBottomTabBar() {
 /* ==========================================================
    功能开始：通用 AI 调用（供计算器/每日记分享/朋友圈等使用）
    ========================================================== */
-async function callAI({ messages, systemPrompt, stream = false }) {
-  const { url, key, model, provider } = db.apiSettings || {};
+async function callAI({ messages, systemPrompt, stream = false, useMemoryApi = false }) {
+  // 记忆 API 独立配置；未配置完整时兼容回退到主 API，避免旧用户突然无法使用。
+  const memoryCfg = db.memoryApiSettings || {};
+  const memoryReady = !!(memoryCfg.url && memoryCfg.key && memoryCfg.model);
+  const activeApiSettings = useMemoryApi && memoryReady ? memoryCfg : (db.apiSettings || {});
+  const { url, key, model, provider } = activeApiSettings;
   if (!url || !key || !model) {
     showToast('请先在“api”应用中完成设置！');
     return null;
@@ -7983,8 +8361,13 @@ if (isGemini) {
     stream
   };
 }
-  const resp = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(body) });
-  if (!resp.ok) throw new Error(`API ${resp.status}: ${await resp.text()}`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45000);
+  let resp;
+  try { resp = await fetch(endpoint, { method: 'POST', headers, body: JSON.stringify(body), signal: controller.signal }); }
+  catch (err) { if (err && err.name === 'AbortError') throw new Error('API 请求超时（45 秒），请检查服务商或网络'); throw err; }
+  finally { clearTimeout(timeoutId); }
+  if (!resp.ok) throw new Error(`API ${resp.status}: ${(await resp.text()).slice(0, 500)}`);
   if (stream) return resp;
   const data = await resp.json();
   return isGemini
@@ -10909,6 +11292,37 @@ function extractFavoriteText(content){return extractQuotePreview({content:conten
 function openFavorites(){renderMessageFavorites('');switchScreen('message-favorites-screen');}
 function jumpToFavorite(f){const screen=f.chatType==='group'?db.groups:db.characters;const chat=screen&&screen.find(c=>c.id===f.chatId);if(!chat){showToast('原聊天已不存在');return;}currentChatType=f.chatType;currentChatId=f.chatId;currentPage=1;switchScreen('chat-room-screen');renderMessages(false,true);setTimeout(()=>{const el=messageArea.querySelector('.message-wrapper[data-id="'+CSS.escape(f.messageId)+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});else showToast('原消息可能已被删除');},150);}
 async function deleteSingleMessage(id){const c=getCurrentChat();if(!c)return;c.history=c.history.filter(m=>m.id!==id);await saveData();currentPage=1;renderMessages(false,true);renderChatList();showToast('已删除消息');}
+function openWithdrawnMessageViewer(message) {
+  const old = document.getElementById('withdrawn-message-viewer'); if (old) old.remove();
+  const overlay = document.createElement('div'); overlay.id = 'withdrawn-message-viewer';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:11000;background:rgba(0,0,0,.42);display:flex;align-items:center;justify-content:center;padding:22px;box-sizing:border-box;';
+  const card = document.createElement('div'); card.style.cssText = 'width:min(100%,420px);max-height:75vh;overflow:auto;background:var(--panel-bg,#fff);color:var(--text-color,#222);border-radius:16px;padding:18px;box-shadow:0 12px 36px rgba(0,0,0,.2);';
+  const title = document.createElement('div'); title.textContent = '已撤回的消息'; title.style.cssText = 'font-size:16px;font-weight:600;margin-bottom:12px;';
+  const body = document.createElement('div'); body.textContent = message.withdrawnContent || '（原消息内容不可用）'; body.style.cssText = 'white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;font-size:15px;padding:12px;background:rgba(130,120,150,.08);border-radius:10px;';
+  const time = document.createElement('div'); time.textContent = message.withdrawnAt ? new Date(message.withdrawnAt).toLocaleString() : ''; time.style.cssText = 'font-size:11px;color:#999;margin-top:10px;';
+  const close = document.createElement('button'); close.textContent = '知道了'; close.style.cssText = 'width:100%;margin-top:16px;border:0;border-radius:10px;padding:11px;background:#eee8ff;color:#7055a8;font-size:14px;'; close.onclick = () => overlay.remove();
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); }; card.append(title, body, time, close); overlay.appendChild(card); document.body.appendChild(overlay);
+}
+async function withdrawLastAIMessage(chat) {
+  if (!chat || !Array.isArray(chat.history)) return false;
+  for (let i = chat.history.length - 1; i >= 0; i--) {
+    const msg = chat.history[i];
+    if (!msg || msg.role === 'user' || msg.role === 'system' || msg.isOffline || msg.withdrawnBySender) continue;
+    const original = String(msg.content || '').trim();
+    if (!original) continue;
+    msg.withdrawnContent = original;
+    msg.withdrawnBySender = true;
+    msg.withdrawnAt = Date.now();
+    msg.content = '[对方撤回了一条消息]';
+    msg.parts = [{ type: 'text', text: msg.content }];
+    await saveData();
+    if (typeof currentChatId !== 'undefined' && currentChatId === chat.id && typeof renderMessages === 'function') renderMessages(false, true);
+    if (typeof renderChatList === 'function') renderChatList();
+    return true;
+  }
+  return false;
+}
+
 function openForwardContactPicker(messages, sourceLabel='聊天记录') {
  const contacts=[...(db.characters||[]).map(c=>({...c,_type:'private'})),...(db.groups||[]).map(c=>({...c,_type:'group'}))];
  if(!contacts.length){showToast('通讯录暂无可转发的联系人');return;}
@@ -11339,6 +11753,17 @@ function createMessageBubbleElement(message) {
   const wrapper = document.createElement('div');
   wrapper.dataset.id = id;
   if (senderId) wrapper.dataset.senderId = senderId;
+  if (message.withdrawnBySender) {
+    wrapper.className = `message-wrapper ${role === 'user' ? 'sent' : 'received'} withdrawn-message-wrapper`;
+    const notice = document.createElement('button');
+    notice.type = 'button';
+    notice.className = 'withdrawn-message-notice';
+    notice.textContent = '对方撤回了一条消息 · 查看内容';
+    notice.style.cssText = 'border:0;background:transparent;color:#999;font-size:12px;padding:8px 12px;cursor:pointer;border-radius:8px;';
+    notice.onclick = () => openWithdrawnMessageViewer(message);
+    wrapper.appendChild(notice);
+    return wrapper;
+  }
   if (timeSkipMatch || inviteMatch || renameMatch || narrationBubbleMatch) {
     const isNarrationBubble = !!narrationBubbleMatch;
     wrapper.className = 'message-wrapper system-notification' + (isNarrationBubble ? ' narration-bubble-wrapper' : '');
@@ -11938,10 +12363,11 @@ function generatePrivateSystemPrompt(character) {
   const actionDescriptionEnabled = character.actionDescriptionMode === true;
   const narrationEnabled = character.narrationMode === true;
   let prompt = phoneAwarenessEnabled
-    ? `【任务】你正在扮演一个真实的人，和我（${currentUserName}）在手机上的「404」聊天软件里对话。\n\n`
+    ? `【任务】你正在扮演一个真实的人，和我（${currentUserName}）在手机上的「微信」聊天软件里对话。\n\n`
     : `【任务】你正在扮演角色本人，与我（${currentUserName}）处于同一个现实场景中面对面交谈。请把这当成两个人正在现场自然说话，而不是线上聊天；绝对不要提手机、屏幕、软件、消息、打字、发送、已读、回复速度、网络或任何线上媒介。\n\n`;
   prompt += focusPrompt(phoneAwarenessEnabled ? '线上私聊' : '面对面现场对话（界面以聊天气泡显示台词）', phoneAwarenessEnabled ? '只进行自然私聊，不要输出小说体，不要输出群聊多角色格式，不要处理其他任何功能。你只需按下面格式回一条或多条私聊消息。' : '把用户和角色视为同处一个现实场景、面对面交谈。界面会把台词显示成聊天气泡只是软件呈现方式，不代表角色正在打字或线上交流。只输出角色自然说出的台词及符合当前场景的动作/心声，不要提任何手机、软件、消息或线上沟通概念。');
   prompt += buildMaskIdentityPrompt(character);
+  if (phoneAwarenessEnabled) prompt += `════ 自主撤回消息规则（可选动作，不要滥用）════\n你可以像真实聊天的人一样，在确实觉得自己刚才某句话说得不合适、太冲动、过于羞耻或想收回时，主动撤回自己最近发出的一条消息。需要执行时，在回复中输出内部动作标记 [ACTION:WITHDRAW_LAST_MESSAGE]；该标记不会展示给用户，而是把你最近一条已发送的 AI 消息显示为“对方撤回了一条消息”，用户仍可点击查看原文。只有你确实想撤回自己说过的话时才使用，不要因为普通道歉、改口或每次回复而使用；绝不能撤回用户的消息。标记后如需继续说话，可以接着输出新的自然回复。\n\n`;
   prompt += buildMemoryBlock(character, getLatestUserMemoryQuery(character));
   // 同一 AI 的不同面具窗口共享近期对话上下文：不合并各窗口 history，但每轮都把其他面具最近发生的事带入提示词。
   prompt += buildSharedRecentMaskChatContext(character);
@@ -12146,6 +12572,7 @@ function generateGroupSystemPrompt(group) {
 
   let prompt = `【任务】你正在扮演「${group.name}」这个群聊里的所有 AI 角色。我（${group.me.nickname}）是群里唯一的人类。\n\n`;
   prompt += focusPrompt('群聊扮演', '只扮演群成员在群里发言。不要输出私聊格式，不要输出线下小说体，不要处理其他任何功能。你的每一条输出都必须是群里某个成员发出的一条群消息。');
+  prompt += `\n【自主撤回自己发出的消息】如果你确实想收回自己刚刚发出的一句话，可以输出内部动作标记 [ACTION:WITHDRAW_LAST_MESSAGE]。系统会把最近一条 AI 群聊发言显示为“对方撤回了一条消息”，用户仍可点击查看原文。只在角色真心想撤回时使用，不要滥用，也绝不能撤回用户发言。\n`;
   const activeStickerGroupForGroupChat = (db.stickerGroups || []).find(g => g.id === db.activeStickerGroupId);
   if (activeStickerGroupForGroupChat && Array.isArray(activeStickerGroupForGroupChat.stickers) && activeStickerGroupForGroupChat.stickers.length) {
     prompt += `\n════ 用户指定的 AI 表情包组（优先使用）════\n`;
@@ -12598,6 +13025,12 @@ if (fullResponse && fullResponse.trim()) {
     // 即使动作标记被用于其他会话，也绝不把内部标记显示给用户。
     fullResponse = fullResponse.replace(/\[ACTION:INCOMING_VOICE_CALL\]/ig, '').trim();
   }
+  const wantsWithdrawLastMessage = !isOffline && /\[ACTION:WITHDRAW_LAST_MESSAGE\]/i.test(fullResponse);
+  if (wantsWithdrawLastMessage) {
+    fullResponse = fullResponse.replace(/\[ACTION:WITHDRAW_LAST_MESSAGE\]/ig, '').trim();
+    await withdrawLastAIMessage(chat);
+    if (!fullResponse) { await saveData(); if (currentChatId === chat.id && currentChatType === chatType) renderMessages(false, true); return; }
+  }
   
 /* 兜底：如果模型误输出了整段 JSON，抢救成纯文本 */
 const salvaged = salvageJsonAsText(fullResponse);
@@ -12898,18 +13331,9 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
     }, 5000 + Math.random() * 8000);
   }
 
-  /* 功能开始：AI 自动归档记忆 */
-  if (!isOffline) {
-    if (!character._memoryTick) character._memoryTick = 0;
-    character._memoryTick++;
-    if (character._memoryTick >= 3) {
-      character._memoryTick = 0;
-      setTimeout(() => {
-        try { autoArchiveRecent(character); }
-        catch (e) { console.warn('自动记忆归档失败:', e); }
-      }, 2500);
-    }
-  }
+  /* 自动总结频率统一为每 50 轮，避免旧的每 3 轮归档任务额外频繁调用 API。 */
+  /* 每 50 轮 AI 回复自动调用记忆 API，总结近期对话 */
+  if (!isOffline) setTimeout(() => { maybeAutoSummarizeEvery50Turns(character, false).catch(e => console.warn('每50轮记忆总结失败', e)); }, 1800);
   /* 功能结束：AI 自动归档记忆 */
 
   /* 功能开始：AI 根据记忆发朋友圈 */
@@ -12992,19 +13416,8 @@ if (!isOffline && Math.random() < 0.03 && canAiPostMoment(character)) {
           await saveData();
         }
       }
-      /* 功能开始：群聊自动记忆归档 */
-      if (!isOffline) {
-        if (!chat._memoryTick) chat._memoryTick = 0;
-        chat._memoryTick++;
-        if (chat._memoryTick >= 2) {
-          chat._memoryTick = 0;
-          setTimeout(() => {
-            try { autoArchiveRecent(chat, true); }
-            catch (e) { console.warn('群聊自动记忆归档失败:', e); }
-          }, 3000);
-        }
-      }
-      /* 功能结束：群聊自动记忆归档 */
+      /* 群聊记忆自动总结统一为每 50 轮，避免旧的每 2 轮归档任务额外频繁调用 API。 */
+      if (!isOffline) setTimeout(() => { maybeAutoSummarizeEvery50Turns(chat, true).catch(e => console.warn('群聊每50轮记忆总结失败', e)); }, 2200);
     }
     await saveData();
     renderChatList();
@@ -14558,6 +14971,34 @@ function setupApiPresetAndFloatingBall() {
     showToast(`已切换到：${preset.name}`);
   });
 
+  // 直接复用已有 API 预设作为记忆总结专用配置，不再提供独立的记忆 API 表单。
+  const memoryPresetBtn = document.getElementById('api-preset-memory-btn');
+  const memoryPresetStatus = document.getElementById('api-preset-memory-status');
+  const renderMemoryPresetStatus = () => {
+    if (!memoryPresetStatus) return;
+    const cfg = db.memoryApiSettings || {};
+    const matched = (db.apiPresets || []).find(p => {
+      const c = p.config || p;
+      return c.url === cfg.url && c.key === cfg.key && c.model === cfg.model && c.provider === cfg.provider;
+    });
+    memoryPresetStatus.textContent = matched
+      ? `记忆总结专用预设：${matched.name}`
+      : (cfg.url && cfg.key && cfg.model ? '记忆总结专用预设：已保存的配置（当前未匹配预设）' : '记忆总结专用预设：使用主 API（未单独指定）');
+  };
+  if (memoryPresetBtn) memoryPresetBtn.addEventListener('click', async () => {
+    const name = presetSelectEl?.value;
+    if (!name) return showToast('请先在 API 预设中选择一个已保存的预设');
+    const preset = (db.apiPresets || []).find(p => p.name === name);
+    if (!preset) return showToast('找不到选中的 API 预设，请重新选择');
+    const cfg = preset.config || preset;
+    if (!cfg.url || !cfg.key || !cfg.model) return showToast('这个预设缺少 API 地址、密钥或模型，暂时不能用于记忆总结');
+    db.memoryApiSettings = { provider: cfg.provider || 'newapi', url: String(cfg.url).trim(), key: String(cfg.key).trim(), model: String(cfg.model).trim(), presetName: preset.name, updatedAt: Date.now() };
+    await saveData();
+    renderMemoryPresetStatus();
+    showToast(`已将「${preset.name}」设为记忆总结专用 API`);
+  });
+  renderMemoryPresetStatus();
+
   presetDeleteBtn?.addEventListener('click', async () => {
     const name = presetSelectEl?.value;
     if (!name) return showToast('请先选择要删除的预设');
@@ -15327,6 +15768,41 @@ function bindTplToolbar(scope) {
 
   document.getElementById('go-to-beautify-settings-btn').onclick = () => switchScreen('beautify-settings-screen');
   document.getElementById('go-to-css-beautify-btn').onclick = () => switchScreen('css-beautify-screen');
+  const clearBeautifyBtn = document.getElementById('clear-beautify-settings-btn');
+  if (clearBeautifyBtn && clearBeautifyBtn.dataset.bound !== '1') {
+    clearBeautifyBtn.dataset.bound = '1';
+    const clearBeautify = async () => {
+      const confirmed = await showHgConfirm('确定清空所有美化设置并恢复默认吗？这会清除自定义桌面壁纸、锁屏壁纸、桌面图标、CSS 美化模板和自定义字体；聊天记录、角色和其他个人数据不会删除。此操作无法自动撤销。');
+      if (!confirmed) return;
+      // 只重置外观/美化相关数据，不触碰聊天记录、角色、世界书、账号和铃声设置。
+      db.wallpaper = 'https://imgbed.heliar.top/i/pX_cEqBBfZXtfT4a_Image_1791127884776_623.png';
+      db.wallpaperType = 'image';
+      db.lockScreenWallpaper = '';
+      db.lockScreenWallpaperType = 'image';
+      db.customIcons = {};
+      db.fontUrl = '';
+      db.homeScreenMode = 'night';
+      db.timeFormat24h = true;
+      db.statusBarEnabled = false;
+      db.customCssSettings = {
+        heart: '',
+        bubble: { global: '', perChar: {} },
+        list: '',
+        online: { global: '', perChar: {} },
+        offline: { global: '', perChar: {} }
+      };
+      db.cssTemplates = [];
+      const saved = await saveData();
+      if (!saved) {
+        showToast('恢复默认未能保存，请检查存储空间后重试');
+        return;
+      }
+      showToast('美化设置已清空，正在恢复默认…');
+      setTimeout(() => window.location.reload(), 250);
+    };
+    clearBeautifyBtn.addEventListener('click', clearBeautify);
+    clearBeautifyBtn.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); clearBeautify(); } });
+  }
   document.getElementById('go-to-heart-beautify-btn').onclick = () => switchScreen('beautify-heart-screen');
   document.getElementById('go-to-bubble-beautify-btn').onclick = () => switchScreen('beautify-bubble-screen');
   document.getElementById('go-to-list-beautify-btn').onclick = () => switchScreen('beautify-list-screen');
@@ -15341,22 +15817,116 @@ function bindTplToolbar(scope) {
 /* ==========================================================
    功能开始：壁纸设置
    ========================================================== */
-function setupWallpaperApp() {
-  const e = document.getElementById('wallpaper-upload'), t = document.getElementById('wallpaper-preview');
-  t.style.backgroundImage = `url(${db.wallpaper})`;
-  t.textContent = '';
-  e.addEventListener('change', async (a) => {
-    const n = a.target.files[0];
-    if (n) {
-      try {
-        const r = await compressImage(n, { quality: 0.85, maxWidth: 1080, maxHeight: 1920 });
-        db.wallpaper = r;
-        applyWallpaper(r);
-        t.style.backgroundImage = `url(${r})`;
-        await saveData();
-        showToast('壁纸更换成功！');
-      } catch (s) { showToast('壁纸压缩失败，请重试'); }
+// Live Photo / Android Motion Photo helper: supports a paired video file and JPEG Motion Photo with an embedded trailing MP4.
+async function extractEmbeddedMotionVideo(file) {
+  // Android Motion Photo / Motion JPEG files vary by manufacturer. Check XMP offsets first,
+  // then fall back to locating an MP4 ftyp box appended after the JPEG image data.
+  if (!file || (!/^image\/(jpeg|jpg)/i.test(file.type) && !/\.jpe?g$/i.test(file.name))) return null;
+  try {
+    const headSize = Math.min(file.size, 4 * 1024 * 1024);
+    const head = await file.slice(0, headSize).arrayBuffer();
+    const headBytes = new Uint8Array(head);
+    const text = new TextDecoder('utf-8', {fatal:false}).decode(headBytes);
+    const offsetPatterns = [
+      /(?:GCamera:)?MicroVideoOffset\s*=\s*["']?(\d+)/i,
+      /MotionPhotoVideoOffset\s*=\s*["']?(\d+)/i,
+      /(?:GCamera:)?MotionPhoto\s*=\s*["']?1["']?/i
+    ];
+    let offsetMatch = text.match(offsetPatterns[0]) || text.match(offsetPatterns[1]);
+    if (offsetMatch) {
+      const offset = Number(offsetMatch[1]);
+      if (Number.isFinite(offset) && offset >= 16 && offset < file.size) {
+        const candidate = file.slice(file.size - offset, file.size, 'video/mp4');
+        if (await looksLikeMp4(candidate)) {
+          return new File([candidate], (file.name.replace(/\.[^.]+$/, '') || 'motion-photo') + '.mp4', {type:'video/mp4'});
+        }
+      }
     }
+    // Fallback: inspect the tail for an MP4 box signature. In an appended Motion Photo,
+    // an MP4 box has its 4-byte size immediately before the ASCII string "ftyp".
+    // Search a bounded tail to avoid loading an unexpectedly huge photo into memory.
+    const tailStart = Math.max(0, file.size - 96 * 1024 * 1024);
+    const tail = new Uint8Array(await file.slice(tailStart, file.size).arrayBuffer());
+    const needle = [0x66,0x74,0x79,0x70]; // ftyp
+    for (let i = tail.length - 4; i >= 4; i--) {
+      if (tail[i] === needle[0] && tail[i+1] === needle[1] && tail[i+2] === needle[2] && tail[i+3] === needle[3]) {
+        const start = i - 4;
+        // Only accept a plausible MP4 beginning after the JPEG end marker when available.
+        const absoluteStart = tailStart + start;
+        const eoi = findJpegEnd(headBytes);
+        if (eoi >= 0 && absoluteStart < eoi + 2) continue;
+        const candidate = file.slice(absoluteStart, file.size, 'video/mp4');
+        if (candidate.size >= 1024 && await looksLikeMp4(candidate)) {
+          return new File([candidate], (file.name.replace(/\.[^.]+$/, '') || 'motion-photo') + '.mp4', {type:'video/mp4'});
+        }
+      }
+    }
+  } catch (e) { console.warn('Motion Photo 视频提取失败', e); }
+  return null;
+}
+function findJpegEnd(bytes) {
+  for (let i = 1; i < bytes.length; i++) if (bytes[i-1] === 0xff && bytes[i] === 0xd9) return i-1;
+  return -1;
+}
+async function looksLikeMp4(blob) {
+  if (!blob || blob.size < 16) return false;
+  const bytes = new Uint8Array(await blob.slice(0, Math.min(blob.size, 32)).arrayBuffer());
+  const signature = String.fromCharCode(...bytes.slice(4, 8));
+  return ['ftyp','moov','mdat','free','wide','skip'].includes(signature);
+}
+async function liveVideoDataFromSelection(files) {
+  const list = Array.from(files || []);
+  const video = list.find(f => /^video\//i.test(f.type) || /\.(mp4|mov|m4v|webm|3gp)$/i.test(f.name));
+  if (video) return {data: await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(video);}), name:video.name};
+  const photo = list.find(f => /^image\//i.test(f.type) || /\.(jpe?g|heic|heif|avif)$/i.test(f.name));
+  if (photo) {
+    const embedded = await extractEmbeddedMotionVideo(photo);
+    if (embedded) return {data: await new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(embedded);}), name:embedded.name};
+  }
+  return null;
+}
+
+function setupWallpaperApp() {
+  const input = document.getElementById('wallpaper-upload');
+  const preview = document.getElementById('wallpaper-preview');
+  if (!input || !preview || input.dataset.v26Bound === '1') return;
+  input.dataset.v26Bound = '1';
+  const renderPreview = () => {
+    preview.innerHTML = '';
+    if (db.wallpaperType === 'video' && db.wallpaper) {
+      const video = document.createElement('video'); video.src = db.wallpaper; video.autoplay = true; video.loop = true; video.muted = true; video.playsInline = true;
+      Object.assign(video.style,{width:'100%',height:'100%',objectFit:'cover',position:'absolute',inset:'0'}); preview.style.position='relative'; preview.appendChild(video);
+    } else {
+      preview.style.backgroundImage = db.wallpaper ? `url("${db.wallpaper}")` : 'none';
+      preview.style.backgroundSize = 'cover'; preview.style.backgroundPosition = 'center';
+      if (!db.wallpaper) preview.textContent = '当前壁纸预览';
+    }
+  };
+  renderPreview();
+  input.addEventListener('change', async (event) => {
+    const files = event.target.files; if (!files || !files.length) return;
+    try {
+      const list = Array.from(files);
+      const videoFile = list.find(f => f.type.startsWith('video/') || /\.(mp4|mov|m4v|webm|3gp)$/i.test(f.name));
+      let dataUrl, isVideo = !!videoFile;
+      if (videoFile) {
+        dataUrl = await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(videoFile);});
+      } else {
+        const file = list[0];
+        const embedded = await extractEmbeddedMotionVideo(file);
+        if (embedded) {
+          isVideo = true;
+          dataUrl = await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(embedded);});
+        } else if (file.type === 'image/gif' || /\.gif$/i.test(file.name)) {
+          dataUrl = await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file);});
+        } else {
+          dataUrl = await compressImage(file,{quality:0.88,maxWidth:1440,maxHeight:2560});
+        }
+      }
+      db.wallpaper = dataUrl; db.wallpaperType = isVideo ? 'video' : 'image';
+      applyWallpaper(dataUrl); renderPreview(); await saveData(); showToast(isVideo ? '动态壁纸已导入并循环播放' : '未识别到实况视频数据：当前只读到了 JPG 画面，请检查原图是否包含内嵌视频');
+    } catch (err) { console.error('桌面壁纸设置失败',err); showToast('壁纸读取失败，请选择原始视频或较小的文件'); }
+    finally { input.value=''; }
   });
 }
 /* ==========================================================
@@ -15840,7 +16410,7 @@ function setupCustomizeApp() {
       const iconId = e.target.dataset.id;
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
-      fileInput.accept = 'image/*';
+      fileInput.accept = 'image/*,video/*,.gif,.webp,.mov,.mp4,.webm';
       fileInput.onchange = async (ev) => {
         const file = ev.target.files[0];
         if (file) {
@@ -15951,8 +16521,8 @@ function renderTutorialContent() {
   const tutorials = [
     { title: '写在前面', imageUrls: ['https://i.postimg.cc/7PgyMG9S/image.jpg'] },
     { title: '软件介绍', imageUrls: ['https://i.postimg.cc/VvsJRh6q/IMG-20250713-162647.jpg', 'https://i.postimg.cc/8P5FfxxD/IMG-20250713-162702.jpg', 'https://i.postimg.cc/3r94R3Sn/IMG-20250713-162712.jpg'] },
-    { title: '404', imageUrls: ['https://i.postimg.cc/x8scFPJW/IMG-20250713-162756.jpg', 'https://i.postimg.cc/pX6mfqtj/IMG-20250713-162809.jpg', 'https://i.postimg.cc/YScjV00q/IMG-20250713-162819.jpg', 'https://i.postimg.cc/13VfJw9j/IMG-20250713-162828.jpg'] },
-    { title: '404-群聊', imageUrls: ['https://i.postimg.cc/X7LSmRTJ/404.jpg'] }
+    { title: '微信', imageUrls: ['https://i.postimg.cc/x8scFPJW/IMG-20250713-162756.jpg', 'https://i.postimg.cc/pX6mfqtj/IMG-20250713-162809.jpg', 'https://i.postimg.cc/YScjV00q/IMG-20250713-162819.jpg', 'https://i.postimg.cc/13VfJw9j/IMG-20250713-162828.jpg'] },
+    { title: '微信-群聊', imageUrls: ['https://i.postimg.cc/X7LSmRTJ/404.jpg'] }
   ];
   tutorialContentArea.innerHTML = '';
   tutorials.forEach(tutorial => {
@@ -16008,6 +16578,8 @@ const homeScreenHTML = `
   if (fontBtn) fontBtn.onclick = () => switchScreen('font-settings-screen');
   const wpBtn = document.getElementById('go-to-wallpaper-settings-btn');
   if (wpBtn) wpBtn.onclick = () => switchScreen('wallpaper-screen');
+  const lockBtn = document.getElementById('go-to-lockscreen-settings-btn');
+  if (lockBtn) lockBtn.onclick = () => { if (window.v26RenderLockSettings) window.v26RenderLockSettings(); switchScreen('lockscreen-settings-screen'); };
   const tutBtn = document.getElementById('go-to-tutorial-btn');
   if (tutBtn) tutBtn.onclick = () => { renderTutorialContent(); switchScreen('tutorial-screen'); };
   const nightModeToggle = document.getElementById('setting-night-mode-toggle');
@@ -16031,12 +16603,26 @@ const homeScreenHTML = `
   }
 }
 
-function applyWallpaper(url) { homeScreen.style.backgroundImage = `url(${url})`; }
+function applyWallpaper(url) {
+  if (!homeScreen) return;
+  let live = homeScreen.querySelector(':scope > .v26-live-wallpaper');
+  const isVideo = db.wallpaperType === 'video' && url;
+  if (isVideo) {
+    homeScreen.style.backgroundImage = 'none';
+    if (!live) { live = document.createElement('video'); live.className='v26-live-wallpaper'; live.autoplay=true; live.loop=true; live.muted=true; live.playsInline=true; homeScreen.prepend(live); }
+    if (live.src !== url) live.src = url;
+    const play = live.play(); if (play && play.catch) play.catch(()=>{});
+  } else {
+    if (live) live.remove();
+    homeScreen.style.backgroundImage = url ? `url("${url}")` : 'none';
+  }
+}
 async function applyHomeScreenMode(mode) {
   if (mode === 'day') homeScreen.classList.add('day-mode');
   else homeScreen.classList.remove('day-mode');
   db.homeScreenMode = mode;
   await saveData();
+  if (typeof window.updateV26LockClock === 'function') window.updateV26LockClock();
 }
 
 function updateClock() {
@@ -16116,12 +16702,89 @@ function canAiPostMoment(char, minIntervalMs = 6 * 60 * 60 * 1000) {
   if (!last) return true;
   return Date.now() - last > minIntervalMs;
 }
+/* 朋友圈封面媒体：静态图照常显示，视频/Live 动图封面静音循环自动播放 */
+function isMomentCoverVideo(src) {
+  const value = String(src || '').trim();
+  return /^data:video\//i.test(value) || /\.(mp4|m4v|mov|webm|ogv)(?:[?#].*)?$/i.test(value);
+}
+function renderMomentCoverMedia(container, src) {
+  if (!container) return;
+  const value = String(src || '').trim();
+  const existing = container.querySelector(':scope > .moments-cover-live-video');
+  if (existing) existing.remove();
+  container.style.backgroundSize = 'cover';
+  container.style.backgroundPosition = 'center';
+  container.style.backgroundRepeat = 'no-repeat';
+  if (!value) { container.style.backgroundImage = ''; return; }
+  if (!isMomentCoverVideo(value)) {
+    container.style.backgroundImage = `url("${value.replace(/"/g, '%22')}")`;
+    return;
+  }
+  container.style.backgroundImage = 'none';
+  if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
+  container.style.overflow = 'hidden';
+  const video = document.createElement('video');
+  video.className = 'moments-cover-live-video';
+  video.src = value;
+  video.autoplay = true;
+  video.loop = true;
+  video.muted = true;
+  video.defaultMuted = true;
+  video.playsInline = true;
+  video.setAttribute('playsinline', '');
+  video.setAttribute('webkit-playsinline', '');
+  video.setAttribute('muted', '');
+  video.setAttribute('autoplay', '');
+  video.setAttribute('loop', '');
+  video.preload = 'auto';
+  Object.assign(video.style, {position:'absolute', inset:'0', width:'100%', height:'100%', objectFit:'cover', zIndex:'0', pointerEvents:'none', display:'block'});
+  // 保证封面原有文字/交互仍在视频上方
+  Array.from(container.children).forEach(child => {
+    if (child !== video && !child.classList.contains('moments-cover-live-video')) {
+      if (!child.dataset.momentsCoverZ) child.dataset.momentsCoverZ = child.style.zIndex || '';
+      child.style.position = child.style.position || 'relative';
+      child.style.zIndex = '1';
+    }
+  });
+  container.prepend(video);
+  const tryPlay = () => {
+    video.muted = true;
+    const result = video.play();
+    if (result && typeof result.catch === 'function') result.catch(() => {});
+  };
+  video.addEventListener('loadeddata', tryPlay, {once:true});
+  video.addEventListener('canplay', tryPlay, {once:true});
+  tryPlay();
+}
+async function readMomentCoverFile(file) {
+  if (!file) return '';
+  if (file.type.startsWith('video/')) {
+    // 保留视频原始字节，供离线 HTML 内循环播放
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('视频读取失败'));
+      reader.readAsDataURL(file);
+    });
+  }
+  if (file.type === 'image/gif' || /\.gif$/i.test(file.name || '')) {
+    // GIF 不能走静态图片压缩，否则会丢失动画帧
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.onerror = () => reject(reader.error || new Error('动图读取失败'));
+      reader.readAsDataURL(file);
+    });
+  }
+  return await compressImage(file, {quality:0.8, maxWidth:1080, maxHeight:1920});
+}
+
 function renderDiscoverScreen() {
   const coverArea = document.getElementById('discover-cover-area');
   const avatarImg = document.getElementById('discover-avatar');
   const nicknameSpan = document.getElementById('discover-nickname');
   if (!coverArea || !db.myProfile) return;
-  coverArea.style.backgroundImage = `url('${db.myProfile.cover}')`;
+  renderMomentCoverMedia(coverArea, db.myProfile.cover);
   avatarImg.src = db.myProfile.avatar;
   nicknameSpan.textContent = db.myProfile.nickname;
 
@@ -16690,16 +17353,16 @@ function setupDiscoverScreen() {
 
   coverArea.addEventListener('click', () => {
     const fileInput = document.createElement('input');
-    fileInput.type = 'file'; fileInput.accept = 'image/*';
+    fileInput.type = 'file'; fileInput.accept = 'image/*,video/*,.gif,.webp,.mov,.mp4,.webm';
     fileInput.onchange = async (e) => {
       const file = e.target.files[0];
       if (file) {
         try {
-          const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 1080, maxHeight: 1920 });
-          db.myProfile.cover = compressedUrl;
+          const coverUrl = await readMomentCoverFile(file);
+          db.myProfile.cover = coverUrl;
           await saveData();
           renderDiscoverScreen();
-          showToast('背景图已更换');
+          showToast(file.type.startsWith('video/') ? 'Live 视频封面已设置并自动播放' : '背景图已更换');
         } catch (error) { showToast('图片处理失败'); }
       }
     };
@@ -17211,7 +17874,7 @@ function renderMyProfileMomentsScreen() {
   const nickname = document.getElementById('my-profile-nickname');
   const signature = document.getElementById('my-profile-signature');
   const list = document.getElementById('my-profile-moments-list');
-  if (cover) cover.style.backgroundImage = `url('${db.myProfile.cover}')`;
+  if (cover) renderMomentCoverMedia(cover, db.myProfile.cover);
   if (avatar) avatar.src = db.myProfile.avatar;
   if (nickname) nickname.textContent = db.myProfile.nickname;
   if (signature) signature.textContent = db.myProfile.signature || '这个人很懒，什么都没有留下';
@@ -17253,7 +17916,7 @@ function renderCharProfileMomentsScreen(charId) {
   const list = document.getElementById('char-profile-moments-list');
 
   if (cover) {
-    cover.style.backgroundImage = `url('${char.momentsCover}')`;
+    renderMomentCoverMedia(cover, char.momentsCover);
     cover.onclick = () => {
       const fileInput = document.createElement('input');
       fileInput.type = 'file';
@@ -17262,11 +17925,11 @@ function renderCharProfileMomentsScreen(charId) {
         const file = e.target.files[0];
         if (!file) return;
         try {
-          const compressedUrl = await compressImage(file, { quality: 0.8, maxWidth: 1080, maxHeight: 1920 });
-          char.momentsCover = compressedUrl;
+          const coverUrl = await readMomentCoverFile(file);
+          char.momentsCover = coverUrl;
           await saveData();
-          cover.style.backgroundImage = `url('${compressedUrl}')`;
-          showToast('背景图已更换');
+          renderMomentCoverMedia(cover, coverUrl);
+          showToast(file.type.startsWith('video/') ? 'Live 视频封面已设置并自动播放' : '背景图已更换');
         } catch (error) { showToast('图片处理失败'); }
       };
       fileInput.click();
@@ -20665,6 +21328,7 @@ function isMemoryDuplicate(store, content) {
   const newKw = extractKeywords(content);
   if (newKw.length === 0) return false;
   return store.some(m => {
+    if (!m || m.withdrawn === true) return false;
     const oldKw = m.keywords && m.keywords.length ? m.keywords : extractKeywords(m.content);
     const overlap = newKw.filter(k => oldKw.includes(k)).length;
     const ratio = overlap / Math.max(newKw.length, oldKw.length, 1);
@@ -20693,6 +21357,9 @@ async function addMemory(chat, entry) {
     sourceTime: entry.sourceTime || Date.now(),
     sourceMaskId: maskId || '',
     sourceMaskName: sourceMaskName || '',
+    sourceChatId: chat.id,
+    ownerCharacterId: isPrivate ? (root.id || chat.id) : '',
+    memoryScope: isPrivate ? 'character-root' : 'group',
     keywords: extractKeywords(entry.content)
   };
   store.push(mem);
@@ -20723,12 +21390,26 @@ function trimMemories(chat) {
   });
 }
 
+function getMemoryRootOwner(chat) {
+  if (!chat) return null;
+  if (Array.isArray(db.characters) && db.characters.some(c => c.id === chat.id)) {
+    return (typeof getMaskChatRoot === 'function' ? getMaskChatRoot(chat) : null) || chat;
+  }
+  return chat;
+}
+function getWithdrawnMemoryIds(chat) {
+  const root = getMemoryRootOwner(chat) || chat;
+  if (!Array.isArray(root.withdrawnMemoryIds)) root.withdrawnMemoryIds = [];
+  return new Set(root.withdrawnMemoryIds);
+}
 function getSharedMemoryPool(chat) {
+  const withdrawnIds = getWithdrawnMemoryIds(chat);
   const pool = [];
   const seen = new Set();
   const addStore = (owner, sourceLabel = '') => {
     if (!owner || !Array.isArray(owner.memories)) return;
     owner.memories.forEach(m => {
+      if (m && (m.withdrawn === true || (m.id && withdrawnIds.has(m.id)))) return;
       const key = m.id || `${m.createdAt || 0}:${m.content || ''}`;
       if (seen.has(key)) return;
       seen.add(key);
@@ -20764,6 +21445,7 @@ function getSharedMemoryPool(chat) {
       // Canonical shared memories survive mask switching and remain available even if a session map is incomplete.
       if (Array.isArray(root.sharedMaskMemories)) {
         root.sharedMaskMemories.forEach(m => {
+          if (m && (m.withdrawn === true || (m.id && withdrawnIds.has(m.id)))) return;
           const sourceName = m.sourceMaskName || ((db.profileMasks || []).find(x => x.id === m.sourceMaskId)?.name) || '未标记面具';
           const sourceLabel = `同一 AI「${root.realName || root.name || '角色'}」的跨面具记忆（最初来自面具「${sourceName}」）`;
           const key = m.id || `${m.createdAt || 0}:${m.content || ''}`;
@@ -20805,7 +21487,8 @@ function buildSharedRecentMaskChatContext(chat, limit = 80) {
   // Add persistent extracted memories as well as recent raw messages. This means important
   // events remain recallable after the recent-message window moves on or the app is reopened.
   (Array.isArray(root.sharedMaskMemories) ? root.sharedMaskMemories : []).forEach(mem => {
-    if (!mem || !String(mem.content || '').trim()) return;
+    const withdrawnIds = new Set(Array.isArray(root.withdrawnMemoryIds) ? root.withdrawnMemoryIds : []);
+    if (!mem || mem.withdrawn === true || (mem.id && withdrawnIds.has(mem.id)) || !String(mem.content || '').trim()) return;
     const mask = (db.profileMasks || []).find(m => m.id === mem.sourceMaskId);
     const maskName = mem.sourceMaskName || (mask && (mask.name || (mask.profile && mask.profile.nickname))) || '未标记面具';
     rows.push({ time: Number(mem.sourceTime || mem.createdAt || 0), role: 'memory', maskName, content: `【长期记忆】${String(mem.content).slice(0,900)}`, sessionId: 'shared-memory' });
@@ -20842,7 +21525,7 @@ function buildSharedRecentMaskChatContext(chat, limit = 80) {
     picked.unshift(line);budget-=line.length+1;
   }
   if(!picked.length)return '';
-  return `\n════ 同一 AI 的跨面具共同经历记忆（按时间排序）════\n你是同一个持续存在的 AI 角色。所有面具窗口里由你说过的话、收到的信息、共同经历、承诺、冲突、情绪变化与未完成事项，都是你自己的真实经历，应在相关话题中连续记得并接续。不得因切换面具而失忆或否认已经发生的事。\n每条经历都必须保留来源面具、参与者、关系归属和时间顺序。你可以记得自己与其他面具经历过的事，但不能把该经历说成当前面具亲自经历过。记忆共享不等于身份合并，关系也不自动转移；固定绑定关系始终归属于绑定面具。\n${picked.join('\n')}\n`;
+  return `\n════ 同一 AI 的跨面具共同经历记忆（按时间排序）════\n【身份隔离最高规则】你只继承同一 AI 根角色（${root.realName || root.name || '当前角色'}）在各个面具会话里亲历或明确听闻的内容。其他 AI 角色拥有独立记忆库，禁止读取、继承或假装知道其他 AI 的私聊细节。不同用户面具与同一 AI 的互动属于同一个角色连续人生的一部分：可以记得自己分别与每个面具聊过什么，但必须区分来源面具、时间、参与者与场景；绝不把来自一个用户面具的经历说成另一个面具亲历，也不把某一面具下的承诺自动转移给另一个面具。若只是从群聊或第三方听说，必须保留“听说/由谁告知”的来源，不能当作亲历。切换面具不等于失忆，记忆共享也不等于身份、关系或知情范围合并。\n${picked.join('\n')}\n`;
 }
 
 function recallMemories(chat, query, limit = 8) {
@@ -21051,7 +21734,9 @@ function showHgConfirm(message, { title = '提示', confirmText = '确定', canc
 
 /* 核心归档：AI 以"我"的心去回想，但写出来用第三人称 */
 async function aiArchiveConversation(chat, msgs) {
-  const { url, key, model } = db.apiSettings || {};
+  const memoryCfg = db.memoryApiSettings || {};
+  const activeApi = memoryCfg.url && memoryCfg.key && memoryCfg.model ? memoryCfg : (db.apiSettings || {});
+  const { url, key, model } = activeApi;
   if (!url || !key || !model) return { added: 0, reason: 'no-api' };
   const convText = buildConvTextForMemory(chat, msgs);
   if (convText.length < 20) return { added: 0, reason: 'too-short' };
@@ -21061,8 +21746,8 @@ const name = chat.realName || chat.name || '角色';
 const userName = chat.myName || (chat.me && chat.me.nickname) || '我';
 const archived = getMemoryStore(chat).slice(-40).map(m => `· ${m.content}`).join('\n') || '（暂无）';
 
-  const systemPrompt = `你现在就是「${name}」本人。
-你不是 AI，不是在分析数据，不是在写报告。对面这个人是真实存在的——你有过交集的、你心里在乎的那个真人。刚才你们之间发生了一段对话，你现在静下来，用你自己的心去回想。
+  const systemPrompt = `你现在就是「${name}」本人，正在整理只属于自己的记忆。
+你不是在分析数据或写报告，而是在回想刚刚这段真实对话。记忆必须按“AI角色身份”隔离：只把当前角色亲历、听到或明确获知的内容归入当前角色；绝不读取、继承或伪装成其他 AI 角色的私人经历。不同用户面具与同一角色聊天时，可以记得自己和每个面具分别发生的事，但必须记录来源面具、参与者、场景与关系归属。对其他角色的事情，只能记录当前角色在对话中确实听说过的部分，并明确标注“听说/由谁告知”，不得继承对方的记忆细节。线上与线下是同一角色的连续时间线，但不同面具的身份、承诺和固定关系不能混为一谈。
 
 ════ 绝对不可以编造（最高铁律） ════
 必须严格基于对话内容进行回想。绝对不可以凭空捏造${userName}没有说过的话、没有做过的事。如果${userName}没有明确提及，就不要归档进记忆里。不要自己给${userName}加戏。
@@ -21104,8 +21789,9 @@ ${persona || '一个友好、有自己性格的人'}
   try {
     const reply = await callAI({
       systemPrompt,
-      messages: [{ role: 'user', content: `对话记录：\n${convText}\n\n已经记过的（不要重复）：\n${archived}\n\n请回想。注意：所有记忆里提到「${userName}」时，必须直接用这个名字，绝对不要写成"用户"。` }],
-      stream: false
+      messages: [{ role: 'user', content: `对话记录：\n${convText}\n\n已经记过的（不要重复）：\n${archived}\n\n请回想。注意：所有记忆里提到「${userName}」时，必须直接用这个名字，绝对不要写成"用户"。分类时优先保留锚点、重要、日常、碎片四级结构；每条记忆写明当前 AI 的亲历事实和来源面具，若只是听闻则明确写成听闻。` }],
+      stream: false,
+      useMemoryApi: true
     });
     if (!reply) return { added: 0, reason: 'empty' };
     let jsonStr = String(reply).trim();
@@ -21162,6 +21848,37 @@ async function autoArchiveRecent(chat, isGroup = false) {
       }
     }
   }
+}
+
+/* 每累计 50 轮 AI 回复，单独触发一次长期记忆总结；与小批量自动归档分开计数，避免归档游标互相影响。 */
+async function maybeAutoSummarizeEvery50Turns(chat, isGroup = false) {
+  if (!chat || !Array.isArray(chat.history) || chat._autoMemorySummaryRunning) return;
+  chat._autoMemorySummaryTurns = Math.max(0, Number(chat._autoMemorySummaryTurns) || 0) + 1;
+  if (chat._autoMemorySummaryTurns < 50) { await saveData(); return; }
+  const cursor = Math.max(0, Number(chat._autoMemorySummaryCursor) || 0);
+  const batch = chat.history.slice(cursor).filter(m => m && !m.sendFailed && m.role !== 'system' && !m.isOffline);
+  if (batch.filter(m => m.role === 'user').length < 10 || batch.length < 20) {
+    // 防止旧数据或单向群聊误触发；先重置计数，继续累计下一批。
+    chat._autoMemorySummaryTurns = 0; await saveData(); return;
+  }
+  chat._autoMemorySummaryRunning = true;
+  try {
+    const result = await aiArchiveConversation(chat, batch);
+    if (result && result.reason === 'ok') {
+      chat._autoMemorySummaryCursor = chat.history.length;
+      chat._autoMemorySummaryTurns = 0;
+      await saveData();
+      console.log(`[记忆·每50轮自动总结] ${chat.name || chat.realName || '会话'}：新增 ${result.added || 0} 条`);
+      if (result.added > 0 && typeof showToast === 'function' && currentChatId === chat.id) showToast(`已自动总结 50 轮对话，新增 ${result.added} 条记忆`);
+    } else {
+      // 失败时保留 49 轮，下次 AI 回复再重试，不丢失待总结内容。
+      chat._autoMemorySummaryTurns = 49;
+      console.warn('[记忆·每50轮自动总结] 暂未成功，将在下一轮重试', result && result.reason);
+    }
+  } catch (err) {
+    chat._autoMemorySummaryTurns = 49;
+    console.warn('[记忆·每50轮自动总结] 调用失败，将在下一轮重试', err);
+  } finally { chat._autoMemorySummaryRunning = false; await saveData(); }
 }
 
 /* 功能开始：群聊记忆 → 私聊主动发起 */
@@ -21336,6 +22053,15 @@ function renderMemoryScreen() {
     : db.groups.find(g => g.id === currentMemoryChatId);
   if (!chat) return;
   const store = getMemoryStore(chat);
+  // 记忆管理不提供‘撤回’功能；撤回只用于线上聊天消息。
+  const canWithdrawOnlineRoleMemory = false;
+  const memoryRoot = getMemoryRootOwner(chat) || chat;
+  if (!canWithdrawOnlineRoleMemory && currentMemoryLevel === 'withdrawn') {
+    currentMemoryLevel = 'all';
+    document.querySelectorAll('.memory-tab').forEach(t => t.classList.toggle('active', t.dataset.level === 'all'));
+  }
+  if (!Array.isArray(memoryRoot.withdrawnMemories)) memoryRoot.withdrawnMemories = [];
+  if (!Array.isArray(memoryRoot.withdrawnMemoryIds)) memoryRoot.withdrawnMemoryIds = [];
 
   const stats = { anchor: 0, important: 0, daily: 0, trivial: 0 };
   store.forEach(m => { if (stats[m.level] !== undefined) stats[m.level]++; });
@@ -21348,8 +22074,9 @@ function renderMemoryScreen() {
   `;
 
   const listEl = document.getElementById('memory-list');
-  let filtered = store.slice();
-  if (currentMemoryLevel !== 'all') filtered = filtered.filter(m => m.level === currentMemoryLevel);
+  const showingWithdrawn = canWithdrawOnlineRoleMemory && currentMemoryLevel === 'withdrawn';
+  let filtered = showingWithdrawn ? memoryRoot.withdrawnMemories.slice() : store.filter(m => !m.withdrawn && !memoryRoot.withdrawnMemoryIds.includes(m.id));
+  if (!showingWithdrawn && currentMemoryLevel !== 'all') filtered = filtered.filter(m => m.level === currentMemoryLevel);
   if (currentMemoryQuery) {
     const q = currentMemoryQuery.toLowerCase();
     filtered = filtered.filter(m =>
@@ -21365,12 +22092,42 @@ function renderMemoryScreen() {
   });
 
   if (filtered.length === 0) {
-    listEl.innerHTML = '<div class="memory-empty">还没有记忆。<br>和TA多聊聊，TA会自己记住重要的。</div>';
+    listEl.innerHTML = showingWithdrawn
+      ? '<div class="memory-empty">这里还没有撤回的记忆。<br>撤回的内容会保留在这里，可随时恢复。</div>'
+      : '<div class="memory-empty">还没有记忆。<br>和TA多聊聊，TA会自己记住重要的。</div>';
     return;
   }
 
   listEl.innerHTML = '';
   filtered.forEach(m => {
+    if (showingWithdrawn) {
+      const el = document.createElement('div');
+      el.className = `memory-item ${m.level || 'daily'}`;
+      const date = new Date(m.withdrawnAt || m.sourceTime || m.createdAt || Date.now());
+      const dateStr = `${date.getFullYear()}/${String(date.getMonth()+1).padStart(2,'0')}/${String(date.getDate()).padStart(2,'0')}`;
+      el.innerHTML = `<div class="m-badge">已撤回 · ${(MEMORY_LEVELS[m.level] && MEMORY_LEVELS[m.level].label) || '日常'}</div><div class="m-content">${escapeHtml(m.content || '')}</div><div class="m-meta"><span>${dateStr}</span><span>撤回内容可恢复</span></div><div class="m-actions"><button class="m-restore">恢复记忆</button><button class="m-delete-withdrawn danger">永久清除</button></div>`;
+      el.querySelector('.m-restore').onclick = async () => {
+        memoryRoot.withdrawnMemories = memoryRoot.withdrawnMemories.filter(x => x.id !== m.id);
+        memoryRoot.withdrawnMemoryIds = memoryRoot.withdrawnMemoryIds.filter(id => id !== m.id);
+        m.withdrawn = false; delete m.withdrawnAt;
+        const origin = db.characters?.find(c => c.id === m.sourceChatId) || db.groups?.find(g => g.id === m.sourceChatId) || chat;
+        if (!Array.isArray(origin.memories)) origin.memories = [];
+        if (!origin.memories.some(x => x.id === m.id)) origin.memories.push({ ...m });
+        if (Array.isArray(memoryRoot.sharedMaskMemories) && !memoryRoot.sharedMaskMemories.some(x => x.id === m.id)) memoryRoot.sharedMaskMemories.push({ ...m });
+        await saveData(); renderMemoryScreen(); showToast('记忆已恢复');
+      };
+      el.querySelector('.m-delete-withdrawn').onclick = async () => {
+        if (!await showHgConfirm('永久清除后将无法恢复这条记忆，确定吗？')) return;
+        memoryRoot.withdrawnMemories = memoryRoot.withdrawnMemories.filter(x => x.id !== m.id);
+        memoryRoot.withdrawnMemoryIds = memoryRoot.withdrawnMemoryIds.filter(id => id !== m.id);
+        memoryRoot.sharedMaskMemories = (memoryRoot.sharedMaskMemories || []).filter(x => x.id !== m.id);
+        (db.characters || []).forEach(c => { if (Array.isArray(c.memories)) c.memories = c.memories.filter(x => x.id !== m.id); });
+        (db.groups || []).forEach(g => { if (Array.isArray(g.memories)) g.memories = g.memories.filter(x => x.id !== m.id); });
+        await saveData(); renderMemoryScreen(); showToast('已永久清除');
+      };
+      listEl.appendChild(el);
+      return;
+    }
     const el = document.createElement('div');
     el.className = `memory-item ${m.level}`;
     const date = new Date(m.sourceTime || m.createdAt);
@@ -21436,10 +22193,20 @@ el.querySelector('.m-downgrade').onclick = async () => {
       renderMemoryScreen();
     };
     el.querySelector('.m-delete').onclick = async () => {
-      if (await showHgConfirm('删除这条记忆？')) {
-        chat.memories = chat.memories.filter(x => x.id !== m.id);
-        await saveData();
-        renderMemoryScreen();
+      if (canWithdrawOnlineRoleMemory) {
+        if (!await showHgConfirm('撤回这条线上角色记忆？AI 将不再召回，但内容会保留在「已撤回」中，可恢复。')) return;
+        const owner = getMemoryRootOwner(chat) || chat;
+        if (!Array.isArray(owner.withdrawnMemories)) owner.withdrawnMemories = [];
+        if (!Array.isArray(owner.withdrawnMemoryIds)) owner.withdrawnMemoryIds = [];
+        if (!owner.withdrawnMemoryIds.includes(m.id)) owner.withdrawnMemoryIds.push(m.id);
+        if (!owner.withdrawnMemories.some(x => x.id === m.id)) owner.withdrawnMemories.push({ ...m, withdrawn: true, withdrawnAt: Date.now(), sourceChatId: m.sourceChatId || chat.id });
+        chat.memories = (chat.memories || []).filter(x => x.id !== m.id);
+        if (Array.isArray(owner.sharedMaskMemories)) owner.sharedMaskMemories = owner.sharedMaskMemories.filter(x => x.id !== m.id);
+        await saveData(); renderMemoryScreen(); showToast('线上角色记忆已撤回，可在「已撤回」中查看或恢复');
+      } else {
+        if (!await showHgConfirm('确定永久删除这条记忆吗？此处不会进入「已撤回」列表。')) return;
+        chat.memories = (chat.memories || []).filter(x => x.id !== m.id);
+        await saveData(); renderMemoryScreen(); showToast('记忆已删除');
       }
     };
     listEl.appendChild(el);
@@ -22783,6 +23550,96 @@ window.addEventListener('beforeunload',()=>{window.stopFictionCallRingtone();if(
   });}
  }
  document.addEventListener('DOMContentLoaded',install);setTimeout(install,1500);setTimeout(install,2500);
+})();
+</script>
+
+
+<div id="lockscreen-overlay" aria-label="锁屏界面" aria-hidden="true">
+  <div class="v26-lock-bg" id="v26-lock-bg"></div><div class="v26-lock-shade"></div>
+  <div class="v26-lock-content" id="v26-lock-content">
+    <div class="v26-lock-time" id="v26-lock-time">09:41</div><div class="v26-lock-date" id="v26-lock-date">星期五 · 10月16日</div>
+    <div class="v26-lock-bottom" id="v26-lock-bottom"><button class="v26-lock-triangle" id="v26-swipe-unlock" type="button" aria-label="解锁" title="解锁"><span aria-hidden="true">⌃</span></button></div>
+  </div>
+</div>
+<script id="v26-lockscreen-controller">
+(function(){
+  const COVER = 'https://imgbed.heliar.top/i/vI5nX8lpRUdC4QhS_IMG_20261016_060523.jpg';
+  const $ = id => document.getElementById(id);
+  const readAsDataURL = file => new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file);});
+  const hashPassword = async value => {
+    try { if (window.crypto && crypto.subtle && window.TextEncoder) { const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value)); return Array.from(new Uint8Array(buf)).map(x=>x.toString(16).padStart(2,'0')).join(''); } } catch(e){}
+    let h=2166136261; for(let i=0;i<value.length;i++){h^=value.charCodeAt(i);h=Math.imul(h,16777619);} return 'fallback-'+(h>>>0).toString(16);
+  };
+  function ensureSettingsScreen(){
+    const screen=$('lockscreen-settings-screen'); if(!screen || screen.dataset.v26Built==='1') return;
+    screen.dataset.v26Built='1';
+    screen.innerHTML=`<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">锁屏设置</h1></div><div class="placeholder"></div></header><main class="content" style="padding:16px;overflow-y:auto;"><section class="v26-lock-settings-card"><h3>锁屏显示</h3><div class="v26-lock-toggle-row"><span>启用锁屏界面</span><label class="switch" style="margin:0"><input type="checkbox" id="v26-lock-enabled-toggle"><span class="slider round"></span></label></div><div id="v26-lock-enabled-status" style="font-size:12px;color:#888;line-height:1.7;margin-bottom:4px;">开启后进入应用时显示锁屏</div></section><section class="v26-lock-settings-card"><h3>锁屏壁纸</h3><div class="v26-lock-preview" id="v26-lock-preview"></div><input class="v26-lock-file" id="v26-lock-wallpaper-file" type="file" accept="image/*,video/*,.gif,.webp,.heic,.heif,.mov,.mp4,.3gp" multiple><div class="v26-lock-settings-actions"><button class="btn btn-primary" id="v26-choose-lock-wallpaper" type="button">更换锁屏壁纸</button><button class="btn btn-neutral" id="v26-preview-lock" type="button">预览锁屏</button></div></section><section class="v26-lock-settings-card"><h3>解锁方式</h3><div class="v26-lock-toggle-row"><span>启用锁屏密码</span><label class="switch" style="margin:0"><input type="checkbox" id="v26-lock-password-toggle"><span class="slider round"></span></label></div><div id="v26-lock-password-status" style="font-size:12px;color:#888;line-height:1.7;margin-bottom:12px;">当前：滑动解锁</div><button class="btn btn-neutral" id="v26-change-lock-password" type="button" style="width:100%;">设置 / 修改密码</button></section></main>`;
+    $('v26-lock-enabled-toggle').onchange=async e=>{db.lockScreenEnabled=!!e.target.checked;await saveData();updateLockEnabledStatus();if(!db.lockScreenEnabled)hideLock();showToast(db.lockScreenEnabled?'锁屏界面已开启':'锁屏界面已关闭');};
+    $('v26-choose-lock-wallpaper').onclick=()=>$('v26-lock-wallpaper-file').click();
+    $('v26-preview-lock').onclick=()=>showLock(true);
+    $('v26-lock-wallpaper-file').addEventListener('change',async e=>{
+      const files=e.target.files;if(!files||!files.length)return;
+      try{const list=Array.from(files);const videoFile=list.find(f=>f.type.startsWith('video/')||/\.(mp4|mov|m4v|webm|3gp)$/i.test(f.name));let video=!!videoFile,data;
+        if(videoFile){data=await readAsDataURL(videoFile);}else{const file=list[0];const embedded=await extractEmbeddedMotionVideo(file);if(embedded){video=true;data=await readAsDataURL(embedded);}else if(file.type==='image/gif'||/\.gif$/i.test(file.name)){data=await readAsDataURL(file);}else{data=await compressImage(file,{quality:.88,maxWidth:1440,maxHeight:2560});}}
+        db.lockScreenWallpaper=data;db.lockScreenWallpaperType=video?'video':'image';await saveData();renderLockPreview();applyLockWallpaper();showToast(video?'动态视频已导入，锁屏将循环播放':'未识别到实况视频数据：当前只读到了 JPG 画面，请检查原图或配套视频');
+      }catch(err){console.error(err);showToast('壁纸读取失败，请选择原始视频或较小的文件');}finally{e.target.value='';}
+    });
+    $('v26-lock-password-toggle').onchange=async e=>{
+      if(e.target.checked){
+        if(!db.lockScreenPasswordHash){e.target.checked=false;const ok=await setPasswordFlow();if(ok){e.target.checked=true;db.lockScreenPasswordEnabled=true;await saveData();updatePasswordStatus();}}
+        else{db.lockScreenPasswordEnabled=true;await saveData();updatePasswordStatus();}
+      }else{db.lockScreenPasswordEnabled=false;await saveData();updatePasswordStatus();}
+    };
+    $('v26-change-lock-password').onclick=async()=>{const ok=await setPasswordFlow();if(ok){if($('v26-lock-password-toggle'))$('v26-lock-password-toggle').checked=true;db.lockScreenPasswordEnabled=true;await saveData();updatePasswordStatus();showToast('锁屏密码已更新');}};
+    renderLockPreview();updatePasswordStatus();updateLockEnabledStatus();
+  }
+  function updateLockEnabledStatus(){const enabled=!(window.db&&db.lockScreenEnabled===false);const toggle=$('v26-lock-enabled-toggle'),status=$('v26-lock-enabled-status');if(toggle)toggle.checked=enabled;if(status)status.textContent=enabled?'开启后进入应用时显示锁屏':'已关闭锁屏，打开应用时直接进入内容';}
+  function updatePasswordStatus(){const enabled=!!(window.db&&db.lockScreenPasswordEnabled&&db.lockScreenPasswordHash);const status=$('v26-lock-password-status'),toggle=$('v26-lock-password-toggle');if(status)status.textContent=enabled?'当前：密码解锁':'当前：滑动解锁';if(toggle)toggle.checked=enabled;}
+  function renderLockPreview(){const el=$('v26-lock-preview');if(!el)return;el.innerHTML='';const url=(window.db&&db.lockScreenWallpaper)||COVER;const type=(window.db&&db.lockScreenWallpaperType)||'image';if(type==='video'){const v=document.createElement('video');v.src=url;v.autoplay=true;v.loop=true;v.muted=true;v.playsInline=true;Object.assign(v.style,{width:'100%',height:'100%',objectFit:'cover'});el.appendChild(v);}else{el.style.backgroundImage=`url("${url}")`;}}
+  function applyLockWallpaper(){const el=$('v26-lock-bg');if(!el)return;el.innerHTML='';const url=(window.db&&db.lockScreenWallpaper)||COVER;const type=(window.db&&db.lockScreenWallpaperType)||'image';if(type==='video'){el.style.backgroundImage='none';const v=document.createElement('video');v.src=url;v.autoplay=true;v.loop=true;v.muted=true;v.playsInline=true;v.className='v26-lock-bg';el.replaceWith(v);v.id='v26-lock-bg';const play=v.play();if(play&&play.catch)play.catch(()=>{});}else{if(el.tagName.toLowerCase()==='video'){const d=document.createElement('div');d.id='v26-lock-bg';d.className='v26-lock-bg';el.replaceWith(d);return applyLockWallpaper();}el.style.backgroundImage=`url("${url}")`;}}
+  function updateLockClock(){const d=new Date();const time=$('v26-lock-time'),date=$('v26-lock-date'),overlay=$('lockscreen-overlay');if(time)time.textContent=d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false});if(date)date.textContent=d.toLocaleDateString('zh-CN',{weekday:'long',month:'long',day:'numeric'});const isNight=!!(window.db&&db.homeScreenMode==='night');const color=isNight?'#202020':'#fff';if(overlay){overlay.style.setProperty('--v26-lock-clock-color',color);overlay.classList.toggle('v26-clock-dark',isNight);}}window.updateV26LockClock=updateLockClock;
+  function showLock(force){const overlay=$('lockscreen-overlay');if(!overlay)return;if(!force&&window.db&&db.lockScreenEnabled===false)return;ensureSettingsScreen();applyLockWallpaper();updateLockClock();overlay.classList.add('v26-visible');overlay.setAttribute('aria-hidden','false');renderUnlockMode();if(force){const active=document.querySelector('.screen.active');if(active&&active.id!=='home-screen')window.switchScreen('home-screen',true);}}
+  function hideLock(){const overlay=$('lockscreen-overlay');if(!overlay)return;overlay.classList.remove('v26-visible');overlay.setAttribute('aria-hidden','true');}
+  function renderUnlockMode(){
+    const bottom=$('v26-lock-bottom');if(!bottom)return;
+    const overlay=$('lockscreen-overlay');
+    if(window.db&&db.lockScreenPasswordEnabled&&db.lockScreenPasswordHash){
+      if(overlay)overlay.classList.add('v26-password-mode');
+      bottom.innerHTML=`<div class="v26-passcode-panel"><div class="v26-lock-pass-dots">${Array.from({length:4},(_,i)=>`<span data-lock-dot="${i}"></span>`).join('')}</div><div class="v26-lock-pass-error" id="v26-lock-pass-error"></div><div class="v26-lock-pass-keypad">${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>`<button type="button" data-lock-key="${k}">${k==='⌫'?'⌫':k}</button>`).join('')}</div><button class="v26-lock-pass-submit" id="v26-lock-pass-submit" type="button">确认</button></div>`;
+      let digits='',checking=false;const update=()=>{bottom.querySelectorAll('[data-lock-dot]').forEach((d,i)=>d.classList.toggle('filled',i<Math.min(4,digits.length)));const submit=$('v26-lock-pass-submit');if(submit)submit.style.display=digits.length===4?'block':'none';};
+      const verify=async()=>{if(checking||digits.length<4)return;checking=true;const attempt=digits;const hash=await hashPassword(attempt);if(hash===db.lockScreenPasswordHash){hideLock();digits='';}else if(attempt.length===6){const err=$('v26-lock-pass-error');if(err)err.textContent='密码不正确，请重试';digits='';setTimeout(()=>{if(bottom.isConnected){update();const e=$('v26-lock-pass-error');if(e)e.textContent='';}},700);}else{const err=$('v26-lock-pass-error');if(err)err.textContent='';}checking=false;update();};
+      bottom.querySelectorAll('[data-lock-key]').forEach(b=>b.onclick=async()=>{if(checking)return;const k=b.dataset.lockKey;if(k==='⌫')digits=digits.slice(0,-1);else if(k)digits+=k;digits=digits.slice(0,6);update();const err=$('v26-lock-pass-error');if(err)err.textContent='';if(digits.length===4){const hash=await hashPassword(digits);if(hash===db.lockScreenPasswordHash){hideLock();digits='';return;}}if(digits.length===6)await verify();});
+      $('v26-lock-pass-submit').onclick=verify;
+    }else{if(overlay)overlay.classList.remove('v26-password-mode');bottom.innerHTML=`<button class="v26-lock-triangle" id="v26-swipe-unlock" type="button" aria-label="解锁" title="解锁"><span aria-hidden="true">⌃</span></button>`;$('v26-swipe-unlock').onclick=hideLock;}
+  }
+  function collectLockScreenDigits(title, subtitle, expectedHash){
+    return new Promise(resolve=>{
+      const overlay=document.createElement('div');overlay.className='v26-setpass-overlay';let digits='',checking=false;
+      overlay.innerHTML=`<div class="v26-setpass-card"><button class="v26-setpass-close" aria-label="取消">×</button><div class="v26-setpass-title">${title}</div><div class="v26-setpass-sub">${subtitle||'请输入 4 位数字密码'}</div><div class="v26-setpass-dots">${Array.from({length:4},(_,i)=>`<span data-dot="${i}"></span>`).join('')}</div><div class="v26-setpass-error"></div><div class="v26-setpass-keypad">${['1','2','3','4','5','6','7','8','9','','0','⌫'].map(k=>`<button type="button" data-key="${k}">${k==='⌫'?'⌫':k}</button>`).join('')}</div></div>`;
+      document.body.appendChild(overlay);const finish=v=>{overlay.remove();resolve(v);};const update=()=>overlay.querySelectorAll('[data-dot]').forEach((d,i)=>d.classList.toggle('filled',i<Math.min(4,digits.length)));
+      const tryVerify=async(force=false)=>{if(checking)return;checking=true;const attempt=digits;const hash=await hashPassword(attempt);if(hash===expectedHash){finish(attempt);return;}if(attempt.length>=6||force){overlay.querySelector('.v26-setpass-error').textContent='密码不正确，请重新输入';digits='';update();setTimeout(()=>{if(overlay.isConnected)overlay.querySelector('.v26-setpass-error').textContent='';},700);}checking=false;};
+      overlay.querySelector('.v26-setpass-close').onclick=()=>finish(null);overlay.addEventListener('click',e=>{if(e.target===overlay)finish(null);});
+      overlay.querySelectorAll('[data-key]').forEach(b=>b.onclick=async()=>{if(checking)return;const k=b.dataset.key;if(k==='⌫')digits=digits.slice(0,-1);else if(k)digits+=k;digits=digits.slice(0,6);update();overlay.querySelector('.v26-setpass-error').textContent='';if(expectedHash){if(digits.length===4){const hash=await hashPassword(digits);if(hash===expectedHash){finish(digits);return;}}if(digits.length===6)await tryVerify();}else if(digits.length===4){setTimeout(()=>finish(digits),120);}});
+    });
+  }
+  async function setPasswordFlow(){
+    const oldHash=String(db.lockScreenPasswordHash||'');
+    if(oldHash){const current=await collectLockScreenDigits('验证锁屏密码','输入当前密码（原来的 4 位密码可直接验证）',oldHash);if(current===null)return false;}
+    const first=await collectLockScreenDigits('设置锁屏密码','设置 4 位数字密码');if(first===null)return false;
+    const second=await collectLockScreenDigits('确认锁屏密码','再输入一次，确认新密码');if(second===null)return false;
+    if(first!==second){showToast('两次密码不一致，请重新设置');return false;}
+    db.lockScreenPasswordHash=await hashPassword(first);db.lockScreenPasswordLength=4;return true;
+  }
+  function bindSwipe(){const overlay=$('lockscreen-overlay');if(!overlay||overlay.dataset.v26Swipe==='1')return;overlay.dataset.v26Swipe='1';let startY=null;overlay.addEventListener('touchstart',e=>{if(!overlay.classList.contains('v26-visible'))return;startY=e.touches[0].clientY;},{passive:true});overlay.addEventListener('touchend',e=>{if(startY===null)return;const dy=startY-e.changedTouches[0].clientY;startY=null;if(dy>65&&!(db&&db.lockScreenPasswordEnabled&&db.lockScreenPasswordHash)){hideLock();}},{passive:true});}
+  window.v26RenderLockSettings=()=>{ensureSettingsScreen();renderLockPreview();updatePasswordStatus();};
+  let initialized=false;
+  function init(){if(initialized||!window.db)return;initialized=true;if(typeof db.lockScreenEnabled!=='boolean')db.lockScreenEnabled=true;if(!db.lockScreenWallpaper)db.lockScreenWallpaper=COVER;if(!db.lockScreenWallpaperType)db.lockScreenWallpaperType='image';if(typeof db.lockScreenPasswordEnabled!=='boolean')db.lockScreenPasswordEnabled=false;ensureSettingsScreen();bindSwipe();updateLockClock();setInterval(updateLockClock,15000);applyLockWallpaper();
+    // 仅将原先的默认朋友圈封面迁移为用户指定图片，保留用户已经自定义的封面。
+    if(db.myProfile&&(!db.myProfile.cover||db.myProfile.cover==='https://imgbed.heliar.top/i/jZ1OI1whdv32dikS_IMG_20261004_034256.jpg')){db.myProfile.cover=COVER;if(typeof saveData==='function')saveData();}
+    // 每次重新打开应用时显示锁屏；未设置密码时使用滑动手势或底部小三角解锁。
+    if(db.lockScreenEnabled!==false)showLock(false);
+  }
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(init,500));setTimeout(init,1200);
 })();
 </script>
 
