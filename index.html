@@ -139,6 +139,7 @@ body {
   padding: 5px 10px !important;
   width: auto !important; height: auto !important;
 }
+
 /* ==========================================================
    功能结束：通用顶栏
    ========================================================== */
@@ -2300,6 +2301,8 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 .tpl-toolbar .tpl-save-btn:active { background: #111; }
 .tpl-toolbar .tpl-del-btn:active { background: #ffd0d0; }
+@media(max-width:380px){ .tpl-toolbar { gap:5px; } .tpl-toolbar .tpl-save-btn,.tpl-toolbar .tpl-del-btn { padding:8px 9px; font-size:12px; } }
+
 /* ==========================================================
    功能结束：模板工具条
    ========================================================== */
@@ -3478,6 +3481,10 @@ body {
 
 <style id="v26-korean-lockscreen-wallpaper">
 /* v26：仅系统美化/锁屏组件；微信消息、转账和微信 CSS 美化区域不套用本主题 */
+/* CSS美化二级菜单：列表留白与上一级“美化设置”菜单保持一致 */
+#css-beautify-screen .content { padding-left: 8px !important; padding-right: 8px !important; box-sizing: border-box; }
+#css-beautify-screen .list-container { width: 100%; max-width: none; margin: 0 auto; }
+#css-beautify-screen .settings-list-item { width: 100%; min-height: 64px; padding: 16px 14px; box-sizing: border-box; }
 /* 设置与美化菜单统一加宽：减少两侧留白，让列表栏更贴近屏幕边缘 */
 #settings-menu-screen .content, #beautify-menu-screen .content, #beautify-settings-screen .content, #customize-screen .content { padding-left: 8px !important; padding-right: 8px !important; box-sizing:border-box; }
 #settings-menu-screen .list-container, #beautify-menu-screen .list-container, #beautify-settings-screen .list-container { width:100%; max-width:none; margin:0 auto; }
@@ -3625,6 +3632,22 @@ body {
  #sound-settings-screen #preview-sms-btn, #sound-settings-screen #reset-sms-btn, #sound-settings-screen #preview-special-btn, #sound-settings-screen #reset-special-btn, #sound-settings-screen #preview-call-btn, #sound-settings-screen #reset-call-btn { padding:0 8px !important; }
 }
 </style>
+
+<style id="remove-phone-safe-area-gap-from-app-layout">
+/* 修复手机端页面容器顶部多出一整条系统状态栏高度的空白；安全区只由宿主系统处理，不再重复叠加到应用页面。 */
+:root { --safe-top: 0px !important; }
+html, body { margin-top: 0 !important; padding-top: 0 !important; }
+body { padding-block-start: 0 !important; }
+.phone-screen { margin-top: 0 !important; padding-top: 0 !important; inset-block-start: 0 !important; }
+@media (max-width: 480px) {
+  html, body { margin-top: 0 !important; padding-top: 0 !important; }
+  .phone-screen { margin-top: 0 !important; padding-top: 0 !important; }
+  .app-header, #chat-list-screen .wechat-header, #contacts-screen .wechat-header {
+    margin-top: 0 !important;
+    padding-top: 12px !important;
+  }
+}
+</style>
 </head>
 <body>
 <div class="phone-screen">
@@ -3632,7 +3655,7 @@ body {
 <!-- ==========================================================
      功能开始：自定义状态栏
      ========================================================== -->
-<div id="custom-status-bar" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 26px; padding: 0 15px; background: transparent; z-index: 9999; align-items: center; justify-content: space-between; font-size: 12px; color: #333; font-family: -apple-system, sans-serif; pointer-events: none; box-sizing: border-box;">
+<div id="custom-status-bar" style="display: none; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 100%; height: 26px; padding: 0 15px; background: transparent; z-index: 9999; align-items: center; justify-content: space-between; font-size: 12px; color: #333; font-family: -apple-system, sans-serif; pointer-events: none; box-sizing: border-box;">
   <div id="status-time" style="font-weight: 500;">17:05</div>
   <div style="display: flex; align-items: center; gap: 4px;">
     <div id="status-signal" style="font-size: 10px; font-weight: bold;">5G</div>
@@ -3900,6 +3923,10 @@ body {
         <div class="item-details"><div class="item-name">声音设置</div><div style="font-size:12px;color:#999;margin-top:4px">MiniMax 官方语音接入与角色音色</div></div>
         <div class="item-arrow">›</div>
       </li>
+      <li class="settings-list-item" id="go-to-update-log-btn">
+        <div class="item-details"><div class="item-name">更新日志</div><div style="font-size:12px;color:#999;margin-top:4px">查看当前基础功能与更新内容</div></div>
+        <div class="item-arrow">›</div>
+      </li>
       <li class="settings-list-item" id="go-to-tutorial-btn">
         <div class="item-details"><div class="item-name">旧版教程</div></div>
         <div class="item-arrow">›</div>
@@ -3955,7 +3982,7 @@ body {
       </label>
     </li>
     <li class="settings-list-item" style="justify-content: space-between;">
-      <div class="item-details"><div class="item-name">顶栏设置</div></div>
+      <div class="item-details"><div class="item-name">状态栏设置</div></div>
       <label class="switch" style="margin: 0;">
         <input type="checkbox" id="setting-status-bar-toggle">
         <span class="slider round"></span>
@@ -7189,6 +7216,10 @@ document.getElementById('sound-settings-screen').innerHTML = `<header class="app
 document.getElementById('customize-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="beautify-settings-screen">‹</button><div class="title-container"><h1 class="title">主屏幕自定义</h1></div><div class="placeholder"></div></header><main class="content"><form id="customize-form"></form></main>`;
 
 document.getElementById('tutorial-screen').innerHTML = `<header class="app-header"><button class="back-btn" data-target="home-screen">‹</button><div class="title-container"><h1 class="title">教程</h1></div><div class="placeholder"></div></header><main class="content" id="tutorial-content-area"></main>`;
+
+/* 更新日志独立页面：旧版教程内容保持原样 */
+const updateLogScreen = document.getElementById('update-log-screen') || (()=>{const d=document.createElement('div');d.id='update-log-screen';d.className='screen system-panel';document.getElementById('tutorial-screen').parentElement.appendChild(d);return d;})();
+updateLogScreen.innerHTML = `<header class="app-header"><button class="back-btn" data-target="settings-menu-screen">‹</button><div class="title-container"><h1 class="title">更新日志</h1></div><div class="placeholder"></div></header><main class="content" style="padding:18px 16px 32px;background:#f5f5f5;min-height:100%;box-sizing:border-box"><section style="background:#fff;border:1px solid #e8e8e8;border-radius:14px;padding:18px 16px"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px"><strong style="font-size:16px;color:#292929">基础功能汇总</strong><span style="font-size:12px;color:#777">更新者：璟</span></div><p style="margin:0;color:#555;font-size:14px;line-height:1.9">支持聊天与群聊、世界书、API配置、壁纸字体美化、声音音效、桌面自定义、数据备份导入及多项便捷工具。</p></section></main>`;
 /* ==========================================================
    功能结束：动态注入 HTML
    ========================================================== */
@@ -8024,6 +8055,8 @@ if (!db.myProfile) {
   if (!db.myProfile.worldBookIds) db.myProfile.worldBookIds = [];
 }
   if (db.statusBarEnabled === undefined) db.statusBarEnabled = false;
+  if (db.statusBarHeight === undefined) db.statusBarHeight = 26;
+  if (db.statusBarWidth === undefined) db.statusBarWidth = 100;
   if (db.safeAreaEnabled === undefined) db.safeAreaEnabled = true;
   if (db.timeFormat24h === undefined) db.timeFormat24h = true;
 
@@ -15587,13 +15620,16 @@ function setupBeautifySettings() {
 
   applyCustomCss();
 
+  // 内置模板只是可编辑的起点；用户可继续修改任意 CSS 选择器与属性。
+
+
   const renderBeautifyPreview = (prefix, cssText) => {
     const previewBox = document.getElementById(`${prefix}-css-preview`);
     if (!previewBox) return;
     previewBox.innerHTML = `<div class="preview-tip">实时预览</div>`;
     if (!cssText.trim()) return;
     const styleTag = document.createElement('style');
-    const scopedCss = cssText.replace(/(\.message-bubble|\.voice-bubble|\.image-bubble|\.transfer-card|\.gift-card|\.pv-card|\.static-location-card|\.heart-card|\.heart-card-body|\.chat-item|\.offline-bubble|\.offline-card-header|\.offline-turn-badge)/g, `#${prefix}-css-preview $1`);
+    const scopedCss = cssText.replace(/(\.message-bubble|\.voice-bubble|\.image-bubble|\.transfer-card|\.gift-card|\.pv-card|\.static-location-card|\.heart-card|\.heart-card-body|\.chat-item|\.chat-avatar|\.item-name|\.item-preview|\.offline-bubble|\.offline-bubble-wrapper|\.offline-card-header|\.offline-turn-badge|\.system-notification-bubble|\.wechat-input-bar)/g, `#${prefix}-css-preview $1`);
     styleTag.textContent = scopedCss;
     previewBox.appendChild(styleTag);
 
@@ -15602,7 +15638,7 @@ function setupBeautifySettings() {
     } else if (prefix === 'bubble' || prefix === 'online') {
       previewBox.innerHTML += `<div style="display:flex;flex-direction:column;width:100%;gap:10px;"><div class="message-bubble received">对方气泡预览</div><div class="message-bubble sent" style="align-self:flex-end;">我方气泡预览</div></div>`;
     } else if (prefix === 'list') {
-      previewBox.innerHTML += `<div class="chat-item"><div class="chat-avatar" style="width:40px;height:40px;background:#ccc;border-radius:4px;margin-right:12px;"></div><div class="item-details"><div class="item-name">聊天对象</div><div class="item-preview">最后一条消息内容</div></div></div>`;
+      previewBox.innerHTML += `<div class="chat-item" style="display:flex;align-items:center;padding:12px;width:100%;box-sizing:border-box;"><div class="chat-avatar" style="flex:0 0 40px;width:40px;height:40px;background:linear-gradient(135deg,#dbeafe,#93c5fd);border-radius:50%;margin-right:12px;"></div><div class="item-details" style="min-width:0;flex:1;"><div class="item-name">聊天对象</div><div class="item-preview">最后一条消息内容</div></div></div>`;
     } else if (prefix === 'offline') {
       previewBox.innerHTML += `<div class="offline-bubble-wrapper"><div class="offline-bubble-container"><div class="offline-bubble"><div class="offline-card-header"><img src="https://i.postimg.cc/Y96LPskq/o-o-2.jpg"><span>角色名</span></div><div class="offline-bubble-text">这是线下剧情的卡片预览。</div></div></div></div>`;
     }
@@ -16521,8 +16557,8 @@ function renderTutorialContent() {
   const tutorials = [
     { title: '写在前面', imageUrls: ['https://i.postimg.cc/7PgyMG9S/image.jpg'] },
     { title: '软件介绍', imageUrls: ['https://i.postimg.cc/VvsJRh6q/IMG-20250713-162647.jpg', 'https://i.postimg.cc/8P5FfxxD/IMG-20250713-162702.jpg', 'https://i.postimg.cc/3r94R3Sn/IMG-20250713-162712.jpg'] },
-    { title: '微信', imageUrls: ['https://i.postimg.cc/x8scFPJW/IMG-20250713-162756.jpg', 'https://i.postimg.cc/pX6mfqtj/IMG-20250713-162809.jpg', 'https://i.postimg.cc/YScjV00q/IMG-20250713-162819.jpg', 'https://i.postimg.cc/13VfJw9j/IMG-20250713-162828.jpg'] },
-    { title: '微信-群聊', imageUrls: ['https://i.postimg.cc/X7LSmRTJ/404.jpg'] }
+    { title: '404', imageUrls: ['https://i.postimg.cc/X7LSmRTJ/404.jpg', 'https://i.postimg.cc/X7LSmRTJ/404.jpg', 'https://i.postimg.cc/X7LSmRTJ/404.jpg', 'https://i.postimg.cc/X7LSmRTJ/404.jpg'] },
+    { title: '404群聊', imageUrls: ['https://i.postimg.cc/X7LSmRTJ/404.jpg'] }
   ];
   tutorialContentArea.innerHTML = '';
   tutorials.forEach(tutorial => {
@@ -16582,6 +16618,8 @@ const homeScreenHTML = `
   if (lockBtn) lockBtn.onclick = () => { if (window.v26RenderLockSettings) window.v26RenderLockSettings(); switchScreen('lockscreen-settings-screen'); };
   const tutBtn = document.getElementById('go-to-tutorial-btn');
   if (tutBtn) tutBtn.onclick = () => { renderTutorialContent(); switchScreen('tutorial-screen'); };
+  const updateLogBtn = document.getElementById('go-to-update-log-btn');
+  if (updateLogBtn) updateLogBtn.onclick = () => switchScreen('update-log-screen');
   const nightModeToggle = document.getElementById('setting-night-mode-toggle');
   if (nightModeToggle) {
     nightModeToggle.checked = (db.homeScreenMode === 'night');
@@ -16654,6 +16692,7 @@ function setupStatusBar() {
   const customStatusBar = document.getElementById('custom-status-bar');
   if (!statusBarToggle || !customStatusBar) return;
   statusBarToggle.checked = !!db.statusBarEnabled;
+
   function updateStatusBarTime() {
     const now = new Date();
     const timeEl = document.getElementById('status-time');
@@ -16681,8 +16720,8 @@ function setupStatusBar() {
   statusBarToggle.addEventListener('change', async (e) => {
     db.statusBarEnabled = e.target.checked;
     await saveData();
-    if (db.statusBarEnabled) { customStatusBar.classList.add('visible'); updateStatusBarTime(); showToast('顶栏已开启'); }
-    else { customStatusBar.classList.remove('visible'); showToast('顶栏已关闭'); }
+    if (db.statusBarEnabled) { customStatusBar.classList.add('visible'); updateStatusBarTime(); showToast('状态栏已开启'); }
+    else { customStatusBar.classList.remove('visible'); showToast('状态栏已关闭'); }
   });
   if (db.statusBarEnabled) { customStatusBar.classList.add('visible'); updateStatusBarTime(); }
   setInterval(updateStatusBarTime, 60000);
